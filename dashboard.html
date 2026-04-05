@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사군자 티오방 스코어 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a2e1a 0%, #0f1f0f 100%);
+      border-bottom: 1px solid #2d4a2d;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #7ec87e;
+      letter-spacing: -0.5px;
+    }
+    .header-left p {
+      font-size: 12px;
+      color: #6b8f6b;
+      margin-top: 2px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: #2d4a2d;
+      border: 1px solid #3d6a3d;
+      color: #7ec87e;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .refresh-btn:hover { background: #3d6a3d; }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #7ec87e;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Layout ── */
+    .container { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1e2e1e;
+      padding-bottom: 0;
+    }
+    .tab {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6b8f6b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: #a8d4a8; }
+    .tab.active { color: #7ec87e; border-bottom-color: #7ec87e; }
+
+    /* ── Summary Cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .card-sm {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .card-sm .label {
+      font-size: 12px;
+      color: #6b8f6b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .card-sm .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #e2e8f0;
+      line-height: 1;
+    }
+    .card-sm .sub {
+      font-size: 12px;
+      color: #4a6a4a;
+    }
+    .card-sm .accent { color: #7ec87e; }
+
+    /* ── Two Column ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .three-col {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .full-col { margin-bottom: 16px; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #a8d4a8;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title span { font-size: 16px; }
+
+    /* ── Ranking Table ── */
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .rank-table th {
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #4a6a4a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #21262d;
+    }
+    .rank-table th.right { text-align: right; }
+    .rank-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #1a1f26;
+      vertical-align: middle;
+    }
+    .rank-table tr:last-child td { border-bottom: none; }
+    .rank-table tr:hover td { background: #1a2033; }
+
+    .rank-num {
+      font-size: 12px;
+      color: #4a6a4a;
+      font-weight: 600;
+      width: 28px;
+    }
+    .rank-num.top3 { color: #f0b429; font-size: 14px; }
+
+    .player-name {
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .score-val {
+      text-align: right;
+      font-weight: 700;
+      font-size: 15px;
+      color: #e2e8f0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rounds-val {
+      text-align: right;
+      font-size: 12px;
+      color: #4a6a4a;
+    }
+
+    /* ── Tier Badge ── */
+    .tier-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .tier-0 { background: #1a3a2a; color: #4ade80; border: 1px solid #2d5a3d; }
+    .tier-1 { background: #1a2a3a; color: #60a5fa; border: 1px solid #2d4a6a; }
+    .tier-2 { background: #2a2a1a; color: #facc15; border: 1px solid #5a5a2d; }
+    .tier-3 { background: #2a1a2a; color: #c084fc; border: 1px solid #5a3a6a; }
+    .tier-4 { background: #2a1a1a; color: #f87171; border: 1px solid #6a3a3a; }
+    .tier-5 { background: #1a1a1a; color: #94a3b8; border: 1px solid #3a3a4a; }
+
+    /* ── Bar ── */
+    .score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .score-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: #2d4a2d;
+      flex: 1;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #4ade80, #7ec87e);
+    }
+
+    /* ── Chart container ── */
+    .chart-wrap {
+      position: relative;
+      height: 200px;
+    }
+
+    /* ── Matchplay ── */
+    .win-rate-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #21262d;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .win-rate-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* ── Heatmap ── */
+    .heatmap-wrap { overflow-x: auto; }
+    .heatmap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 600px;
+    }
+    .heatmap-table th {
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 10px;
+      color: #4a6a4a;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .heatmap-table th.name-col { text-align: left; padding-left: 8px; }
+    .heatmap-table td {
+      padding: 4px;
+      text-align: center;
+      border: 1px solid #1a1f26;
+    }
+    .heatmap-table td.name-cell {
+      text-align: left;
+      padding-left: 8px;
+      font-weight: 500;
+      color: #c8d8c8;
+      white-space: nowrap;
+    }
+    .hm-yes {
+      background: #1a3a2a;
+      color: #4ade80;
+      font-weight: 700;
+      border-radius: 3px;
+    }
+    .hm-no {
+      background: #161b22;
+      color: #2a3a2a;
+    }
+    .hm-score {
+      background: #1a2e3a;
+      color: #60a5fa;
+      font-weight: 600;
+      border-radius: 3px;
+    }
+
+    /* ── Personal Best ── */
+    .best-list { display: flex; flex-direction: column; gap: 8px; }
+    .best-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .best-rank { font-size: 11px; color: #4a6a4a; width: 20px; }
+    .best-name { flex: 1; font-size: 13px; color: #c8d8c8; }
+    .best-score {
+      font-size: 15px;
+      font-weight: 700;
+      color: #4ade80;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #4a6a4a;
+      font-size: 14px;
+      gap: 10px;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid #2d4a2d;
+      border-top-color: #7ec87e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Page visibility ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Scrollable table ── */
+    .table-scroll { max-height: 400px; overflow-y: auto; }
+    .table-scroll::-webkit-scrollbar { width: 4px; }
+    .table-scroll::-webkit-scrollbar-track { background: #0f1117; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #2d4a2d; border-radius: 2px; }
+
+    /* ── Tier section ── */
+    .tier-section { margin-bottom: 12px; }
+    .tier-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: #0f1117;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+    .tier-header .tier-name { font-size: 13px; font-weight: 600; }
+    .tier-header .tier-count { font-size: 11px; color: #4a6a4a; }
+    .tier-header .tier-avg { font-size: 12px; color: #4a6a4a; margin-left: auto; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>⛳ 사군자 티오방</h1>
+    <p id="last-updated">데이터 로딩 중...</p>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <button class="refresh-btn" onclick="loadAll()">↻ 새로고침</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">전체 현황</div>
+    <div class="tab" onclick="switchTab('ranking')">랭킹</div>
+    <div class="tab" onclick="switchTab('tier')">티어</div>
+    <div class="tab" onclick="switchTab('matchplay')">매치플레이</div>
+    <div class="tab" onclick="switchTab('attendance')">참가 현황</div>
+  </div>
+
+  <div id="loading" class="loading"><div class="spinner"></div> 구글 시트에서 데이터 불러오는 중...</div>
+
+  <!-- ──────────────── TAB: 전체 현황 ──────────────── -->
+  <div id="page-overview" class="page">
+
+    <div class="summary-grid">
+      <div class="card card-sm">
+        <div class="label">전체 멤버</div>
+        <div class="value" id="stat-total">-</div>
+        <div class="sub">등록 인원</div>
+      </div>
+      <div class="card card-sm">
+        <div class="label">시즌 라운드</div>
+        <div class="value accent" id="stat-rounds">-</div>
+        <div class="sub">누적 대회 수</div>
+      </div>
+      <div class="card card-sm">
+        <div class="label">최저 누적평균</div>
+        <div class="value" id="stat-best-avg">-</div>
+        <div class="sub" id="stat-best-name">-</div>
+      </div>
+      <div class="card card-sm">
+        <div class="label">개인 베스트</div>
+        <div class="value accent" id="stat-best-score">-</div>
+        <div class="sub" id="stat-best-score-name">-</div>
+      </div>
+    </div>
+
+    <div class="three-col">
+      <!-- 누적평균 TOP 10 -->
+      <div class="card">
+        <div class="card-title"><span>🏆</span> 누적평균 TOP 10</div>
+        <div class="table-scroll">
+          <table class="rank-table" id="top10-table">
+            <thead><tr>
+              <th>#</th><th>선수</th><th>티어</th>
+              <th class="right">평균</th><th class="right">라운드</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 티어 분포 차트 -->
+      <div class="card">
+        <div class="card-title"><span>📊</span> 티어 분포</div>
+        <div class="chart-wrap">
+          <canvas id="tier-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 개인 베스트 TOP 5 -->
+      <div class="card">
+        <div class="card-title"><span>🎯</span> 개인 베스트 TOP 5</div>
+        <div class="best-list" id="best-list"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- 가중평균 랭킹 TOP 10 -->
+      <div class="card">
+        <div class="card-title"><span>⚡</span> 가중평균 TOP 10 <small style="font-size:11px;color:#4a6a4a;font-weight:400">(누적평균 + 최근스코어) ÷ 2</small></div>
+        <table class="rank-table" id="weighted-table">
+          <thead><tr>
+            <th>#</th><th>선수</th><th>티어</th>
+            <th class="right">가중평균</th><th class="right">최근</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- 매치플레이 TOP 5 -->
+      <div class="card">
+        <div class="card-title"><span>⚔️</span> 매치플레이 TOP 5</div>
+        <div id="mp-overview"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ──────────────── TAB: 랭킹 ──────────────── -->
+  <div id="page-ranking" class="page">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span>📈</span> 누적평균 전체 랭킹</div>
+        <div class="table-scroll" style="max-height:600px">
+          <table class="rank-table" id="full-rank-table">
+            <thead><tr>
+              <th>#</th><th>선수</th><th>티어</th>
+              <th class="right">누적평균</th><th class="right">베스트</th><th class="right">라운드</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>⚡</span> 가중평균 전체 랭킹</div>
+        <div class="table-scroll" style="max-height:600px">
+          <table class="rank-table" id="weighted-full-table">
+            <thead><tr>
+              <th>#</th><th>선수</th><th>티어</th>
+              <th class="right">가중평균</th><th class="right">누적평균</th><th class="right">최근</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────── TAB: 티어 ──────────────── -->
+  <div id="page-tier" class="page">
+    <div class="card">
+      <div class="card-title"><span>🎖️</span> 티어별 현황</div>
+      <div id="tier-sections"></div>
+    </div>
+  </div>
+
+  <!-- ──────────────── TAB: 매치플레이 ──────────────── -->
+  <div id="page-matchplay" class="page">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><span>⚔️</span> 매치플레이 랭킹</div>
+        <div class="table-scroll" style="max-height:500px">
+          <table class="rank-table" id="mp-table">
+            <thead><tr>
+              <th>#</th><th>선수</th>
+              <th class="right">횟수</th><th class="right">평균</th>
+              <th class="right">승리</th><th class="right">승률</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📊</span> 승률 차트</div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="mp-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────── TAB: 참가 현황 ──────────────── -->
+  <div id="page-attendance" class="page">
+    <div class="card full-col">
+      <div class="card-title"><span>📅</span> 대회별 참가 현황</div>
+      <div class="heatmap-wrap">
+        <div id="attendance-table"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+let DATA = {};
+let charts = {};
+
+async function fetchAllSheets() {
+  const res = await fetch('/api/data');
+  if (!res.ok) throw new Error(`서버 오류: ${res.status}`);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json; // { score: [...], ranking: [...], matchplay: [...], member: [...] }
+}
+
+// ── 탭 전환 ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('page-' + name).classList.add('active');
+}
+
+// ── 티어 배지 HTML ──
+function tierBadge(tier) {
+  const labels = { '0':'T0', '1':'T1', '2':'T2', '3':'T3', '4':'T4', '5':'T5' };
+  const t = String(tier);
+  return `<span class="tier-badge tier-${t}">${labels[t] || t}</span>`;
+}
+
+// ── 숫자 파싱 ──
+function num(v) { const n = parseFloat(v); return isNaN(n) ? null : n; }
+
+// ── 숫자 파싱 ──
+function num(v) { const n = parseFloat(String(v).replace('%','')); return isNaN(n) ? null : n; }
+
+// ── dict에서 키 찾기 (부분 일치) ──
+function findKey(obj, ...keywords) {
+  const keys = Object.keys(obj);
+  for (const kw of keywords) {
+    const k = keys.find(k => k.includes(kw));
+    if (k) return k;
+  }
+  return null;
+}
+
+// ── 데이터 로드 ──
+async function loadAll() {
+  document.getElementById('loading').style.display = 'flex';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  try {
+    const sheets = await fetchAllSheets();
+    DATA.score   = sheets.score   || [];
+    DATA.rank    = sheets.ranking || [];
+    DATA.mp      = sheets.matchplay || [];
+    DATA.member  = sheets.member  || [];
+
+    render();
+    document.getElementById('last-updated').textContent =
+      '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
+  } catch(e) {
+    document.getElementById('loading').innerHTML =
+      `<span style="color:#f87171">❌ 데이터 로드 실패: ${e.message}</span>`;
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('page-overview').classList.add('active');
+}
+
+// ── 전체 렌더 ──
+function render() {
+  const players    = parseScoreDicts(DATA.score);
+  const rankPlayers = parseRankDicts(DATA.rank);
+  const mpPlayers  = parseMPDicts(DATA.mp);
+
+  renderSummary(players);
+  renderTop10(players);
+  renderWeightedTop10(rankPlayers);
+  renderBestList(players);
+  renderTierChart(players);
+  renderMPOverview(mpPlayers);
+  renderFullRanking(players);
+  renderWeightedFull(rankPlayers);
+  renderTierSections(players);
+  renderMPTable(mpPlayers);
+  renderMPChart(mpPlayers);
+  renderAttendance(DATA.member);
+}
+
+// ── 스코어 집계 파싱 (dict 배열) ──
+function parseScoreDicts(dicts) {
+  if (!dicts || dicts.length === 0) return [];
+  const sample = dicts[0];
+  const avgKey    = findKey(sample, '누적평균');
+  const tierKey   = findKey(sample, '현재 티어', '티어');
+  const bestKey   = findKey(sample, '개인 베스트');
+  const roundKey  = findKey(sample, '라운드횟수', '라운드 횟수');
+  const recentKey = findKey(sample, '가장최근', '최근라운딩');
+  const mpCntKey  = findKey(sample, '매치 플레이 횟수', '매치플레이 횟수');
+  const mpAvgKey  = findKey(sample, '매치 플레이 평균', '매치플레이 평균');
+
+  // 대회 컬럼: 연도' N차 패턴
+  const contestKeys = Object.keys(sample).filter(k => /\d{2}' /.test(k) && !k.includes('매치'));
+  const mpContestKeys = Object.keys(sample).filter(k => /\d{2}' /.test(k) && k.includes('매치'));
+
+  const players = [];
+  for (const d of dicts) {
+    const name = d['이름']?.trim();
+    if (!name) continue;
+    const avg = num(d[avgKey]);
+    if (avg === null) continue;
+
+    players.push({
+      name,
+      avg,
+      tier: d[tierKey]?.trim() || '-',
+      best: num(d[bestKey]),
+      rounds: num(d[roundKey]),
+      recent: num(d[recentKey]),
+      mpCount: num(d[mpCntKey]),
+      mpAvg: num(d[mpAvgKey]),
+      scores: contestKeys.map(k => ({ name: k, score: num(d[k]) })),
+      mpScores: mpContestKeys.map(k => ({ name: k, score: num(d[k]) }))
+    });
+  }
+  return players.sort((a, b) => a.avg - b.avg);
+}
+
+// ── 순위 시트 파싱 (dict 배열) ──
+function parseRankDicts(dicts) {
+  if (!dicts || dicts.length === 0) return [];
+  const sample = dicts[0];
+  const avgKey    = findKey(sample, '누적평균');
+  const tierKey   = findKey(sample, '티어');
+  const recentKey = findKey(sample, '최근');
+  const wAvgKey   = findKey(sample, '가중평균');
+  const roundKey  = findKey(sample, '라운드');
+
+  const players = [];
+  for (const d of dicts) {
+    const name = d['이름']?.trim();
+    if (!name) continue;
+    const avg  = num(d[avgKey]);
+    const wAvg = num(d[wAvgKey]);
+    if (avg === null && wAvg === null) continue;
+
+    players.push({
+      name,
+      avg:    avg  || 0,
+      tier:   d[tierKey]?.trim() || '-',
+      recent: num(d[recentKey]),
+      wAvg:   wAvg || avg || 0,
+      rounds: num(d[roundKey])
+    });
+  }
+  return players.sort((a, b) => a.wAvg - b.wAvg);
+}
+
+// ── 매치플레이 파싱 (dict 배열) ──
+function parseMPDicts(dicts) {
+  if (!dicts || dicts.length === 0) return [];
+  const sample = dicts[0];
+  const cntKey  = findKey(sample, '매치 횟수', '횟수');
+  const avgKey  = findKey(sample, '매치 평균', '평균');
+  const winKey  = findKey(sample, '승리');
+  const rateKey = findKey(sample, '승률');
+
+  const players = [];
+  for (const d of dicts) {
+    const name = d['이름']?.trim();
+    if (!name) continue;
+    const count = num(d[cntKey]);
+    if (!count) continue;
+
+    players.push({
+      name,
+      count: count || 0,
+      avg:   num(d[avgKey]),
+      win:   num(d[winKey]) || 0,
+      rate:  num(d[rateKey])
+    });
+  }
+  return players.sort((a, b) => (b.rate || 0) - (a.rate || 0));
+}
+
+// ── Summary 카드 ──
+function renderSummary(players) {
+  document.getElementById('stat-total').textContent = players.length + '명';
+  if (players.length === 0) return;
+
+  // 대회 수: 첫 선수의 scores 배열 길이
+  const contestCount = players[0]?.scores?.length || 0;
+  document.getElementById('stat-rounds').textContent = contestCount + '회';
+
+  const best = players[0];
+  document.getElementById('stat-best-avg').textContent = best.avg.toFixed(1);
+  document.getElementById('stat-best-name').textContent = best.name;
+
+  const withBest = players.filter(p => p.best !== null).sort((a, b) => a.best - b.best);
+  if (withBest.length > 0) {
+    document.getElementById('stat-best-score').textContent = withBest[0].best;
+    document.getElementById('stat-best-score-name').textContent = withBest[0].name;
+  }
+}
+
+// ── TOP 10 테이블 ──
+function renderTop10(players) {
+  const tbody = document.querySelector('#top10-table tbody');
+  tbody.innerHTML = '';
+  const top = players.slice(0, 10);
+  const maxAvg = Math.max(...top.map(p => p.avg));
+  const minAvg = Math.min(...top.map(p => p.avg));
+
+  top.forEach((p, i) => {
+    const pct = maxAvg === minAvg ? 100 : Math.round(100 - ((p.avg - minAvg) / (maxAvg - minAvg)) * 80);
+    const rankClass = i < 3 ? 'top3' : '';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+    tbody.innerHTML += `<tr>
+      <td class="rank-num ${rankClass}">${medal}</td>
+      <td class="player-name">${p.name}</td>
+      <td>${tierBadge(p.tier)}</td>
+      <td class="score-val">${p.avg.toFixed(1)}</td>
+      <td class="rounds-val">${p.rounds ?? '-'}R</td>
+    </tr>`;
+  });
+}
+
+// ── 가중평균 TOP 10 ──
+function renderWeightedTop10(players) {
+  const tbody = document.querySelector('#weighted-table tbody');
+  tbody.innerHTML = '';
+  players.slice(0, 10).forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+    const rankClass = i < 3 ? 'top3' : '';
+    tbody.innerHTML += `<tr>
+      <td class="rank-num ${rankClass}">${medal}</td>
+      <td class="player-name">${p.name}</td>
+      <td>${tierBadge(p.tier)}</td>
+      <td class="score-val">${p.wAvg.toFixed(1)}</td>
+      <td class="rounds-val">${p.recent ?? '-'}</td>
+    </tr>`;
+  });
+}
+
+// ── 개인 베스트 TOP 5 ──
+function renderBestList(players) {
+  const el = document.getElementById('best-list');
+  const sorted = players.filter(p => p.best !== null).sort((a, b) => a.best - b.best).slice(0, 5);
+  el.innerHTML = sorted.map((p, i) => `
+    <div class="best-item">
+      <div class="best-rank">${i + 1}</div>
+      <div class="best-name">${p.name} ${tierBadge(p.tier)}</div>
+      <div class="best-score">${p.best}</div>
+    </div>
+  `).join('');
+}
+
+// ── 티어 차트 ──
+function renderTierChart(players) {
+  const counts = {};
+  players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
+  const labels = Object.keys(counts).sort();
+  const data = labels.map(t => counts[t]);
+  const colors = { '0':'#4ade80','1':'#60a5fa','2':'#facc15','3':'#c084fc','4':'#f87171','5':'#94a3b8' };
+
+  if (charts.tier) charts.tier.destroy();
+  const ctx = document.getElementById('tier-chart').getContext('2d');
+  charts.tier = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels.map(t => `T${t}`),
+      datasets: [{ data, backgroundColor: labels.map(t => colors[t] || '#666'), borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#a8d4a8', font: { size: 11 }, padding: 8 } }
+      }
+    }
+  });
+}
+
+// ── MP 요약 ──
+function renderMPOverview(players) {
+  const el = document.getElementById('mp-overview');
+  const top5 = players.slice(0, 5);
+  el.innerHTML = top5.map((p, i) => `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:13px;color:#c8d8c8">${i+1}. ${p.name}</span>
+        <span style="font-size:12px;color:#60a5fa">${p.rate !== null ? p.rate + '%' : '-'} 승률</span>
+      </div>
+      <div class="win-rate-bar">
+        <div class="win-rate-fill" style="width:${p.rate || 0}%;background:${p.rate >= 70 ? '#4ade80' : p.rate >= 40 ? '#facc15' : '#f87171'}"></div>
+      </div>
+      <div style="font-size:11px;color:#4a6a4a;margin-top:3px">${p.count}경기 · ${p.win}승 · 평균 ${p.avg?.toFixed(1) ?? '-'}</div>
+    </div>
+  `).join('');
+}
+
+// ── 전체 랭킹 ──
+function renderFullRanking(players) {
+  const tbody = document.querySelector('#full-rank-table tbody');
+  tbody.innerHTML = '';
+  players.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+    const rankClass = i < 3 ? 'top3' : '';
+    tbody.innerHTML += `<tr>
+      <td class="rank-num ${rankClass}">${medal}</td>
+      <td class="player-name">${p.name}</td>
+      <td>${tierBadge(p.tier)}</td>
+      <td class="score-val">${p.avg.toFixed(1)}</td>
+      <td class="rounds-val">${p.best ?? '-'}</td>
+      <td class="rounds-val">${p.rounds ?? '-'}R</td>
+    </tr>`;
+  });
+}
+
+// ── 가중평균 전체 ──
+function renderWeightedFull(players) {
+  const tbody = document.querySelector('#weighted-full-table tbody');
+  tbody.innerHTML = '';
+  players.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+    const rankClass = i < 3 ? 'top3' : '';
+    tbody.innerHTML += `<tr>
+      <td class="rank-num ${rankClass}">${medal}</td>
+      <td class="player-name">${p.name}</td>
+      <td>${tierBadge(p.tier)}</td>
+      <td class="score-val">${p.wAvg.toFixed(1)}</td>
+      <td class="rounds-val">${p.avg.toFixed(1)}</td>
+      <td class="rounds-val">${p.recent ?? '-'}</td>
+    </tr>`;
+  });
+}
+
+// ── 티어별 섹션 ──
+function renderTierSections(players) {
+  const el = document.getElementById('tier-sections');
+  const byTier = {};
+  players.forEach(p => {
+    const t = p.tier;
+    if (!byTier[t]) byTier[t] = [];
+    byTier[t].push(p);
+  });
+
+  const tierNames = { '0':'T0 · 스페셜', '1':'T1', '2':'T2', '3':'T3', '4':'T4', '5':'T5' };
+  const tierColors = { '0':'#4ade80','1':'#60a5fa','2':'#facc15','3':'#c084fc','4':'#f87171','5':'#94a3b8' };
+
+  el.innerHTML = Object.keys(byTier).sort().map(tier => {
+    const tierPlayers = byTier[tier].sort((a, b) => a.avg - b.avg);
+    const avgOfTier = tierPlayers.reduce((s, p) => s + p.avg, 0) / tierPlayers.length;
+    const color = tierColors[tier] || '#666';
+
+    const rows = tierPlayers.map((p, i) => `<tr>
+      <td class="rank-num">${i + 1}</td>
+      <td class="player-name">${p.name}</td>
+      <td class="score-val">${p.avg.toFixed(1)}</td>
+      <td class="rounds-val">${p.best ?? '-'}</td>
+      <td class="rounds-val">${p.rounds ?? '-'}R</td>
+    </tr>`).join('');
+
+    return `<div class="tier-section">
+      <div class="tier-header">
+        <span class="tier-badge tier-${tier}">${tierNames[tier] || 'T' + tier}</span>
+        <span class="tier-count">${tierPlayers.length}명</span>
+        <span class="tier-avg">평균 ${avgOfTier.toFixed(1)}</span>
+      </div>
+      <table class="rank-table">
+        <thead><tr>
+          <th>#</th><th>선수</th>
+          <th class="right">누적평균</th><th class="right">베스트</th><th class="right">라운드</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+}
+
+// ── 매치플레이 테이블 ──
+function renderMPTable(players) {
+  const tbody = document.querySelector('#mp-table tbody');
+  tbody.innerHTML = '';
+  players.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+    const rankClass = i < 3 ? 'top3' : '';
+    const rateColor = (p.rate || 0) >= 70 ? '#4ade80' : (p.rate || 0) >= 40 ? '#facc15' : '#f87171';
+    tbody.innerHTML += `<tr>
+      <td class="rank-num ${rankClass}">${medal}</td>
+      <td class="player-name">${p.name}</td>
+      <td class="rounds-val">${p.count}</td>
+      <td class="score-val">${p.avg?.toFixed(1) ?? '-'}</td>
+      <td class="rounds-val">${p.win}</td>
+      <td style="text-align:right;color:${rateColor};font-weight:700">${p.rate !== null ? p.rate + '%' : '-'}</td>
+    </tr>`;
+  });
+}
+
+// ── 매치플레이 차트 ──
+function renderMPChart(players) {
+  if (charts.mp) charts.mp.destroy();
+  const top = players.slice(0, 8);
+  const ctx = document.getElementById('mp-chart').getContext('2d');
+  charts.mp = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top.map(p => p.name),
+      datasets: [{
+        label: '승률 (%)',
+        data: top.map(p => p.rate ?? 0),
+        backgroundColor: top.map(p => (p.rate || 0) >= 70 ? '#4ade8099' : (p.rate || 0) >= 40 ? '#facc1599' : '#f8717199'),
+        borderColor: top.map(p => (p.rate || 0) >= 70 ? '#4ade80' : (p.rate || 0) >= 40 ? '#facc15' : '#f87171'),
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { max: 100, ticks: { color: '#4a6a4a' }, grid: { color: '#1a2a1a' } },
+        x: { ticks: { color: '#a8d4a8', font: { size: 11 } }, grid: { display: false } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+// ── 참가 현황 히트맵 ──
+function renderAttendance(dicts) {
+  if (!dicts || dicts.length === 0) return;
+  const sample = dicts[0];
+  const contestKeys = Object.keys(sample).filter(k => /\d{2}'/.test(k));
+  const el = document.getElementById('attendance-table');
+  const shortName = k => k.replace("25' ", '').replace("26' ", '26/');
+
+  let html = `<table class="heatmap-table">
+    <thead><tr>
+      <th class="name-col">선수</th>
+      ${contestKeys.map(k => `<th>${shortName(k)}</th>`).join('')}
+      <th>참가수</th>
+    </tr></thead><tbody>`;
+
+  for (const d of dicts) {
+    const name = d['이름']?.trim();
+    if (!name) continue;
+
+    let count = 0;
+    const cells = contestKeys.map(k => {
+      const v = d[k]?.trim().toUpperCase();
+      if (v === 'YES') { count++; return `<td class="hm-yes">✓</td>`; }
+      return `<td class="hm-no">·</td>`;
+    }).join('');
+
+    const countColor = count >= 8 ? '#4ade80' : count >= 4 ? '#facc15' : '#94a3b8';
+    html += `<tr>
+      <td class="name-cell">${name}</td>
+      ${cells}
+      <td style="text-align:center;font-weight:700;color:${countColor}">${count}</td>
+    </tr>`;
+  }
+
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ── 시작 ──
+loadAll();
+</script>
+</body>
+</html>

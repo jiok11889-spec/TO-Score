@@ -1,0 +1,10 @@
+# Google credentials
+*.json
+*.txt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Claude local settings
+.claude/
