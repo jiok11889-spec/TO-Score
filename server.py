@@ -62,7 +62,26 @@ def parse_ranking_sheet(rows):
 
 def parse_matchplay_sheet(rows):
     hi = find_header_row(rows)
-    return rows_to_dicts(rows, hi)
+    headers = [h.strip() for h in rows[hi]]
+    # 오른쪽 미니 테이블 무시: 빈 구분 컬럼 이후 잘라냄
+    cut = len(headers)
+    for i, h in enumerate(headers):
+        if i > 3 and h == '':
+            cut = i
+            break
+    result = []
+    for row in rows[hi + 1:]:
+        if not any(cell.strip() for cell in row[:cut]):
+            continue
+        d = {}
+        for i, h in enumerate(headers[:cut]):
+            if h:
+                d[h] = row[i].strip() if i < len(row) else ""
+        name = d.get('이름', '').strip()
+        if not name:
+            continue
+        result.append(d)
+    return result
 
 def parse_member_sheet(rows):
     hi = find_header_row(rows)
