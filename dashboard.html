@@ -243,9 +243,11 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      border-radius: 4px;
+      padding: 4px 8px;
     }
-    .tc-group-label.up   { color: #FBBF24; }
-    .tc-group-label.down { color: #64748B; }
+    .tc-group-label.up   { color: #D4A843; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.15); }
+    .tc-group-label.down { color: #64748B; background: rgba(255,255,255,0.03); border: 1px solid rgba(100,116,139,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 11px;
@@ -255,7 +257,7 @@
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(251,191,36,0.10);  color: #FBBF24; border: 1px solid rgba(251,191,36,0.22); }
+    .tc-count-badge.up   { background: rgba(212,168,67,0.10); color: #D4A843; border: 1px solid rgba(212,168,67,0.25); }
     .tc-count-badge.down { background: rgba(148,163,184,0.08); color: #64748B; border: 1px solid rgba(148,163,184,0.15); }
     .tier-change-item {
       display: flex;
@@ -267,8 +269,8 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(251,191,36,0.05);  border-left: 2px solid rgba(251,191,36,0.28); }
-    .tier-change-item.down { background: rgba(148,163,184,0.04); border-left: 2px solid rgba(148,163,184,0.18); }
+    .tier-change-item.up   { background: rgba(251,191,36,0.06);  border-left: 2px solid rgba(251,191,36,0.30); }
+    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(100,116,139,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -277,7 +279,7 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #FBBF24; }
+    .tc-indicator.up   { color: #D4A843; }
     .tc-indicator.down { color: #64748B; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
@@ -286,7 +288,7 @@
       letter-spacing: -0.01em;
       flex: 1;
     }
-    .tier-change-item.up   .tc-name { color: #FDE68A; }
+    .tier-change-item.up   .tc-name { color: #E8D08A; }
     .tier-change-item.down .tc-name { color: #94A3B8; }
     .tc-tiers {
       font-family: 'DM Mono', monospace;
@@ -294,7 +296,7 @@
     }
     .tier-change-item.up   .tc-tiers { color: #7A6020; }
     .tier-change-item.down .tc-tiers { color: #3A4A5A; }
-    .tc-tiers b.up   { color: #FBBF24; font-weight: 500; }
+    .tc-tiers b.up   { color: #D4A843; font-weight: 500; }
     .tc-tiers b.down { color: #64748B; font-weight: 500; }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
