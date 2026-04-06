@@ -119,11 +119,11 @@
       font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #3A6650;
+      letter-spacing: 0.10em;
+      color: #2A4A38;
       margin-bottom: 12px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(0,200,120,0.08);
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,200,120,0.07);
     }
 
     /* ─── Cards ─── */
@@ -409,26 +409,26 @@
       margin-bottom: 16px;
     }
     .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: #0F1C16;
+      border: 1px solid rgba(0,200,120,0.12);
       border-radius: var(--radius);
       padding: 12px 14px;
     }
-    .stat-card.highlight { border-color: var(--accent-border); }
+    .stat-card.highlight { border-color: rgba(0,200,120,0.12); }
     .stat-label {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--text-muted);
+      color: #3A6650;
       margin-bottom: 8px;
     }
     .stat-value {
       font-family: 'DM Mono', monospace;
-      font-size: 28px;
+      font-size: 48px;
       font-weight: 500;
-      color: var(--text-sub);
+      color: #FFFFFF;
       letter-spacing: -0.02em;
       line-height: 1;
       font-variant-numeric: tabular-nums;
@@ -436,8 +436,9 @@
     .stat-value.accent { color: var(--accent); }
     .stat-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 400;
+      color: #3A6650;
       margin-top: 4px;
     }
 
@@ -454,7 +455,7 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--text-muted);
+      color: #2A4A38;
       text-align: left;
       padding: 6px 10px;
       border-bottom: 1px solid var(--divider);
@@ -467,9 +468,9 @@
       transition: background 150ms;
     }
     .rank-table tr:last-child td { border-bottom: none; }
-    .rank-table tbody tr:nth-child(odd)  td { background: rgba(0,200,120,0.03); }
+    .rank-table tbody tr:nth-child(odd)  td { background: rgba(255,255,255,0.015); }
     .rank-table tbody tr:nth-child(even) td { background: transparent; }
-    .rank-table tbody tr:hover           td { background: rgba(0,200,120,0.07); }
+    .rank-table tbody tr:hover           td { background: rgba(0,200,120,0.05); }
     .rank-table tbody tr.rank-first      td { background: rgba(0,200,120,0.06); }
 
     .rank-num {
@@ -512,19 +513,19 @@
     /* ─── Tier badges ─── */
     .tier-badge {
       display: inline-block;
-      padding: 1px 7px;
+      padding: 2px 7px;
       border-radius: 4px;
       font-family: 'DM Mono', monospace;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 500;
       border: 1px solid;
     }
-    .tier-0 { color: var(--accent);  border-color: rgba(0,200,120,0.40);  background: rgba(0,200,120,0.07); }
-    .tier-1 { color: #7BBFDF;        border-color: rgba(123,191,223,0.30); background: rgba(123,191,223,0.06); }
-    .tier-2 { color: #C8B45A;        border-color: rgba(200,180,90,0.30);  background: rgba(200,180,90,0.06); }
-    .tier-3 { color: #A878C8;        border-color: rgba(168,120,200,0.30); background: rgba(168,120,200,0.06); }
-    .tier-4 { color: #C87878;        border-color: rgba(200,120,120,0.30); background: rgba(200,120,120,0.06); }
-    .tier-5 { color: var(--text-muted); border-color: rgba(58,102,80,0.40);  background: rgba(58,102,80,0.08); }
+    .tier-0 { color: #00C878; border-color: rgba(0,200,120,0.40); background: rgba(0,200,120,0.20); font-weight: 700; }
+    .tier-1 { color: #00C878; border-color: rgba(0,200,120,0.25); background: rgba(0,200,120,0.12); }
+    .tier-2 { color: #D4A843; border-color: rgba(212,168,67,0.22);  background: rgba(212,168,67,0.10); }
+    .tier-3 { color: #6A8A7A; border-color: rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); }
+    .tier-4 { color: #4A6A5A; border-color: rgba(255,255,255,0.07); background: rgba(255,255,255,0.04); }
+    .tier-5 { color: #3A5A4A; border-color: rgba(255,255,255,0.05); background: rgba(255,255,255,0.03); }
 
     /* ─── Best list ─── */
     .best-list { display: flex; flex-direction: column; gap: 0; }
@@ -583,10 +584,10 @@
     }
     .mp-item-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
+      font-weight: 500;
       font-size: 12px;
       letter-spacing: -0.01em;
-      color: var(--text);
+      color: #B0D4C4;
     }
     .mp-item-rate {
       font-family: 'DM Mono', monospace;
@@ -1265,7 +1266,14 @@ function renderTierChart(players) {
   const counts = {};
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
-  const colors = { '0':'#00C878','1':'#7BBFDF','2':'#C8B45A','3':'#A878C8','4':'#C87878','5':'#3A6650' };
+  const colors = {
+    '0': '#00C878',
+    '1': 'rgba(0,200,120,0.70)',
+    '2': 'rgba(0,200,120,0.45)',
+    '3': 'rgba(0,200,120,0.28)',
+    '4': 'rgba(0,200,120,0.16)',
+    '5': 'rgba(0,200,120,0.08)'
+  };
 
   if (charts.tier) charts.tier.destroy();
   charts.tier = new Chart(document.getElementById('tier-chart').getContext('2d'), {
@@ -1274,15 +1282,15 @@ function renderTierChart(players) {
       labels: labels.map(t => `T${t}`),
       datasets: [{
         data: labels.map(t => counts[t]),
-        backgroundColor: labels.map(t => (colors[t] || '#3A6650') + '33'),
-        borderColor: labels.map(t => colors[t] || '#3A6650'),
+        backgroundColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
+        borderColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
         borderWidth: 1
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { color: '#B0D4C4', font: { family: 'DM Mono', size: 11 }, padding: 10, boxWidth: 10 } }
+        legend: { position: 'right', labels: { color: '#3A6650', font: { family: 'Space Grotesk', size: 12, weight: '500' }, padding: 10, boxWidth: 10 } }
       }
     }
   });
@@ -1292,16 +1300,18 @@ function renderTierChart(players) {
 function renderMPOverview(players) {
   const el = document.getElementById('mp-overview');
   el.innerHTML = players.slice(0, 5).map((p, i) => {
-    const rateColor = i === 0 ? '#00C878' : '#B0D4C4';
+    const isTop = i === 0;
+    const barColor  = isTop ? '#00C878' : 'rgba(0,200,120,0.22)';
+    const rateColor = (p.rate === 100) ? '#00C878' : isTop ? '#00C878' : '#B0D4C4';
     return `<div class="mp-item">
       <div class="mp-item-header">
         <span class="mp-item-name">${p.name}</span>
         <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
       </div>
       <div class="win-rate-bar">
-        <div class="win-rate-fill" style="width:${p.rate||0}%;background:${rateColor}"></div>
+        <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
       </div>
-      <div class="mp-item-sub">${p.count}경기 · ${p.win}승 · 평균 ${p.avg?.toFixed(1) ?? '—'}</div>
+      <div class="mp-item-sub" style="color:#3A6650;font-size:11px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
     </div>`;
   }).join('');
 }
