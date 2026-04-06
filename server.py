@@ -94,16 +94,18 @@ def parse_tier_history(rows):
     return result
 
 def get_all_data():
-    score_rows    = fetch_csv_rows(GID["score"])
-    ranking_rows  = fetch_csv_rows(GID["ranking"])
-    matchplay_rows= fetch_csv_rows(GID["matchplay"])
-    member_rows   = fetch_csv_rows(GID["member"])
+    score_rows     = fetch_csv_rows(GID["score"])
+    ranking_rows   = fetch_csv_rows(GID["ranking"])
+    matchplay_rows = fetch_csv_rows(GID["matchplay"])
+    member_rows    = fetch_csv_rows(GID["member"])
+    tier_new_rows  = fetch_csv_rows(GID["tier_new"])
 
     return {
-        "score":     parse_score_sheet(score_rows),
-        "ranking":   parse_ranking_sheet(ranking_rows),
-        "matchplay": parse_matchplay_sheet(matchplay_rows),
-        "member":    parse_member_sheet(member_rows),
+        "score":        parse_score_sheet(score_rows),
+        "ranking":      parse_ranking_sheet(ranking_rows),
+        "matchplay":    parse_matchplay_sheet(matchplay_rows),
+        "member":       parse_member_sheet(member_rows),
+        "tier_history": parse_tier_history(tier_new_rows),
     }
 
 class Handler(BaseHTTPRequestHandler):
@@ -147,6 +149,6 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
 
 if __name__ == "__main__":
-    port = 8000
+    port = int(os.environ.get("PORT", 8000))
     print(f"Server started: http://localhost:{port}")
     HTTPServer(("", port), Handler).serve_forever()
