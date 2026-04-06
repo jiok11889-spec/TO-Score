@@ -889,9 +889,10 @@
       <div>
         <div class="section-label">전체 승/패 현황</div>
         <div class="card">
-          <div class="chart-wrap" style="height:300px">
+          <div class="chart-wrap" style="height:240px">
             <canvas id="mp-chart"></canvas>
           </div>
+          <div id="mp-chart-summary" style="display:flex;justify-content:center;gap:32px;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums"></div>
         </div>
       </div>
     </div>
@@ -1393,6 +1394,15 @@ function renderMPChart(players) {
   const totalWin  = players.reduce((s, p) => s + (p.win  || 0), 0);
   const totalLoss = players.reduce((s, p) => s + (p.loss || 0), 0);
   const totalDraw = players.reduce((s, p) => s + Math.max(0, p.count - p.win - p.loss), 0);
+
+  const total = totalWin + totalLoss + totalDraw;
+  document.getElementById('mp-chart-summary').innerHTML = `
+    <span style="color:#00C878"><b>${totalWin}</b> 승</span>
+    <span style="color:#888">|</span>
+    <span style="color:#C87878"><b>${totalLoss}</b> 패</span>
+    ${totalDraw ? `<span style="color:#888">|</span><span style="color:#3A6650"><b>${totalDraw}</b> 무</span>` : ''}
+    <span style="color:#3A6650;font-size:12px">(총 ${total}회)</span>
+  `;
 
   const ctx = document.getElementById('mp-chart').getContext('2d');
   charts.mp = new Chart(ctx, {
