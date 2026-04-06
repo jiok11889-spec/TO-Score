@@ -244,8 +244,8 @@
       align-items: center;
       gap: 8px;
     }
-    .tc-group-label.up   { color: #00C878; }
-    .tc-group-label.down { color: #F87171; }
+    .tc-group-label.up   { color: #FBBF24; }
+    .tc-group-label.down { color: #64748B; }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 11px;
@@ -255,8 +255,8 @@
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(0,200,120,0.12);   color: #00C878; border: 1px solid rgba(0,200,120,0.25); }
-    .tc-count-badge.down { background: rgba(248,113,113,0.10); color: #F87171; border: 1px solid rgba(248,113,113,0.22); }
+    .tc-count-badge.up   { background: rgba(251,191,36,0.10);  color: #FBBF24; border: 1px solid rgba(251,191,36,0.22); }
+    .tc-count-badge.down { background: rgba(148,163,184,0.08); color: #64748B; border: 1px solid rgba(148,163,184,0.15); }
     .tier-change-item {
       display: flex;
       align-items: center;
@@ -267,8 +267,8 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(0,200,120,0.08);   border-left: 2px solid rgba(0,200,120,0.4); }
-    .tier-change-item.down { background: rgba(248,113,113,0.07); border-left: 2px solid rgba(248,113,113,0.35); }
+    .tier-change-item.up   { background: rgba(251,191,36,0.05);  border-left: 2px solid rgba(251,191,36,0.28); }
+    .tier-change-item.down { background: rgba(148,163,184,0.04); border-left: 2px solid rgba(148,163,184,0.18); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -277,23 +277,25 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #00C878; }
-    .tc-indicator.down { color: #F87171; }
+    .tc-indicator.up   { color: #FBBF24; }
+    .tc-indicator.down { color: #64748B; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
       font-size: 13px;
       letter-spacing: -0.01em;
-      color: var(--text);
       flex: 1;
     }
+    .tier-change-item.up   .tc-name { color: #FDE68A; }
+    .tier-change-item.down .tc-name { color: #94A3B8; }
     .tc-tiers {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      color: var(--text-muted);
     }
-    .tc-tiers b.up   { color: #00C878; font-weight: 500; }
-    .tc-tiers b.down { color: #F87171; font-weight: 500; }
+    .tier-change-item.up   .tc-tiers { color: #7A6020; }
+    .tier-change-item.down .tc-tiers { color: #3A4A5A; }
+    .tc-tiers b.up   { color: #FBBF24; font-weight: 500; }
+    .tc-tiers b.down { color: #64748B; font-weight: 500; }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
@@ -472,11 +474,11 @@
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       font-weight: 500;
-      color: var(--text-muted);
+      color: #6A9A84;
       width: 26px;
       font-variant-numeric: tabular-nums;
     }
-    .rank-num.first { color: var(--accent); font-size: 14px; }
+    .rank-num.first { color: var(--accent); font-size: 14px; font-weight: 700; }
     .rank-num.top3  { color: var(--text-sub); }
 
     .player-name {
@@ -486,6 +488,7 @@
       letter-spacing: -0.01em;
       color: var(--text);
     }
+    .rank-first .player-name { color: var(--accent); font-weight: 700; }
     .score-val {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -1395,13 +1398,15 @@ function renderMPChart(players) {
   const totalLoss = players.reduce((s, p) => s + (p.loss || 0), 0);
   const totalDraw = players.reduce((s, p) => s + Math.max(0, p.count - p.win - p.loss), 0);
 
-  const total = totalWin + totalLoss + totalDraw;
+  const eventCount = DATA.mp.length > 0
+    ? Object.keys(DATA.mp[0]).filter(k => /\d+\/\d+\/\d{4}/.test(k)).length
+    : 0;
   document.getElementById('mp-chart-summary').innerHTML = `
     <span style="color:#00C878"><b>${totalWin}</b> 승</span>
     <span style="color:#888">|</span>
     <span style="color:#C87878"><b>${totalLoss}</b> 패</span>
-    ${totalDraw ? `<span style="color:#888">|</span><span style="color:#3A6650"><b>${totalDraw}</b> 무</span>` : ''}
-    <span style="color:#3A6650;font-size:12px">(총 ${total}회)</span>
+    ${totalDraw ? `<span style="color:#888">|</span><span style="color:#6A9A84"><b>${totalDraw}</b> 무</span>` : ''}
+    <span style="color:#6A9A84;font-size:12px">(총 ${eventCount}회 이벤트)</span>
   `;
 
   const ctx = document.getElementById('mp-chart').getContext('2d');
@@ -1451,6 +1456,7 @@ function renderAttendance(dicts) {
     <th>참가</th>
   </tr></thead><tbody>`;
 
+  const rows = [];
   for (const d of dicts) {
     const name = d['이름']?.trim();
     if (!name) continue;
@@ -1460,9 +1466,13 @@ function renderAttendance(dicts) {
       if (v === 'YES') { count++; return `<td class="hm-yes">✓</td>`; }
       return `<td class="hm-no">·</td>`;
     }).join('');
-    const cc = count >= 8 ? '#00C878' : '#3A6650';
-    html += `<tr><td class="name-cell">${name}</td>${cells}
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:12px;color:${cc};font-variant-numeric:tabular-nums">${count}</td></tr>`;
+    rows.push({ name, cells, count });
+  }
+  const maxCount = Math.max(...rows.map(r => r.count));
+  for (const r of rows) {
+    const cc = r.count === maxCount ? '#00C878' : 'rgba(0,200,120,0.40)';
+    html += `<tr><td class="name-cell">${r.name}</td>${r.cells}
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:12px;color:${cc};font-variant-numeric:tabular-nums">${r.count}</td></tr>`;
   }
   document.getElementById('attendance-table').innerHTML = html + '</tbody></table>';
 }
