@@ -1425,39 +1425,56 @@ function renderMPTable(players) {
   }).join('');
 }
 
-// ── MP 차트 (전체 승/패 도넛) ──
+// ── MP 차트 (모임 기준 승/패 도넛) ──
 function renderMPChart(players) {
   if (charts.mp) charts.mp.destroy();
 
-  // 전 선수의 이벤트 결과를 합산 (각 선수별 WIN/LOST/DRAW 직접 집계값)
-  const totalWin  = players.reduce((s, p) => s + p.win,  0);
-  const totalLoss = players.reduce((s, p) => s + p.loss, 0);
-  const totalDraw = players.reduce((s, p) => s + p.draw, 0);
+  // 이벤트 컬럼(날짜 형식) 목록
+  const eventKeys = DATA.mp.length > 0
+    ? Object.keys(DATA.mp[0]).filter(k => /^\d+\/\d+\/\d{4}$/.test(k))
+    : [];
 
-  // 이벤트 횟수 = 시트의 날짜 컬럼 수 (대회 개최 횟수)
-  const eventCount = DATA.mp.length > 0
-    ? Object.keys(DATA.mp[0]).filter(k => /^\d+\/\d+\/\d{4}$/.test(k)).length
-    : 0;
+  // 모임 기준 다수결 집계:
+  // 각 이벤트에서 우리 모임 WIN 수 > LOST 수 → 모임 승리
+  // WIN 수 < LOST 수 → 모임 패배, 같으면 무승부
+  let clubWin = 0, clubLoss = 0, clubDraw = 0;
+  for (const k of eventKeys) {
+    let wins = 0, losses = 0;
+    for (const d of DATA.mp) {
+      const v = (d[k] || '').trim().toUpperCase();
+      if (v === 'WIN')       wins++;
+      else if (v === 'LOST') losses++;
+    }
+    if (wins > losses)       clubWin++;
+    else if (losses > wins)  clubLoss++;
+    else if (wins > 0)       clubDraw++; // 동수이지만 경기는 있음
+  }
 
+  const eventCount = eventKeys.length;
   document.getElementById('mp-chart-summary').innerHTML = `
-    <div style="color:#6A9A84;font-size:11px;margin-bottom:6px">총 ${eventCount}회 이벤트</div>
+    <div style="color:#6A9A84;font-size:12px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
     <div>
-      <span style="color:#00C878"><b>${totalWin}</b> 승</span>
-      <span style="color:#555;margin:0 6px">|</span>
-      <span style="color:#C87878"><b>${totalLoss}</b> 패</span>
-      ${totalDraw ? `<span style="color:#555;margin:0 6px">|</span><span style="color:#6A9A84"><b>${totalDraw}</b> 무</span>` : ''}
+      <span style="color:#00C878"><b>${clubWin}</b> 승</span>
+      <span style="color:#555;margin:0 8px">|</span>
+      <span style="color:#C87878"><b>${clubLoss}</b> 패</span>
+      ${clubDraw ? `<span style="color:#555;margin:0 8px">|</span><span style="color:#6A9A84"><b>${clubDraw}</b> 무</span>` : ''}
     </div>
   `;
+
+  const labels = ['승', '패', ...(clubDraw ? ['무'] : [])];
+  const data   = [clubWin, clubLoss, ...(clubDraw ? [clubDraw] : [])];
+  const bgColors = ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(100,120,100,0.4)'];
+  const bdColors = ['#00C878', '#C87878', '#3A6650'];
 
   const ctx = document.getElementById('mp-chart').getContext('2d');
   charts.mp = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['승', '패', '무/기타'],
+      labels,
       datasets: [{
-        data: [totalWin, totalLoss, totalDraw],
-        backgroundColor: ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(100,120,100,0.4)'],
-        borderColor:     ['#00C878', '#C87878', '#3A6650'],
+        data,
+        backgroundColor: bgColors.slice(0, data.length),
+        borderColor:     bdColors.slice(0, data.length),
         borderWidth: 1
       }]
     },
@@ -1471,11 +1488,7 @@ function renderMPChart(players) {
         },
         tooltip: {
           callbacks: {
-            label: ctx => {
-              const total = totalWin + totalLoss + totalDraw;
-              const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-              return ` ${ctx.label}: ${ctx.parsed}회 (${pct}%)`;
-            }
+            label: ctx => ` ${ctx.label}: ${ctx.parsed}회`
           }
         }
       }
