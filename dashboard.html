@@ -705,6 +705,150 @@
     .table-scroll { max-height: 400px; overflow-y: auto; }
     .table-scroll::-webkit-scrollbar { width: 2px; }
     .table-scroll::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 2px; }
+
+    /* ─── Bottom Tab Nav (PC: 숨김) ─── */
+    .bottom-tab-nav { display: none; }
+
+    /* ─── Mobile Responsive ─── */
+    @media (max-width: 768px) {
+      /* [4] 헤더 정리 */
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 16px;
+        gap: 4px;
+      }
+      .header-brand h1 { font-size: 18px; }
+      .header-brand .header-sub { font-size: 10px; }
+      .updated-text { font-size: 11px; }
+      .refresh-btn { padding: 5px 10px; font-size: 12px; }
+
+      /* Container */
+      .container { padding: 12px 10px; }
+
+      /* [2] 3단/2단 컬럼 → 세로 스택 */
+      .hero-grid  { grid-template-columns: 1fr; gap: 10px; }
+      .two-col    { grid-template-columns: 1fr; }
+      .three-col  { grid-template-columns: 1fr; }
+
+      /* Stat grid: 4열 → 2열 */
+      .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .stat-value { font-size: 30px; }
+      .stat-card  { padding: 12px 14px; }
+
+      /* 기존 상단 탭 숨김 (하단 탭으로 대체) */
+      .tabs { display: none; }
+
+      /* [3] 하단 고정 탭 네비 */
+      .bottom-tab-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 56px;
+        background: #0C1610;
+        border-top: 1px solid rgba(0,200,120,0.10);
+        z-index: 999;
+      }
+      .bottom-tab-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 10px;
+        color: #2A4A38;
+        gap: 3px;
+        min-height: 44px;
+        cursor: pointer;
+        border-top: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .bottom-tab-item.active {
+        color: #00C878;
+        border-top-color: #00C878;
+      }
+      .bottom-tab-item .btab-icon { font-size: 16px; line-height: 1; }
+      body { padding-bottom: 56px; }
+
+      /* Section label */
+      .section-label { font-size: 12px; margin-bottom: 6px; }
+
+      /* Card padding 축소 */
+      .card { padding: 12px 10px; }
+
+      /* [1] 텍스트 줄바꿈 방지 — 선수 이름·티어 */
+      .player-name,
+      .tc-name,
+      .ya-name,
+      .mp-part-name {
+        white-space: nowrap;
+        word-break: keep-all;
+      }
+      .tier-badge { white-space: nowrap; }
+
+      /* Tables: 작은 폰트 */
+      .rank-table th { font-size: 11px; padding: 5px 6px; }
+      .rank-table td { padding: 7px 6px; }
+      .player-name { font-size: 13px; }
+      .score-val   { font-size: 13px; }
+
+      /* 다열 테이블 가로 스크롤 래퍼 */
+      .mobile-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .mobile-table-scroll .rank-table { min-width: 340px; }
+
+      /* Ranking page: table scroll 높이 */
+      #page-ranking .two-col > div .table-scroll { max-height: 480px; }
+
+      /* 티어 페이지 테이블 */
+      .tier-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tier-section .rank-table { min-width: 300px; }
+
+      /* Heatmap */
+      .heatmap-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -10px;
+        padding: 0 10px;
+      }
+
+      /* Chart height 축소 */
+      .chart-wrap { height: 160px; }
+      #page-matchplay .chart-wrap { height: 200px; }
+
+      /* [5] 티어 변동 카드 행 */
+      .tier-change-item {
+        min-height: 44px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+      }
+      .tc-name {
+        font-size: 14px;
+        white-space: nowrap;
+        min-width: 60px;
+      }
+      .tc-tiers { white-space: nowrap; }
+
+      /* MP part list */
+      .mp-part-name  { width: 56px; font-size: 12px; }
+      .mp-part-count { font-size: 12px; }
+      .mp-part-rate  { font-size: 12px; }
+
+      /* Year avg */
+      .ya-name   { font-size: 12px; }
+      .ya-score  { font-size: 12px; }
+      .ya-attend { font-size: 12px; }
+      .ya-rounds { font-size: 12px; }
+    }
+
+    @media (max-width: 400px) {
+      .stat-value { font-size: 26px; }
+      .header-brand h1 { font-size: 15px; }
+      .bottom-tab-item { font-size: 9px; }
+    }
   </style>
 </head>
 <body>
@@ -754,11 +898,11 @@
 
   <!-- Tabs -->
   <div class="tabs" id="tabs" style="display:none">
-    <div class="tab active" data-tab="overview">전체 현황</div>
-    <div class="tab" data-tab="ranking">랭킹</div>
-    <div class="tab" data-tab="tier">티어</div>
-    <div class="tab" data-tab="matchplay">매치플레이</div>
-    <div class="tab" data-tab="attendance">참가 현황</div>
+    <div class="tab active" data-tab="overview" data-short="현황">전체 현황</div>
+    <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
+    <div class="tab" data-tab="tier" data-short="티어">티어</div>
+    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
+    <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
   </div>
 
   <!-- ── 전체 현황 ── -->
@@ -790,14 +934,16 @@
       <div>
         <div class="section-label">누적평균 TOP 10</div>
         <div class="card">
-          <div class="table-scroll">
-            <table class="rank-table" id="top10-table">
-              <thead><tr>
-                <th>#</th><th>선수</th><th>티어</th>
-                <th class="right">평균</th><th class="right">라운드</th>
-              </tr></thead>
-              <tbody></tbody>
-            </table>
+          <div class="mobile-table-scroll">
+            <div class="table-scroll">
+              <table class="rank-table" id="top10-table">
+                <thead><tr>
+                  <th>#</th><th>선수</th><th>티어</th>
+                  <th class="right">평균</th><th class="right">라운드</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -819,13 +965,15 @@
       <div>
         <div class="section-label">가중평균 TOP 10 <span style="text-transform:none;letter-spacing:0;font-family:'DM Mono',monospace">(누적평균 + 최근) ÷ 2</span></div>
         <div class="card">
-          <table class="rank-table" id="weighted-table">
-            <thead><tr>
-              <th>#</th><th>선수</th><th>티어</th>
-              <th class="right">가중평균</th><th class="right">최근</th>
-            </tr></thead>
-            <tbody></tbody>
-          </table>
+          <div class="mobile-table-scroll">
+            <table class="rank-table" id="weighted-table">
+              <thead><tr>
+                <th>#</th><th>선수</th><th>티어</th>
+                <th class="right">가중평균</th><th class="right">최근</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </div>
       <div>
@@ -843,28 +991,32 @@
       <div>
         <div class="section-label">누적평균 전체 랭킹</div>
         <div class="card">
-          <div class="table-scroll" style="max-height:600px">
-            <table class="rank-table" id="full-rank-table">
-              <thead><tr>
-                <th>#</th><th>선수</th><th>티어</th>
-                <th class="right">누적평균</th><th class="right">베스트</th><th class="right">라운드</th>
-              </tr></thead>
-              <tbody></tbody>
-            </table>
+          <div class="mobile-table-scroll">
+            <div class="table-scroll" style="max-height:600px">
+              <table class="rank-table" id="full-rank-table">
+                <thead><tr>
+                  <th>#</th><th>선수</th><th>티어</th>
+                  <th class="right">누적평균</th><th class="right">베스트</th><th class="right">라운드</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
       <div>
         <div class="section-label">가중평균 전체 랭킹</div>
         <div class="card">
-          <div class="table-scroll" style="max-height:600px">
-            <table class="rank-table" id="weighted-full-table">
-              <thead><tr>
-                <th>#</th><th>선수</th><th>티어</th>
-                <th class="right">가중평균</th><th class="right">누적평균</th><th class="right">최근</th>
-              </tr></thead>
-              <tbody></tbody>
-            </table>
+          <div class="mobile-table-scroll">
+            <div class="table-scroll" style="max-height:600px">
+              <table class="rank-table" id="weighted-full-table">
+                <thead><tr>
+                  <th>#</th><th>선수</th><th>티어</th>
+                  <th class="right">가중평균</th><th class="right">누적평균</th><th class="right">최근</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -885,15 +1037,17 @@
       <div>
         <div class="section-label">매치플레이 랭킹</div>
         <div class="card">
-          <div class="table-scroll" style="max-height:500px">
-            <table class="rank-table" id="mp-table">
-              <thead><tr>
-                <th>#</th><th>선수</th>
-                <th class="right">횟수</th><th class="right">승</th>
-                <th class="right">패</th><th class="right">승률</th>
-              </tr></thead>
-              <tbody></tbody>
-            </table>
+          <div class="mobile-table-scroll">
+            <div class="table-scroll" style="max-height:500px">
+              <table class="rank-table" id="mp-table">
+                <thead><tr>
+                  <th>#</th><th>선수</th>
+                  <th class="right">횟수</th><th class="right">승</th>
+                  <th class="right">패</th><th class="right">승률</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -921,17 +1075,42 @@
 
 </div>
 
+<!-- 하단 고정 탭 네비 (모바일 전용) -->
+<nav class="bottom-tab-nav" id="bottom-tab-nav">
+  <div class="bottom-tab-item active" data-tab="overview">
+    <span class="btab-icon">▤</span>현황
+  </div>
+  <div class="bottom-tab-item" data-tab="ranking">
+    <span class="btab-icon">↑</span>랭킹
+  </div>
+  <div class="bottom-tab-item" data-tab="tier">
+    <span class="btab-icon">◈</span>티어
+  </div>
+  <div class="bottom-tab-item" data-tab="matchplay">
+    <span class="btab-icon">⚔</span>MP
+  </div>
+  <div class="bottom-tab-item" data-tab="attendance">
+    <span class="btab-icon">≡</span>참가
+  </div>
+</nav>
+
 <script>
 let DATA = {};
 let charts = {};
 
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tabName).classList.add('active');
+  document.querySelectorAll('.bottom-tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+}
+
 document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    this.classList.add('active');
-    document.getElementById('page-' + this.dataset.tab).classList.add('active');
-  });
+  tab.addEventListener('click', function() { switchTab(this.dataset.tab); });
+});
+
+document.querySelectorAll('.bottom-tab-item').forEach(item => {
+  item.addEventListener('click', function() { switchTab(this.dataset.tab); });
 });
 
 function tierBadge(tier) {
