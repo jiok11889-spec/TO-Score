@@ -1204,8 +1204,7 @@ function parseScoreDicts(dicts) {
   return dicts.map(d => {
     const name = d['이름']?.trim();
     if (!name) return null;
-    const avg = num(d[avgKey]);
-    if (avg === null) return null;
+    const avg = num(d[avgKey]); // null 허용 — 라운드 미참가 신규 멤버도 포함
 
     const yearScores    = yearKeys.map(k => num(d[k])).filter(v => v !== null);
     const yearAvg       = yearScores.length ? yearScores.reduce((a,b)=>a+b,0)/yearScores.length : null;
@@ -1225,7 +1224,12 @@ function parseScoreDicts(dicts) {
       attendRate, yearAttendRate,
       scores: contestKeys.map(k => ({ name: k, score: num(d[k]) })),
     };
-  }).filter(Boolean).sort((a, b) => a.avg - b.avg);
+  }).filter(Boolean).sort((a, b) => {
+    if (a.avg === null && b.avg === null) return 0;
+    if (a.avg === null) return 1;
+    if (b.avg === null) return -1;
+    return a.avg - b.avg;
+  });
 }
 
 function parseRankDicts(dicts, tierMap = {}) {
@@ -1399,8 +1403,9 @@ function renderSummary(players) {
   document.getElementById('stat-total').textContent = players.length + '명';
   if (!players.length) return;
   document.getElementById('stat-rounds').textContent = (players[0]?.scores?.length || 0) + '회';
-  document.getElementById('stat-best-avg').textContent = players[0].avg.toFixed(1);
-  document.getElementById('stat-best-name').textContent = players[0].name;
+  const bestAvgPlayer = players.find(p => p.avg != null);
+  document.getElementById('stat-best-avg').textContent = bestAvgPlayer ? bestAvgPlayer.avg.toFixed(1) : '—';
+  document.getElementById('stat-best-name').textContent = bestAvgPlayer ? bestAvgPlayer.name : '—';
   const wb = [...players].filter(p => p.best !== null).sort((a,b) => a.best - b.best);
   if (wb.length) {
     document.getElementById('stat-best-score').textContent = wb[0].best;
@@ -1419,7 +1424,7 @@ function renderTop10(players) {
       <td class="rank-num ${numCls}">${i + 1}</td>
       <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier)}</td>
-      <td class="${scoreCls}">${p.avg.toFixed(1)}</td>
+      <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.rounds ?? '—'}R</td>
     </tr>`;
   }).join('');
@@ -1520,7 +1525,7 @@ function renderFullRanking(players) {
       <td class="rank-num ${numCls}">${i + 1}</td>
       <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier)}</td>
-      <td class="${scoreCls}">${p.avg.toFixed(1)}</td>
+      <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.best ?? '—'}</td>
       <td class="rounds-val">${p.rounds ?? '—'}R</td>
     </tr>`;
@@ -1538,8 +1543,8 @@ function renderWeightedFull(players) {
       <td class="rank-num ${numCls}">${i + 1}</td>
       <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier)}</td>
-      <td class="${scoreCls}">${p.wAvg.toFixed(1)}</td>
-      <td class="rounds-val">${p.avg.toFixed(1)}</td>
+      <td class="${scoreCls}">${p.wAvg != null ? p.wAvg.toFixed(1) : '—'}</td>
+      <td class="rounds-val">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.recent ?? '—'}</td>
     </tr>`;
   }).join('');
@@ -1550,7 +1555,7 @@ function tierTableHTML(tp) {
   const rows = tp.map((p, i) => `<tr>
     <td class="rank-num${i === 0 ? ' first' : ''}">${i + 1}</td>
     <td class="player-name">${p.name}</td>
-    <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.avg.toFixed(1)}</td>
+    <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
     <td class="rounds-val">${p.best ?? '—'}</td>
     <td class="rounds-val">${p.rounds ?? '—'}R</td>
   </tr>`).join('');
@@ -1577,13 +1582,14 @@ function renderTierSections(players) {
   const tierNames = { '0':'T0 · 스페셜','1':'T1','2':'T2','3':'T3','4':'T4','5':'T5' };
 
   document.getElementById('tier-sections').innerHTML = Object.keys(byTier).sort().map(tier => {
-    const tp  = byTier[tier].sort((a,b) => a.avg - b.avg);
-    const avg = tp.reduce((s,p) => s+p.avg, 0) / tp.length;
+    const tp  = byTier[tier].sort((a,b) => (a.avg ?? Infinity) - (b.avg ?? Infinity));
+    const withAvg = tp.filter(p => p.avg != null);
+    const avg = withAvg.length ? withAvg.reduce((s,p) => s+p.avg, 0) / withAvg.length : null;
     return `<div class="tier-section">
       <div class="tier-header">
         <span class="tier-badge tier-${tier}">${tierNames[tier] || 'T'+tier}</span>
         <span class="tier-count">${tp.length}명</span>
-        <span class="tier-avg">${avg.toFixed(1)} avg</span>
+        <span class="tier-avg">${avg != null ? avg.toFixed(1) + ' avg' : '—'}</span>
       </div>
       ${tierTableHTML(tp)}
     </div>`;
