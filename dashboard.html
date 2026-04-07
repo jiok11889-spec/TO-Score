@@ -1168,7 +1168,8 @@ async function loadAll() {
 
 function render() {
   const players     = parseScoreDicts(DATA.score);
-  const rankPlayers = parseRankDicts(DATA.rank);
+  const tierMap     = Object.fromEntries(players.map(p => [p.name, p.tier]));
+  const rankPlayers = parseRankDicts(DATA.rank, tierMap);
   const mpPlayers   = parseMPDicts(DATA.mp);
 
   renderHeroTierChange(DATA.tierHistory);
@@ -1227,7 +1228,7 @@ function parseScoreDicts(dicts) {
   }).filter(Boolean).sort((a, b) => a.avg - b.avg);
 }
 
-function parseRankDicts(dicts) {
+function parseRankDicts(dicts, tierMap = {}) {
   if (!dicts?.length) return [];
   const s = dicts[0];
   const avgKey    = findKey(s, '누적평균');
@@ -1242,7 +1243,9 @@ function parseRankDicts(dicts) {
     const avg  = num(d[avgKey]);
     const wAvg = num(d[wAvgKey]);
     if (avg === null && wAvg === null) return null;
-    return { name, avg: avg||0, tier: d[tierKey]?.trim()||'-', recent: num(d[recentKey]), wAvg: wAvg||avg||0, rounds: num(d[roundKey]) };
+    // 랭킹 시트에 티어 컬럼이 없으면 스코어 시트의 tierMap으로 보완
+    const tier = tierMap[name] ?? d[tierKey]?.trim() ?? '-';
+    return { name, avg: avg||0, tier, recent: num(d[recentKey]), wAvg: wAvg||avg||0, rounds: num(d[roundKey]) };
   }).filter(Boolean).sort((a, b) => a.wAvg - b.wAvg);
 }
 
