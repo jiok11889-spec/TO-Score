@@ -1201,9 +1201,12 @@ function parseScoreDicts(dicts) {
   const contestKeys = Object.keys(s).filter(k => /\d{2}' /.test(k) && !k.includes('매치'));
   const yearKeys    = contestKeys.filter(k => k.startsWith("26'"));
 
+  const WITHDRAWN = new Set(['고태현', '이수빈', '이대로', '조승현']);
+
   return dicts.map(d => {
     const name = d['이름']?.trim();
     if (!name) return null;
+    if (WITHDRAWN.has(name)) return null;
     const avg = num(d[avgKey]); // null 허용 — 라운드 미참가 신규 멤버도 포함
 
     const yearScores    = yearKeys.map(k => num(d[k])).filter(v => v !== null);
