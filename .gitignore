@@ -1,6 +1,7 @@
 # Google credentials
 *.json
 *.txt
+!requirements.txt
 
 # Python cache
 __pycache__/
