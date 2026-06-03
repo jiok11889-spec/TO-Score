@@ -22,41 +22,61 @@ def ym_sort_key(ym):
         return (int(p[0]), int(p[1]))
     except: return (99,99)
 
-def load_member_status():
+def _read_payment_sheet():
+    """입금현황 파싱. 형식: 행=멤버, 열=월 (row1: [번호, Status, 누적납금액, 26년 5월, ...])"""
     wb = load_workbook(EXCEL_PATH, data_only=True)
     ws = wb['입금현황']
-    rows = list(ws.iter_rows(min_row=1, max_row=2, values_only=True))
-    headers, statuses = rows[0], rows[1]
-    active = []
-    for name, status in zip(headers, statuses):
-        if name in (None, 'No', '탈퇴멤버', '계'): continue
-        if status == '탈퇴': continue
-        active.append(name)
-    return active
+    all_rows = list(ws.iter_rows(values_only=True))
+    if not all_rows:
+        return [], []
+    header = all_rows[0]
+    month_cols = [
+        (i, str(header[i]))
+        for i in range(3, len(header))
+        if header[i] and isinstance(header[i], str) and '년' in header[i]
+    ]
+    members = []
+    for row in all_rows[1:]:
+        if not row or len(row) < 2:
+            continue
+        name = row[0]
+        if not name or not isinstance(name, str) or name.strip() in ('', '계'):
+            continue
+        status = str(row[1]) if len(row) > 1 and row[1] else ''
+        month_payments = {}
+        for col_idx, ym in month_cols:
+            val = row[col_idx] if col_idx < len(row) else None
+            if isinstance(val, (int, float)) and val > 0:
+                month_payments[ym] = val
+        members.append({'name': name.strip(), 'status': status, 'months': month_payments})
+    return month_cols, members
+
+def load_member_status():
+    _, members = _read_payment_sheet()
+    return [m['name'] for m in members if m['status'] != '탈퇴']
 
 def load_income_by_month():
-    df = pd.read_excel(EXCEL_PATH, sheet_name='입금현황')
-    members = [c for c in df.columns if c not in ['No','계'] and not str(c).startswith('Unnamed')]
-    data = df[df['No'].apply(lambda x: isinstance(x,str) and '년' in str(x))].copy()
+    month_cols, members = _read_payment_sheet()
+    active = [m for m in members if m['status'] != '탈퇴']
     result = {}
-    for _, row in data.iterrows():
-        total = sum(pd.to_numeric(row[m],errors='coerce') for m in members if pd.notna(row[m]))
-        result[row['No']] = int(total)
+    for _, ym in month_cols:
+        total = sum(m['months'].get(ym, 0) for m in active)
+        if total > 0:
+            result[ym] = int(total)
     return result
 
 def load_all_payment_status():
-    active = load_member_status()
-    df = pd.read_excel(EXCEL_PATH, sheet_name='입금현황')
-    members = [c for c in df.columns if c in active]
-    data = df[df['No'].apply(lambda x: isinstance(x,str) and '년' in str(x))]
-    real = data[data[members].apply(lambda r: r.notna().any(), axis=1)]
+    month_cols, members = _read_payment_sheet()
+    active = [m for m in members if m['status'] != '탈퇴']
+    all_member_names = [m['name'] for m in active]
     all_status = {}
-    for ym in real['No'].tolist():
-        row = df[df['No']==ym].iloc[0]
-        all_status[ym] = {m: (pd.notna(row[m]) and float(row[m])>0) for m in members}
+    for _, ym in month_cols:
+        if not any(ym in m['months'] for m in active):
+            continue
+        all_status[ym] = {m['name']: ym in m['months'] for m in active}
     months = list(all_status.keys())
     latest = months[-1] if months else ''
-    return all_status, latest, members
+    return all_status, latest, all_member_names
 
 def load_wonjang_rows():
     wb = load_workbook(EXCEL_PATH)
@@ -75,10 +95,11 @@ def load_wonjang_rows():
     return rows
 
 def load_member_totals():
-    df = pd.read_excel(EXCEL_PATH, sheet_name='입금현황')
-    members = [c for c in df.columns if c not in ['No','탈퇴멤버','계'] and not str(c).startswith('Unnamed')]
-    data = df[df['No'].apply(lambda x: isinstance(x,str) and '년' in str(x))].copy()
-    return [{'name':m,'paid':int(pd.to_numeric(data[m],errors='coerce').fillna(0).sum())} for m in members]
+    _, members = _read_payment_sheet()
+    return [
+        {'name': m['name'], 'paid': int(sum(m['months'].values()))}
+        for m in members if m['status'] != '탈퇴'
+    ]
 
 def build_data():
     rows = load_wonjang_rows()
@@ -589,13 +610,8 @@ if __name__=='__main__':
 
         threading.Thread(target=lambda: (time.sleep(1.2), webbrowser.open(url)), daemon=True).start()
 
-        print(f"""
-  ╔══════════════════════════════════════╗
-  ║   TO-Score 회비 대시보드 실행 중      ║
-  ╠══════════════════════════════════════╣
-  ║  주소:  {url:<28} ║
-  ║  종료:  Ctrl+C  또는 창 닫기         ║
-  ╚══════════════════════════════════════╝
-""")
+        print(f"\n  TO-Score 회비 대시보드 실행 중")
+        print(f"  주소:  {url}")
+        print(f"  종료:  Ctrl+C  또는 창 닫기\n")
         try: server.serve_forever()
         except KeyboardInterrupt: print('\n  서버 종료.')

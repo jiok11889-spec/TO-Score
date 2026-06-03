@@ -19,7 +19,7 @@ if errorlevel 1 (
     pip install pandas openpyxl -q
 )
 
-if not exist "data\TO-Score.xlsx" (
+if not exist "data\TO Score.xlsx" (
     echo  엑셀 파일 최초 생성 중...
     python src\create_excel.py
     echo.
