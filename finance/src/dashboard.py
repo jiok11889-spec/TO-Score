@@ -7,8 +7,8 @@ from openpyxl import load_workbook
 from datetime import datetime
 
 EXCEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'TO Score.xlsx')
-ACCOUNT_NUMBER = '계좌번호 미설정'   # 카카오뱅크 계좌번호 받으면 여기에 입력
-ACCOUNT_HOLDER = '계좌주 미설정'     # 계좌주 이름
+ACCOUNT_NUMBER = '3333-33-8606723'
+ACCOUNT_HOLDER = '옥지엽'
 
 def eval_formula(expr):
     if not isinstance(expr, str): return expr
