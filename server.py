@@ -141,10 +141,36 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
-    def do_HEAD(self):
-        self.send_response(200)
-        self.send_header("Content-Type", "text/plain")
+    def _send_headers(self, status, content_type, extra_headers=None):
+        self.send_response(status)
+        if content_type:
+            self.send_header("Content-Type", content_type)
+        for k, v in (extra_headers or {}).items():
+            self.send_header(k, v)
         self.end_headers()
+
+    def do_HEAD(self):
+        if self.path == "/ping":
+            self._send_headers(200, "text/plain")
+            return
+
+        if self.path == "/api/data":
+            self._send_headers(200, "application/json; charset=utf-8",
+                               {"Access-Control-Allow-Origin": "*"})
+            return
+
+        path = self.path.split("?")[0]
+        if path == "/" or path == "":
+            path = "/dashboard.html"
+
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
+        if os.path.isfile(file_path):
+            ext = file_path.rsplit(".", 1)[-1]
+            mime = {"html": "text/html", "js": "text/javascript",
+                    "css": "text/css"}.get(ext, "text/plain")
+            self._send_headers(200, f"{mime}; charset=utf-8")
+        else:
+            self._send_headers(404, None)
 
     def do_GET(self):
         if self.path == "/ping":
