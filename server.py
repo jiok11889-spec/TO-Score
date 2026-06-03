@@ -9,6 +9,7 @@ import json
 import csv
 import io
 import os
+from config import PRO_PLAYERS
 
 SHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
 GID = {
@@ -54,7 +55,13 @@ def rows_to_dicts(rows, header_idx, skip_extra=0):
 
 def parse_score_sheet(rows):
     hi = find_header_row(rows)
-    return rows_to_dicts(rows, hi)
+    members = rows_to_dicts(rows, hi)
+    for m in members:
+        if m.get("이름", "").strip() in PRO_PLAYERS:
+            for k in m:
+                if "티어" in k:
+                    m[k] = "0"
+    return members
 
 def parse_ranking_sheet(rows):
     hi = find_header_row(rows)
@@ -105,10 +112,12 @@ def parse_tier_history(rows):
         tiers = [m.get(c, "").strip() for c in data_col_names
                  if m.get(c, "").strip() not in ("", "-")]
         if len(tiers) >= 2:
+            prev = "0" if name in PRO_PLAYERS else tiers[-2]
+            curr = "0" if name in PRO_PLAYERS else tiers[-1]
             result.append({
                 "이름": name,
-                "이전티어": tiers[-2],
-                "현재티어": tiers[-1],
+                "이전티어": prev,
+                "현재티어": curr,
             })
     return result
 
@@ -125,11 +134,17 @@ def get_all_data():
         "matchplay":    parse_matchplay_sheet(matchplay_rows),
         "member":       parse_member_sheet(member_rows),
         "tier_history": parse_tier_history(tier_new_rows),
+        "pro_players":  sorted(PRO_PLAYERS),
     }
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
 
     def do_GET(self):
         if self.path == "/ping":
