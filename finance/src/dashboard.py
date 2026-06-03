@@ -58,10 +58,9 @@ def load_member_status():
 
 def load_income_by_month():
     month_cols, members = _read_payment_sheet()
-    active = [m for m in members if m['status'] != '탈퇴']
     result = {}
     for _, ym in month_cols:
-        total = sum(m['months'].get(ym, 0) for m in active)
+        total = sum(m['months'].get(ym, 0) for m in members)  # 탈퇴 포함, 납부된 금액은 모두 수입
         if total > 0:
             result[ym] = int(total)
     return result
