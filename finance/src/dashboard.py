@@ -1,7 +1,8 @@
 """TO-Score 회비 대시보드  |  python dashboard.py  →  http://localhost:8000"""
-import json, os
+import json, os, re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
+from io import BytesIO
 import pandas as pd
 from openpyxl import load_workbook
 from datetime import datetime
@@ -150,12 +151,125 @@ def build_data():
         'account':{'number':ACCOUNT_NUMBER,'holder':ACCOUNT_HOLDER},
     }
 
+def _fmt_k(n):
+    n = abs(round(n))
+    if n >= 1_000_000: return f"{n/1_000_000:.1f}M"
+    if n >= 1_000:     return f"{n//1_000}K"
+    return f"{n:,}"
+
+def generate_og_image():
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError:
+        return None
+    try:
+        data  = build_data()
+        s     = data['summary']
+        bal   = int(s['balance'])
+        t_in  = int(s['total_in'])
+        t_out = int(s['total_out'])
+        m = re.match(r'(\d+)년 (\d+)월', s.get('latest_ym', ''))
+        period = f"20{m.group(1)}.{int(m.group(2)):02d}" if m else ''
+        paid_count = sum(1 for mb in data['members'] if mb['paid'] > 0)
+        total_count = len(data['members'])
+    except Exception:
+        bal = t_in = t_out = paid_count = total_count = 0
+        period = ''
+
+    W, H = 1200, 630
+    BG    = (8,  8,  8)
+    CARD  = (16, 16, 16)
+    BLUE  = (75, 158, 255)
+    WHITE = (255, 255, 255)
+    DIM   = (90,  90,  90)
+    LINE  = (32,  32,  32)
+    GREEN = (80, 200, 140)
+    RED   = (255, 94,  94)
+
+    img  = Image.new('RGB', (W, H), BG)
+    draw = ImageDraw.Draw(img)
+
+    # 배경 카드
+    draw.rounded_rectangle([(40, 40), (W-40, H-40)], radius=18, fill=CARD, outline=LINE, width=1)
+    # 왼쪽 파란 강조 바
+    draw.rounded_rectangle([(40, 40), (46, H-40)], radius=3, fill=BLUE)
+
+    # 폰트 (DejaVu — Render Ubuntu에 기본 탑재)
+    def fnt(size, bold=False):
+        candidates = (
+            ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+             '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf',
+             'C:/Windows/Fonts/arialbd.ttf',
+             'C:/Windows/Fonts/calibrib.ttf']
+            if bold else
+            ['/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+             '/usr/share/fonts/dejavu/DejaVuSans.ttf',
+             'C:/Windows/Fonts/arial.ttf',
+             'C:/Windows/Fonts/calibri.ttf']
+        )
+        for p in candidates:
+            try: return ImageFont.truetype(p, size)
+            except: pass
+        return ImageFont.load_default()
+
+    f_brand = fnt(26, bold=True)
+    f_lbl   = fnt(20)
+    f_big   = fnt(96, bold=True)
+    f_stat  = fnt(38, bold=True)
+    f_slbl  = fnt(18)
+    f_badge = fnt(22)
+
+    # 브랜드
+    draw.text((90, 80), "TO", font=f_brand, fill=BLUE)
+    draw.text((134, 83), "· Fund Dashboard", font=fnt(20), fill=DIM)
+
+    # 라벨
+    draw.text((90, 180), "FUND BALANCE", font=f_lbl, fill=DIM)
+
+    # 잔액 (₩ 작게 + 숫자 크게)
+    draw.text((90, 210), "W", font=fnt(48, bold=True), fill=(60, 120, 200))
+    draw.text((148, 210), f"{bal:,}", font=f_big, fill=WHITE)
+
+    # 구분선
+    draw.line([(90, 400), (W-90, 400)], fill=LINE, width=1)
+
+    # 하단 스탯 3개
+    stats = [
+        ("TOTAL IN",  _fmt_k(t_in),  GREEN),
+        ("TOTAL OUT", _fmt_k(t_out), RED),
+        ("MEMBERS",   f"{paid_count}/{total_count}", WHITE),
+    ]
+    sx = 90
+    for lbl, val, col in stats:
+        draw.text((sx, 418), lbl, font=f_slbl, fill=DIM)
+        draw.text((sx, 444), val, font=f_stat, fill=col)
+        sx += 340
+
+    # 기간 배지 (우상단)
+    if period:
+        bx, by = W - 170, 80
+        draw.rounded_rectangle([(bx-14, by-8), (bx+140, by+34)], radius=8,
+                                fill=(24,24,24), outline=LINE, width=1)
+        draw.text((bx, by), period, font=f_badge, fill=DIM)
+
+    buf = BytesIO()
+    img.save(buf, 'PNG', optimize=True)
+    buf.seek(0)
+    return buf.getvalue()
+
 HTML = '''<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>TO 회비</title>
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="TO 회비 대시보드">
+<meta property="og:description" content="사군자 티오방 회비 현황 — 잔액 · 납부 현황 · 지출 분석">
+<meta property="og:image"       content="__OG_IMAGE_URL__">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color"        content="#080808">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -557,12 +671,21 @@ init();
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self,f,*a): pass
+
+    def _og_image_url(self):
+        host = self.headers.get('Host','localhost')
+        scheme = 'https' if 'onrender.com' in host else 'http'
+        return f'{scheme}://{host}/og-image.png'
+
     def do_HEAD(self):
         p=urlparse(self.path).path
         if p=='/api/data':
             self.send_response(200);self.send_header('Content-Type','application/json;charset=utf-8');self.end_headers()
+        elif p=='/og-image.png':
+            self.send_response(200);self.send_header('Content-Type','image/png');self.end_headers()
         else:
             self.send_response(200);self.send_header('Content-Type','text/html;charset=utf-8');self.end_headers()
+
     def do_GET(self):
         p=urlparse(self.path).path
         if p=='/api/data':
@@ -573,8 +696,14 @@ class Handler(BaseHTTPRequestHandler):
                 import traceback
                 body=json.dumps({'error':str(e),'trace':traceback.format_exc()}).encode()
                 self.send_response(500);self.send_header('Content-Type','application/json');self.end_headers();self.wfile.write(body)
+        elif p=='/og-image.png':
+            body=generate_og_image()
+            if body:
+                self.send_response(200);self.send_header('Content-Type','image/png');self.send_header('Content-Length',len(body));self.send_header('Cache-Control','public, max-age=300');self.end_headers();self.wfile.write(body)
+            else:
+                self.send_response(404);self.end_headers()
         else:
-            body=HTML.encode('utf-8')
+            body=HTML.replace('__OG_IMAGE_URL__', self._og_image_url()).encode('utf-8')
             self.send_response(200);self.send_header('Content-Type','text/html;charset=utf-8');self.send_header('Content-Length',len(body));self.end_headers();self.wfile.write(body)
 
 if __name__=='__main__':
