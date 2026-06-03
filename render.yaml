@@ -7,3 +7,12 @@ services:
     envVars:
       - key: PORT
         generateValue: false
+
+  - type: web
+    name: to-score-finance
+    runtime: python
+    buildCommand: pip install -r finance/requirements.txt
+    startCommand: python finance/src/dashboard.py
+    envVars:
+      - key: PORT
+        generateValue: false

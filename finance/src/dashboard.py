@@ -6,7 +6,7 @@ import pandas as pd
 from openpyxl import load_workbook
 from datetime import datetime
 
-EXCEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'TO-Score.xlsx')
+EXCEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'TO Score.xlsx')
 ACCOUNT_NUMBER = '계좌번호 미설정'   # 카카오뱅크 계좌번호 받으면 여기에 입력
 ACCOUNT_HOLDER = '계좌주 미설정'     # 계좌주 이름
 
@@ -536,6 +536,12 @@ init();
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self,f,*a): pass
+    def do_HEAD(self):
+        p=urlparse(self.path).path
+        if p=='/api/data':
+            self.send_response(200);self.send_header('Content-Type','application/json;charset=utf-8');self.end_headers()
+        else:
+            self.send_response(200);self.send_header('Content-Type','text/html;charset=utf-8');self.end_headers()
     def do_GET(self):
         p=urlparse(self.path).path
         if p=='/api/data':
