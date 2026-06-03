@@ -116,7 +116,7 @@ def build_data():
             net = r['차변'] - max(r['대변'], 0)
             expense_by_cat[r['분류2']]=expense_by_cat.get(r['분류2'],0)+net
             expense_by_month[r['연월']]=expense_by_month.get(r['연월'],0)+net
-    total_in=sum(income_by_month.values())+sum(extra_income.values())+20000
+    total_in=sum(income_by_month.values())+sum(extra_income.values())
     total_out=sum(expense_by_cat.values())
     balance=total_in-total_out
     all_months=sorted(set(list(income_by_month)+list(expense_by_month)),key=ym_sort_key)
