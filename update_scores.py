@@ -3,6 +3,7 @@ from google.oauth2.service_account import Credentials
 from gspread.utils import rowcol_to_a1
 import time
 import sys
+from config import PRO_PLAYERS
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
@@ -10,26 +11,26 @@ SPREADSHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
 JSON_KEY_FILE = "kinetic-horizon-492311-s5-55bd3f137a39.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# 26년 5월 17일 대회 스코어 (18명)
-MAY_2026_SCORES = {
-    "김산":        73,
-    "나한영":      75,
-    "홍경택":      77,
-    "김수민":      79,
-    "최창환":      82,
-    "임익준":      85,
-    "이은광":      85,
-    "강현수":      89,
-    "김성환":      81,
-    "권기표":      91,
-    "김준기":      96,
-    "조현민":      93,
-    "김성환(92)":  95,
-    "강충현":      100,
-    "박헌우":      104,
-    "백근호":      91,
-    "김현섭":      98,
-    "이도영":      103,
+# 26년 6월 12일 대회 스코어 (18명, 최지훈 제외)
+JUN_2026_SCORES = {
+    "이현우":      73,
+    "임승언":      74,
+    "이형석":      76,
+    "김산":        81,
+    "김수민":      81,
+    "이은광":      81,
+    "김대우":      86,
+    "김성환":      87,
+    "조현민":      87,
+    "강현수":      90,
+    "권기표":      92,
+    "박헌우":      93,
+    "김준기":      94,
+    "임익준":      94,
+    "조성태":      96,
+    "김현섭":      96,
+    "이도영":      98,
+    "옥지엽":      108,
 }
 
 # 3차 대회 이후 최신 티어
@@ -63,10 +64,10 @@ TIER_MAP = {
 }
 
 NEW_MEMBERS = []
-EVENT_COL_NAME = "26' 3차 대회"
-EVENT_DATE = "5/17/2026"
-TIER_ROUND_COL = "6회"
-TIER_ROUND_DATE = "5/17/2026"
+EVENT_COL_NAME = "26' 4차 대회"
+EVENT_DATE = "6/12/2026"
+TIER_ROUND_COL = "7회"
+TIER_ROUND_DATE = "6/12/2026"
 
 
 def connect():
@@ -97,12 +98,15 @@ def update_score_sheet(spreadsheet):
     # ── 컬럼 삽입 ──
     if EVENT_COL_NAME not in header_row:
         avg_col_1based = header_row.index("누적평균") + 1
-        sheet.insert_cols([[]], col=avg_col_1based)
-        print(f"  열 {avg_col_1based} 위치에 컬럼 삽입 완료")
+        # 누적평균 앞의 빈 버퍼 칼럼(Q) 위치에 삽입
+        # → AVERAGE 범위 안쪽 삽입이므로 수식이 자동으로 한 칸 확장됨
+        insert_col = avg_col_1based - 1
+        sheet.insert_cols([[]], col=insert_col)
+        print(f"  열 {insert_col} 위치에 컬럼 삽입 완료")
         time.sleep(2)
         all_values = sheet.get_all_values()
         header_row = all_values[1]
-        score_col_1based = avg_col_1based
+        score_col_1based = insert_col
         batch_update_cells(sheet, [
             (2, score_col_1based, EVENT_COL_NAME),
             (3, score_col_1based, EVENT_DATE),
@@ -130,17 +134,18 @@ def update_score_sheet(spreadsheet):
         if not name:
             continue
 
-        if name in MAY_2026_SCORES:
-            score_updates.append((row_idx, score_col_1based, MAY_2026_SCORES[name]))
+        if name in JUN_2026_SCORES:
+            score_updates.append((row_idx, score_col_1based, JUN_2026_SCORES[name]))
             score_done.append(name)
 
         if tier_col_1based and name in TIER_MAP:
-            tier_updates.append((row_idx, tier_col_1based, TIER_MAP[name]))
+            tier = 0 if name in PRO_PLAYERS else TIER_MAP[name]
+            tier_updates.append((row_idx, tier_col_1based, tier))
             tier_done.append(name)
 
     batch_update_cells(sheet, score_updates)
     print(f"  [OK] 스코어 입력: {len(score_done)}명")
-    score_missing = [n for n in MAY_2026_SCORES if n not in score_done]
+    score_missing = [n for n in JUN_2026_SCORES if n not in score_done]
     if score_missing:
         print(f"  [!!] 스코어 미입력 (시트에 없음): {score_missing}")
 
@@ -161,38 +166,44 @@ def update_member_sheet(spreadsheet):
     sheet = spreadsheet.worksheet("멤버명단 (자동)")
     all_values = sheet.get_all_values()
     header_row = all_values[0]
-    name_col_idx = header_row.index("이름") if "이름" in header_row else 1
 
     # ── 컬럼 추가 ──
     if EVENT_COL_NAME not in header_row:
         insert_col = len(header_row) + 1
+        col_letter = chr(64 + insert_col)
         batch_update_cells(sheet, [
-            (1, insert_col, EVENT_COL_NAME),
-            (2, insert_col, EVENT_DATE),
+            (1, insert_col, f"='스코어 집계 (입력)'!{col_letter}2"),
+            (2, insert_col, f"=XLOOKUP({col_letter}1,'스코어 집계 (입력)'!2:2,'스코어 집계 (입력)'!3:3)"),
         ])
-        print(f"  멤버명단 헤더/날짜 입력 (열 {insert_col})")
+        print(f"  멤버명단 헤더/날짜 수식 입력 ({col_letter}열)")
         time.sleep(1)
         all_values = sheet.get_all_values()
     else:
         print(f"  멤버명단 '{EVENT_COL_NAME}' 컬럼 이미 존재")
 
-    # ── YES/NO 배치 입력 ──
+    # ── YES/NO 수식 입력 (스코어 집계에 점수가 있으면 YES, 없으면 NO) ──
     header_row = all_values[0]
-    name_col_idx = header_row.index("이름") if "이름" in header_row else 1
     event_col_1based = header_row.index(EVENT_COL_NAME) + 1
+    col_letter = chr(64 + event_col_1based)
+
+    # 현재 마지막 데이터 행 + 여유 10행까지 수식 입력
+    last_row = max(
+        (i + 3 for i, row in enumerate(all_values[2:])
+         if len(row) > 1 and row[1].strip()),
+        default=10
+    ) + 10
 
     yn_updates = []
-    for row_idx, row in enumerate(all_values[2:], start=3):
-        if len(row) <= name_col_idx:
-            continue
-        name = row[name_col_idx].strip()
-        if not name:
-            continue
-        value = "YES" if name in MAY_2026_SCORES else "NO"
-        yn_updates.append((row_idx, event_col_1based, value))
+    for row_idx in range(3, last_row + 1):
+        formula = (
+            f"=IF($B{row_idx}=\"\",\"\","
+            f"IFERROR(IF(XLOOKUP($B{row_idx},'스코어 집계 (입력)'!$B:$B,"
+            f"'스코어 집계 (입력)'!{col_letter}:{col_letter}),\"YES\",\"NO\"),\"NO\"))"
+        )
+        yn_updates.append((row_idx, event_col_1based, formula))
 
     batch_update_cells(sheet, yn_updates)
-    print(f"  [OK] 멤버명단 YES/NO 입력: {len(yn_updates)}명")
+    print(f"  [OK] 멤버명단 YES/NO 수식 입력: 행3~{last_row}")
 
 
 # ─────────────────────────────────────────────
@@ -235,7 +246,8 @@ def update_tier_history_sheet(spreadsheet):
         name = row[name_col].strip()
         if not name or name not in TIER_MAP:
             continue
-        updates.append((i, round_col_1based, TIER_MAP[name]))
+        tier = 0 if name in PRO_PLAYERS else TIER_MAP[name]
+        updates.append((i, round_col_1based, tier))
         done.append(name)
 
     if updates:
