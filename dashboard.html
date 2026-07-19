@@ -376,6 +376,7 @@
       width: 38px;
       text-align: right;
     }
+    .ya-item.first .ya-name  { color: var(--accent); }
     .ya-item.first .ya-score { color: var(--accent); }
     .ya-attend {
       font-family: 'DM Mono', monospace;
@@ -452,6 +453,7 @@
       width: 34px;
       text-align: right;
     }
+    .le-item.first .le-name  { color: var(--accent); }
     .le-item.first .le-score { color: var(--accent); }
     @media (max-width: 640px) {
       .le-grid { grid-template-columns: 1fr; }
@@ -637,9 +639,12 @@
       font-family: 'DM Mono', monospace;
       font-size: 15px;
       font-weight: 500;
-      color: var(--accent);
+      color: var(--text-sub);
       font-variant-numeric: tabular-nums;
     }
+    .best-item.first .best-rank,
+    .best-item.first .best-name,
+    .best-item.first .best-score { color: var(--accent); }
 
     /* ─── Chart ─── */
     .chart-wrap { position: relative; height: 200px; }
@@ -1240,6 +1245,7 @@ async function loadAll() {
     DATA.mp          = json.matchplay    || [];
     DATA.member      = json.member       || [];
     DATA.tierHistory = json.tier_history || [];
+    DATA.latestEventDate = json.latest_event_date || null;
     PRO_PLAYERS      = new Set(json.pro_players || []);
 
     render();
@@ -1414,7 +1420,11 @@ function renderLatestEvent(players) {
     .filter(e => e.score != null)
     .sort((a, b) => a.score - b.score);
 
-  titleEl.textContent = latestKey;
+  // "7/19/2026" -> "7/19"
+  const rawDate = DATA.latestEventDate;
+  const shortDate = rawDate ? rawDate.split('/').slice(0, 2).join('/') : null;
+
+  titleEl.textContent = shortDate ? `${latestKey} (${shortDate})` : latestKey;
   subEl.textContent = `${entries.length}명 참가`;
 
   listEl.innerHTML = entries.map((e, i) => {
@@ -1589,7 +1599,7 @@ function renderBestList(players) {
   const el = document.getElementById('best-list');
   const sorted = [...players].filter(p => p.best !== null).sort((a,b) => a.best - b.best).slice(0, 5);
   el.innerHTML = sorted.map((p, i) => `
-    <div class="best-item">
+    <div class="best-item${i === 0 ? ' first' : ''}">
       <div class="best-rank">${i + 1}</div>
       <div class="best-name">${p.name} ${tierBadge(p.tier, p.name)}</div>
       <div class="best-score">${p.best}</div>
@@ -1601,15 +1611,15 @@ function renderTierChart(players) {
   const counts = {};
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
-  // T0(프로)만 그린 액센트, 나머지는 중립 그레이 램프 — 도넛 전체가 그린으로
-  // 뒤덮이는 것을 막고 "T0=특별" 신호 하나만 남긴다.
+  // 티어 배지(.tier-0~.tier-5)와 동일한 팔레트 — 사이트 전체에서 티어 색이
+  // 항상 같은 의미(T0/1=그린, T2=골드, T3~5=페이딩 그레이그린)를 갖도록 통일.
   const colors = {
     '0': '#00C878',
-    '1': 'rgba(255,255,255,0.34)',
-    '2': 'rgba(255,255,255,0.26)',
-    '3': 'rgba(255,255,255,0.19)',
-    '4': 'rgba(255,255,255,0.13)',
-    '5': 'rgba(255,255,255,0.08)'
+    '1': '#00C878',
+    '2': '#D4A843',
+    '3': '#6A8A7A',
+    '4': '#4A6A5A',
+    '5': '#3A5A4A'
   };
 
   if (charts.tier) charts.tier.destroy();
@@ -1640,9 +1650,10 @@ function renderMPOverview(players) {
     const isTop = i === 0;
     const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
     const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
+    const nameColor = isTop ? 'var(--accent)' : 'var(--text)';
     return `<div class="mp-item">
       <div class="mp-item-header">
-        <span class="mp-item-name">${p.name}</span>
+        <span class="mp-item-name" style="color:${nameColor}">${p.name}</span>
         <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
       </div>
       <div class="win-rate-bar">
@@ -1740,8 +1751,8 @@ function renderMPTable(players) {
   const tbody = document.querySelector('#mp-table tbody');
   tbody.innerHTML = players.map((p, i) => {
     const numCls   = i === 0 ? 'first' : i < 3 ? 'top3' : '';
-    const rateColor = i === 0 ? '#00C878' : '#B0D4C4';
-    return `<tr>
+    const rateColor = i === 0 ? 'var(--accent)' : 'var(--text-muted)';
+    return `<tr${i === 0 ? ' class="rank-first"' : ''}>
       <td class="rank-num ${numCls}">${i + 1}</td>
       <td class="player-name">${p.name}</td>
       <td class="rounds-val">${p.count}</td>

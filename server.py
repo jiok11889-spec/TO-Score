@@ -121,6 +121,18 @@ def parse_tier_history(rows):
             })
     return result
 
+def parse_latest_event_date(rows):
+    """티어정리_신규 날짜행(헤더 바로 다음 행)에서 마지막으로 채워진 날짜를 반환"""
+    hi = find_header_row(rows)
+    if hi < 0 or hi + 1 >= len(rows):
+        return None
+    date_row = rows[hi + 1]
+    for cell in reversed(date_row):
+        v = cell.strip()
+        if v and v != "기존":
+            return v
+    return None
+
 def get_all_data():
     score_rows     = fetch_csv_rows(GID["score"])
     ranking_rows   = fetch_csv_rows(GID["ranking"])
@@ -129,11 +141,12 @@ def get_all_data():
     tier_new_rows  = fetch_csv_rows(GID["tier_new"])
 
     return {
-        "score":        parse_score_sheet(score_rows),
-        "ranking":      parse_ranking_sheet(ranking_rows),
-        "matchplay":    parse_matchplay_sheet(matchplay_rows),
-        "member":       parse_member_sheet(member_rows),
-        "tier_history": parse_tier_history(tier_new_rows),
+        "score":             parse_score_sheet(score_rows),
+        "ranking":           parse_ranking_sheet(ranking_rows),
+        "matchplay":         parse_matchplay_sheet(matchplay_rows),
+        "member":            parse_member_sheet(member_rows),
+        "tier_history":      parse_tier_history(tier_new_rows),
+        "latest_event_date": parse_latest_event_date(tier_new_rows),
         "pro_players":  sorted(PRO_PLAYERS),
     }
 
