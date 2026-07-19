@@ -260,7 +260,7 @@
       border-radius: 4px;
       padding: 4px 8px;
     }
-    .tc-group-label.up   { color: #D4A843; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.15); }
+    .tc-group-label.up   { color: #E0954A; background: rgba(224,149,74,0.07); border: 1px solid rgba(224,149,74,0.15); }
     .tc-group-label.down { color: #64748B; background: rgba(255,255,255,0.03); border: 1px solid rgba(100,116,139,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
@@ -271,7 +271,7 @@
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(212,168,67,0.10); color: #D4A843; border: 1px solid rgba(212,168,67,0.25); }
+    .tc-count-badge.up   { background: rgba(224,149,74,0.10); color: #E0954A; border: 1px solid rgba(224,149,74,0.25); }
     .tc-count-badge.down { background: rgba(148,163,184,0.08); color: #64748B; border: 1px solid rgba(148,163,184,0.15); }
     .tier-change-item {
       display: flex;
@@ -283,7 +283,7 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(251,191,36,0.06);  border-left: 2px solid rgba(251,191,36,0.30); }
+    .tier-change-item.up   { background: rgba(224,149,74,0.06);  border-left: 2px solid rgba(224,149,74,0.30); }
     .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(100,116,139,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
@@ -293,7 +293,7 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #D4A843; }
+    .tc-indicator.up   { color: #E0954A; }
     .tc-indicator.down { color: #64748B; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
@@ -302,15 +302,15 @@
       letter-spacing: -0.01em;
       flex: 1;
     }
-    .tier-change-item.up   .tc-name { color: #E8D08A; }
+    .tier-change-item.up   .tc-name { color: #F0C093; }
     .tier-change-item.down .tc-name { color: #94A3B8; }
     .tc-tiers {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
     }
-    .tier-change-item.up   .tc-tiers { color: #7A6020; }
+    .tier-change-item.up   .tc-tiers { color: #8A5A2E; }
     .tier-change-item.down .tc-tiers { color: #3A4A5A; }
-    .tc-tiers b.up   { color: #D4A843; font-weight: 500; }
+    .tc-tiers b.up   { color: #E0954A; font-weight: 500; }
     .tc-tiers b.down { color: #64748B; font-weight: 500; }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
@@ -349,6 +349,12 @@
       border-top: 1px solid var(--divider);
     }
     .ya-item:first-of-type { border-top: none; }
+    .ya-item.first {
+      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
+      margin: 0 -8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
     .ya-rank {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -423,6 +429,12 @@
       border-top: 1px solid var(--divider);
     }
     .le-item:nth-child(-n+2) { border-top: none; }
+    .le-item.first {
+      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
+      margin: 0 -8px;
+      padding: 7px 8px;
+      border-radius: 6px;
+    }
     .le-rank {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -554,7 +566,13 @@
     }
     .rank-table tr:last-child td { border-bottom: none; }
     .rank-table tbody tr:hover      td { background: rgba(255,255,255,0.028); }
-    /* 1위 강조는 순위·점수 텍스트만으로 충분 — 행 전체 배경 워시는 다른 그린 배지와 겹쳐 번잡해지므로 제거 */
+    /* 1위 행: 배경 전체 워시 + 그라데이션 음영이 있어야 "강조"로 인지된다(텍스트 색만으로는 부족).
+       PRO 배지를 중립화해서 다른 그린과 안 겹치므로 다시 넣어도 번잡하지 않다. */
+    .rank-table tbody tr.rank-first td {
+      background: linear-gradient(90deg, rgba(0,200,120,0.10), rgba(0,200,120,0.02));
+    }
+    .rank-table tbody tr.rank-first td:first-child { border-radius: 6px 0 0 6px; }
+    .rank-table tbody tr.rank-first td:last-child  { border-radius: 0 6px 6px 0; }
 
     .rank-num {
       font-family: 'DM Mono', monospace;
@@ -604,7 +622,7 @@
       border: 1px solid;
     }
     .tier-0 { color: #00C878; border-color: rgba(0,200,120,0.40); background: rgba(0,200,120,0.20); font-weight: 700; }
-    .tier-1 { color: #00C878; border-color: rgba(0,200,120,0.25); background: rgba(0,200,120,0.12); }
+    .tier-1 { color: #5FC99A; border-color: rgba(95,201,154,0.25); background: rgba(95,201,154,0.12); }
     .tier-2 { color: #D4A843; border-color: rgba(212,168,67,0.22);  background: rgba(212,168,67,0.10); }
     .tier-3 { color: #6A8A7A; border-color: rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); }
     .tier-4 { color: #4A6A5A; border-color: rgba(255,255,255,0.07); background: rgba(255,255,255,0.04); }
@@ -620,6 +638,12 @@
       border-top: 1px solid var(--divider);
     }
     .best-item:first-child { border-top: none; }
+    .best-item.first {
+      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
+      margin: 0 -8px;
+      padding: 8px 8px;
+      border-radius: 6px;
+    }
     .best-rank {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -662,6 +686,12 @@
     /* ─── MP item ─── */
     .mp-item { padding: 8px 0; border-top: 1px solid var(--divider); }
     .mp-item:first-child { border-top: none; }
+    .mp-item.leader {
+      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
+      margin: 0 -10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
     .mp-item-header {
       display: flex;
       justify-content: space-between;
@@ -1612,10 +1642,10 @@ function renderTierChart(players) {
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
   // 티어 배지(.tier-0~.tier-5)와 동일한 팔레트 — 사이트 전체에서 티어 색이
-  // 항상 같은 의미(T0/1=그린, T2=골드, T3~5=페이딩 그레이그린)를 갖도록 통일.
+  // 항상 같은 의미를 갖도록 통일. T0/T1도 서로 구분되게(밝은 그린/연한 그린).
   const colors = {
     '0': '#00C878',
-    '1': '#00C878',
+    '1': '#5FC99A',
     '2': '#D4A843',
     '3': '#6A8A7A',
     '4': '#4A6A5A',
@@ -1651,7 +1681,7 @@ function renderMPOverview(players) {
     const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
     const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
     const nameColor = isTop ? 'var(--accent)' : 'var(--text)';
-    return `<div class="mp-item">
+    return `<div class="mp-item${isTop ? ' leader' : ''}">
       <div class="mp-item-header">
         <span class="mp-item-name" style="color:${nameColor}">${p.name}</span>
         <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
