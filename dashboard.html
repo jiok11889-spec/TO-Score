@@ -1676,7 +1676,14 @@ function renderTierChart(players) {
 // ── MP 요약 ──
 function renderMPOverview(players) {
   const el = document.getElementById('mp-overview');
-  el.innerHTML = players.slice(0, 5).map((p, i) => {
+  // 승리 기록이 있는 선수만 TOP5 후보로 — 0승(패만 있거나 무만 있는)인
+  // 선수가 표본이 적다는 이유만으로 순위표에 끼는 것을 방지.
+  const withWin = players.filter(p => (p.win || 0) > 0);
+  if (!withWin.length) {
+    el.innerHTML = `<div class="no-change-msg">승리 기록 있는 선수 없음</div>`;
+    return;
+  }
+  el.innerHTML = withWin.slice(0, 5).map((p, i) => {
     const isTop = i === 0;
     const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
     const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
