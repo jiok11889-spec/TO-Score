@@ -395,6 +395,69 @@
       text-align: right;
     }
 
+    /* ─── Latest event result list ─── */
+    .latest-event-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .latest-event-sub {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .le-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 24px;
+    }
+    .le-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 2px;
+      border-top: 1px solid var(--divider);
+    }
+    .le-item:nth-child(-n+2) { border-top: none; }
+    .le-rank {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      width: 20px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .le-rank.first { color: var(--accent); }
+    .le-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .le-score {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-sub);
+      font-variant-numeric: tabular-nums;
+      width: 34px;
+      text-align: right;
+    }
+    .le-item.first .le-score { color: var(--accent); }
+    @media (max-width: 640px) {
+      .le-grid { grid-template-columns: 1fr; }
+      .le-item:nth-child(2) { border-top: 1px solid var(--divider); }
+    }
+
     /* ─── Tabs (중립 비활성 · 그린 활성) ─── */
     .tabs {
       display: flex;
@@ -887,6 +950,14 @@
 
   <!-- 우선순위 섹션 -->
   <div id="hero-section" style="display:none">
+    <div style="margin-bottom:24px">
+      <div class="section-label">최근 대회 결과</div>
+      <div class="card accent-border">
+        <div class="latest-event-title" id="latest-event-title">—</div>
+        <div class="latest-event-sub" id="latest-event-sub"></div>
+        <div class="le-grid" id="latest-event-list"></div>
+      </div>
+    </div>
     <div class="hero-grid">
       <div>
         <div class="section-label">최근 대회 티어 변동</div>
@@ -1192,6 +1263,7 @@ function render() {
   const rankPlayers = parseRankDicts(DATA.rank, tierMap);
   const mpPlayers   = parseMPDicts(DATA.mp);
 
+  renderLatestEvent(players);
   renderHeroTierChange(DATA.tierHistory);
   renderHeroYearAvg(players);
   renderHeroAttendance(players);
@@ -1312,6 +1384,48 @@ function parseMPDicts(dicts) {
 
     return { name, count, win: wins, loss: losses, draw: draws, rate };
   }).filter(Boolean).sort((a, b) => (b.win||0) - (a.win||0) || (b.rate||0) - (a.rate||0));
+}
+
+// ── Hero: 최근 대회 결과 ──
+function renderLatestEvent(players) {
+  const titleEl = document.getElementById('latest-event-title');
+  const subEl   = document.getElementById('latest-event-sub');
+  const listEl  = document.getElementById('latest-event-list');
+
+  const allKeys = (players[0]?.scores || []).map(s => s.name);
+  // 뒤에서부터 실제로 한 명이라도 스코어가 있는 첫 컬럼 = 최근 대회
+  let latestKey = null;
+  for (let i = allKeys.length - 1; i >= 0; i--) {
+    if (players.some(p => p.scores.find(s => s.name === allKeys[i])?.score != null)) {
+      latestKey = allKeys[i];
+      break;
+    }
+  }
+
+  if (!latestKey) {
+    titleEl.textContent = '최근 대회 데이터 없음';
+    subEl.textContent = '';
+    listEl.innerHTML = '';
+    return;
+  }
+
+  const entries = players
+    .map(p => ({ name: p.name, tier: p.tier, score: p.scores.find(s => s.name === latestKey)?.score ?? null }))
+    .filter(e => e.score != null)
+    .sort((a, b) => a.score - b.score);
+
+  titleEl.textContent = latestKey;
+  subEl.textContent = `${entries.length}명 참가`;
+
+  listEl.innerHTML = entries.map((e, i) => {
+    const isFirst = i === 0;
+    return `<div class="le-item${isFirst ? ' first' : ''}">
+      <span class="le-rank${isFirst ? ' first' : ''}">${i + 1}</span>
+      <span class="le-name">${e.name}</span>
+      ${tierBadge(e.tier, e.name)}
+      <span class="le-score">${e.score}</span>
+    </div>`;
+  }).join('');
 }
 
 // ── Hero: 티어 변동 ──
