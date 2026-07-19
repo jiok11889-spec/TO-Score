@@ -6,7 +6,7 @@
   <title>사군자 티오방 스코어 대시보드</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -508,11 +508,11 @@
       margin-bottom: 14px;
     }
     .stat-value {
-      font-family: 'DM Mono', monospace;
-      font-size: 54px;
-      font-weight: 500;
+      font-family: 'DM Serif Display', serif;
+      font-size: 58px;
+      font-weight: 400;
       color: var(--text);
-      letter-spacing: -0.03em;
+      letter-spacing: -0.01em;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
@@ -552,7 +552,7 @@
     }
     .rank-table tr:last-child td { border-bottom: none; }
     .rank-table tbody tr:hover      td { background: rgba(255,255,255,0.028); }
-    .rank-table tbody tr.rank-first td { background: var(--accent-dim); }
+    /* 1위 강조는 순위·점수 텍스트만으로 충분 — 행 전체 배경 워시는 다른 그린 배지와 겹쳐 번잡해지므로 제거 */
 
     .rank-num {
       font-family: 'DM Mono', monospace;
@@ -1204,7 +1204,7 @@ function tierBadge(tier, name) {
   const t = String(tier);
   const labels = { '0':'T0','1':'T1','2':'T2','3':'T3','4':'T4','5':'T5' };
   const proBadge = (name && PRO_PLAYERS.has(name))
-    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:#00C878;background:rgba(0,200,120,0.10);border:1px solid rgba(0,200,120,0.30);border-radius:3px;padding:1px 5px">PRO</span>`
+    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--text-muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:3px;padding:1px 5px">PRO</span>`
     : '';
   return `<span class="tier-badge tier-${t}">${labels[t] || t}</span>${proBadge}`;
 }
@@ -1601,13 +1601,15 @@ function renderTierChart(players) {
   const counts = {};
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
+  // T0(프로)만 그린 액센트, 나머지는 중립 그레이 램프 — 도넛 전체가 그린으로
+  // 뒤덮이는 것을 막고 "T0=특별" 신호 하나만 남긴다.
   const colors = {
     '0': '#00C878',
-    '1': 'rgba(0,200,120,0.70)',
-    '2': 'rgba(0,200,120,0.45)',
-    '3': 'rgba(0,200,120,0.28)',
-    '4': 'rgba(0,200,120,0.16)',
-    '5': 'rgba(0,200,120,0.08)'
+    '1': 'rgba(255,255,255,0.34)',
+    '2': 'rgba(255,255,255,0.26)',
+    '3': 'rgba(255,255,255,0.19)',
+    '4': 'rgba(255,255,255,0.13)',
+    '5': 'rgba(255,255,255,0.08)'
   };
 
   if (charts.tier) charts.tier.destroy();
