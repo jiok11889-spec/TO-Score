@@ -3,7 +3,7 @@
 실행: python server.py
 접속: http://localhost:8000
 """
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import urllib.request
 import json
 import csv
@@ -218,4 +218,4 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     print(f"Server started: http://localhost:{port}")
-    HTTPServer(("", port), Handler).serve_forever()
+    ThreadingHTTPServer(("", port), Handler).serve_forever()
