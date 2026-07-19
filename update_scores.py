@@ -267,9 +267,21 @@ def update_tier_history_sheet(spreadsheet):
     if updates:
         batch_update_cells(sheet, updates)
         print(f"  [OK] 티어 히스토리 입력: {len(done)}명")
-    missing = [n for n in TIER_MAP if n not in done]
+
+    # 시트에 행이 없는 멤버는 새 행으로 자동 추가(마지막 데이터행 다음부터).
+    # PRO는 항상 T0라 히스토리 미추적 관례 유지. 신규 멤버는 이번 회차만 채워지고,
+    # 다음 회차부터 2개 이상 값이 쌓이면 티어 변동 카드에 정상 반영된다.
+    missing = [n for n in TIER_MAP if n not in done and n not in PRO_PLAYERS]
     if missing:
-        print(f"  [!!] 티어 히스토리 미입력 (시트에 없음): {missing}")
+        append_row = len(all_values) + 1
+        add_updates, added = [], []
+        for name in missing:
+            add_updates.append((append_row, name_col + 1, name))
+            add_updates.append((append_row, round_col_1based, TIER_MAP[name]))
+            added.append(name)
+            append_row += 1
+        batch_update_cells(sheet, add_updates)
+        print(f"  [OK] 티어 히스토리 신규 행 추가: {len(added)}명 {added}")
 
 
 def main():
