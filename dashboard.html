@@ -10,17 +10,21 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg:             #080F0C;
-      --surface:        #0F1C16;
-      --surface-2:      #0C1610;
-      --accent:         #00C878;
-      --accent-border:  rgba(0,200,120,0.28);
-      --text:           #FFFFFF;
-      --text-sub:       #B0D4C4;
-      --text-muted:     #3A6650;
-      --border:         rgba(0,200,120,0.10);
+      /* 골프 정체성(그린)은 유지하되, 구조는 중립 헤어라인 + 흰색 투명도 램프로 (사군자 원칙) */
+      --bg:             #0A0F0C;
+      --surface:        rgba(255,255,255,0.020);  /* 중립 서페이스 (녹색 틴트 제거) */
+      --surface-2:      #0B110E;
+      --accent:         #00C878;                  /* 골프 그린 액센트 1개 유지 */
+      --accent-dim:     rgba(0,200,120,0.10);
+      --accent-border:  rgba(0,200,120,0.22);
+      --text:           #ECF1EE;                  /* 니어-화이트 */
+      --text-sub:       rgba(236,241,238,0.60);   /* 흰색 램프 */
+      --text-muted:     rgba(236,241,238,0.30);
+      --text-faint:     rgba(236,241,238,0.16);   /* 아이브로우/최옅음 */
+      --border:         rgba(255,255,255,0.07);   /* 중립 헤어라인 (그린 틴트 아님) */
+      --border-2:       rgba(255,255,255,0.12);
       --divider:        rgba(255,255,255,0.05);
-      --radius:         8px;
+      --radius:         10px;
     }
 
     * {
@@ -39,11 +43,13 @@
       line-height: 1.5;
     }
 
-    /* ─── Header ─── */
+    /* ─── Header (스티키 블러 · 중립 헤어라인, 그린 액센트바=정체성 유지) ─── */
     .header {
-      background: var(--surface-2);
+      background: rgba(10,15,12,0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border);
-      padding: 16px 32px;
+      padding: 18px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -74,11 +80,11 @@
     }
     .header-brand .header-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 500;
-      color: #3A6650;
+      color: var(--text-faint);
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.18em;
       display: block;
     }
     .header-right {
@@ -116,35 +122,38 @@
     }
 
     /* ─── Container ─── */
-    .container { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+    .container { padding: 40px 32px 96px; max-width: 1320px; margin: 0 auto; }
 
-    /* ─── Section label (above cards) ─── */
+    /* ─── Section label (아이브로우: 중립·자간, 헤비 그린 언더라인 제거) ─── */
     .section-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.10em;
-      color: #2A4A38;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(0,200,120,0.07);
+      letter-spacing: 0.18em;
+      color: var(--text-faint);
+      margin-bottom: 14px;
     }
 
-    /* ─── Cards ─── */
+    /* ─── Cards (박스보다 여백: 중립 헤어라인·옅은 서페이스) ─── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 12px 14px;
+      padding: 18px 20px;
     }
-    .card.accent-border { border-color: var(--accent-border); }
+    /* 강조는 그린 풀-보더 남발 대신, 상단 얇은 액센트 라인 하나로 절제 */
+    .card.accent-border {
+      border-color: var(--border);
+      border-top: 1px solid var(--accent-border);
+      background: linear-gradient(180deg, rgba(0,200,120,0.035), rgba(255,255,255,0.010));
+    }
 
     .card-title {
       font-family: 'Syne', sans-serif;
       font-size: 13px;
       font-weight: 700;
-      color: var(--accent);
+      color: var(--text-sub);
       margin-bottom: 12px;
     }
 
@@ -152,8 +161,8 @@
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 18px;
+      margin-bottom: 40px;
     }
 
     /* ─── Matchplay participation card ─── */
@@ -386,103 +395,107 @@
       text-align: right;
     }
 
-    /* ─── Tabs ─── */
+    /* ─── Tabs (중립 비활성 · 그린 활성) ─── */
     .tabs {
       display: flex;
-      border-bottom: 1px solid rgba(0,200,120,0.08);
-      margin-bottom: 16px;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
-      font-weight: 400;
-      padding: 10px 16px;
-      color: #3A6650;
+      font-weight: 500;
+      padding: 12px 18px;
+      color: var(--text-muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
+      letter-spacing: 0.01em;
       transition: color 0.15s, border-color 0.15s;
     }
     .tab:hover { color: var(--text-sub); }
-    .tab.active { color: #00C878; border-bottom-color: #00C878; font-weight: 700; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
 
-    /* ─── Stat cards ─── */
+    /* ─── Stat cards (에디토리얼 위계: 중립 라벨 · 지배적 숫자 · 헤어라인) ─── */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 40px;
     }
     .stat-card {
-      background: #0F1C16;
-      border: 1px solid rgba(0,200,120,0.12);
-      border-radius: var(--radius);
-      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
+      padding: 18px 4px 4px;
     }
-    .stat-card.highlight { border-color: rgba(0,200,120,0.12); }
+    /* 강조 지표만 유일한 액센트 서페이스 */
+    .stat-card.highlight {
+      border-top-color: var(--accent-border);
+    }
     .stat-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #3A6650;
-      margin-bottom: 8px;
+      letter-spacing: 0.16em;
+      color: var(--text-faint);
+      margin-bottom: 14px;
     }
     .stat-value {
       font-family: 'DM Mono', monospace;
-      font-size: 48px;
+      font-size: 54px;
       font-weight: 500;
-      color: #FFFFFF;
-      letter-spacing: -0.02em;
+      color: var(--text);
+      letter-spacing: -0.03em;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
     .stat-value.accent { color: var(--accent); }
     .stat-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 400;
-      color: #3A6650;
-      margin-top: 4px;
+      color: var(--text-muted);
+      margin-top: 8px;
     }
 
     /* ─── Grid layouts ─── */
-    .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 8px; margin-bottom: 8px; }
-    .three-col { display: grid; grid-template-columns: 2fr 1fr 1fr;   gap: 8px; margin-bottom: 8px; }
-    .full-col  { margin-bottom: 8px; }
+    .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 24px; margin-bottom: 24px; }
+    .three-col { display: grid; grid-template-columns: 2fr 1fr 1fr;   gap: 24px; margin-bottom: 24px; }
+    .full-col  { margin-bottom: 24px; }
 
-    /* ─── Tables ─── */
+    /* ─── Tables (스트라이핑 제거 · 헤어라인 행 · 중립 헤더) ─── */
     .rank-table { width: 100%; border-collapse: collapse; }
     .rank-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #2A4A38;
+      letter-spacing: 0.14em;
+      color: var(--text-faint);
       text-align: left;
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--divider);
+      padding: 6px 10px 10px;
+      border-bottom: 1px solid var(--border);
     }
     .rank-table th.right { text-align: right; }
     .rank-table td {
-      padding: 8px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--divider);
       color: var(--text-sub);
       transition: background 150ms;
     }
     .rank-table tr:last-child td { border-bottom: none; }
-    .rank-table tbody tr:nth-child(odd)  td { background: rgba(255,255,255,0.015); }
-    .rank-table tbody tr:nth-child(even) td { background: transparent; }
-    .rank-table tbody tr:hover           td { background: rgba(0,200,120,0.05); }
-    .rank-table tbody tr.rank-first      td { background: rgba(0,200,120,0.06); }
+    .rank-table tbody tr:hover      td { background: rgba(255,255,255,0.028); }
+    .rank-table tbody tr.rank-first td { background: var(--accent-dim); }
 
     .rank-num {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
       font-weight: 500;
-      color: #6A9A84;
+      color: var(--text-muted);
       width: 26px;
       font-variant-numeric: tabular-nums;
     }
@@ -660,11 +673,11 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 10px;
-      background: rgba(0,200,120,0.03);
-      border-radius: 6px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.022);
+      border-radius: 8px;
       border: 1px solid var(--border);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .tier-header .tier-count {
       font-family: 'Space Grotesk', sans-serif;
@@ -745,8 +758,10 @@
         position: fixed;
         bottom: 0; left: 0; right: 0;
         height: 56px;
-        background: #0C1610;
-        border-top: 1px solid rgba(0,200,120,0.10);
+        background: rgba(11,17,14,0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border);
         z-index: 999;
       }
       .bottom-tab-item {
@@ -757,7 +772,7 @@
         justify-content: center;
         font-family: 'Space Grotesk', sans-serif;
         font-size: 10px;
-        color: #2A4A38;
+        color: var(--text-muted);
         gap: 3px;
         min-height: 44px;
         cursor: pointer;
@@ -1358,12 +1373,11 @@ function renderHeroYearAvg(players) {
 
   const rows = withYear.map((p, i) => {
     const isFirst = i === 0;
-    const attendColor = (p.yearAttendRate||0) >= 80 ? '#00C878' : 'var(--text-muted)';
     return `<div class="ya-item${isFirst ? ' first' : ''}">
       <span class="ya-rank${isFirst ? ' first' : ''}">${isFirst ? '1' : i + 1}</span>
       <span class="ya-name">${p.name}</span>
       <span class="ya-score">${p.yearAvg.toFixed(1)}</span>
-      <span class="ya-attend" style="color:${attendColor}">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
+      <span class="ya-attend">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
       <span class="ya-rounds">${p.yearRounds}R</span>
     </div>`;
   }).join('');
@@ -1508,8 +1522,8 @@ function renderMPOverview(players) {
   const el = document.getElementById('mp-overview');
   el.innerHTML = players.slice(0, 5).map((p, i) => {
     const isTop = i === 0;
-    const barColor  = isTop ? '#00C878' : 'rgba(0,200,120,0.22)';
-    const rateColor = (p.rate === 100) ? '#00C878' : isTop ? '#00C878' : '#B0D4C4';
+    const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
+    const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
     return `<div class="mp-item">
       <div class="mp-item-header">
         <span class="mp-item-name">${p.name}</span>
@@ -1518,7 +1532,7 @@ function renderMPOverview(players) {
       <div class="win-rate-bar">
         <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
       </div>
-      <div class="mp-item-sub" style="color:#3A6650;font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
+      <div class="mp-item-sub" style="color:var(--text-muted);font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
     </div>`;
   }).join('');
 }
