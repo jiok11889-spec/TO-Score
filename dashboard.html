@@ -164,6 +164,18 @@
       gap: 18px;
       margin-bottom: 40px;
     }
+    .hero-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 40px;
+    }
+    /* 티어 변동: 상승|하락 2단 — 전원 표시해도 세로로 길어지지 않게 */
+    .tc-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
 
     /* ─── Matchplay participation card ─── */
     .mp-part-list { display: flex; flex-direction: column; gap: 0; }
@@ -211,6 +223,7 @@
       flex-shrink: 0;
     }
     .mp-part-count.leader { color: var(--accent); }
+    .mp-part-item.leader .mp-part-rate { color: var(--accent); }
     .mp-part-rate {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -302,16 +315,14 @@
       letter-spacing: -0.01em;
       flex: 1;
     }
-    .tier-change-item.up   .tc-name { color: #F0C093; }
-    .tier-change-item.down .tc-name { color: #94A3B8; }
+    .tc-name { color: var(--text); }
     .tc-tiers {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
-    .tier-change-item.up   .tc-tiers { color: #8A5A2E; }
-    .tier-change-item.down .tc-tiers { color: #3A4A5A; }
-    .tc-tiers b.up   { color: #E0954A; font-weight: 500; }
-    .tc-tiers b.down { color: #64748B; font-weight: 500; }
+    .tc-arrow { color: var(--text-faint); font-family: 'DM Mono', monospace; font-size: 12px; }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
@@ -382,8 +393,10 @@
       width: 38px;
       text-align: right;
     }
-    .ya-item.first .ya-name  { color: var(--accent); }
-    .ya-item.first .ya-score { color: var(--accent); }
+    .ya-item.first .ya-name,
+    .ya-item.first .ya-score,
+    .ya-item.first .ya-attend,
+    .ya-item.first .ya-rounds { color: var(--accent); }
     .ya-attend {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -582,6 +595,7 @@
        PRO 배지를 중립화해서 다른 그린과 안 겹치므로 다시 넣어도 번잡하지 않다. */
     .rank-table tbody tr.rank-first td {
       background: linear-gradient(90deg, rgba(0,200,120,0.10), rgba(0,200,120,0.02));
+      color: var(--accent);
     }
     .rank-table tbody tr.rank-first td:first-child { border-radius: 6px 0 0 6px; }
     .rank-table tbody tr.rank-first td:last-child  { border-radius: 0 6px 6px 0; }
@@ -850,9 +864,11 @@
       .container { padding: 12px 10px; }
 
       /* [2] 3단/2단 컬럼 → 세로 스택 */
-      .hero-grid  { grid-template-columns: 1fr; gap: 10px; }
-      .two-col    { grid-template-columns: 1fr; }
-      .three-col  { grid-template-columns: 1fr; }
+      .hero-grid   { grid-template-columns: 1fr; gap: 10px; }
+      .hero-grid-2 { grid-template-columns: 1fr; gap: 10px; }
+      .tc-cols     { grid-template-columns: 1fr; gap: 14px; }
+      .two-col     { grid-template-columns: 1fr; }
+      .three-col   { grid-template-columns: 1fr; }
 
       /* Stat grid: 4열 → 2열 */
       .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -1005,13 +1021,13 @@
         <div class="le-grid" id="latest-event-list"></div>
       </div>
     </div>
-    <div class="hero-grid">
-      <div>
-        <div class="section-label">최근 대회 티어 변동</div>
-        <div class="card accent-border">
-          <div class="tier-change-list" id="tier-change-list"></div>
-        </div>
+    <div style="margin-bottom:24px">
+      <div class="section-label">최근 대회 티어 변동</div>
+      <div class="card accent-border">
+        <div class="tier-change-list" id="tier-change-list"></div>
       </div>
+    </div>
+    <div class="hero-grid-2">
       <div>
         <div class="section-label">2026 시즌 평균 TOP</div>
         <div class="card accent-border">
@@ -1019,7 +1035,7 @@
         </div>
       </div>
       <div>
-        <div class="section-label">대회 참여 TOP</div>
+        <div class="section-label">2026 참여 TOP</div>
         <div class="card accent-border">
           <div class="mp-part-list" id="mp-part-list"></div>
         </div>
@@ -1495,33 +1511,24 @@ function renderHeroTierChange(history) {
   const ups   = changed.filter(h => parseInt(h['현재티어']) < parseInt(h['이전티어']));
   const downs = changed.filter(h => parseInt(h['현재티어']) > parseInt(h['이전티어']));
 
-  // 히어로는 요약 — 상승/하락 각 최대 3명씩만, 나머지는 하단에 총원 표기
-  const CAP = 3;
-  let html = '';
-  if (ups.length) {
-    html += `<div class="tc-group">
-      <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
-      ${ups.slice(0, CAP).map(h => `<div class="tier-change-item up">
-        <span class="tc-indicator up">▲</span>
-        <span class="tc-name">${h['이름']}</span>
-        <span class="tc-tiers">T${h['이전티어']} → <b class="up">T${h['현재티어']}</b></span>
-      </div>`).join('')}
-    </div>`;
-  }
-  if (downs.length) {
-    html += `<div class="tc-group">
-      <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
-      ${downs.slice(0, CAP).map(h => `<div class="tier-change-item down">
-        <span class="tc-indicator down">▼</span>
-        <span class="tc-name">${h['이름']}</span>
-        <span class="tc-tiers">T${h['이전티어']} → <b class="down">T${h['현재티어']}</b></span>
-      </div>`).join('')}
-    </div>`;
-  }
-  if (ups.length > CAP || downs.length > CAP) {
-    html += `<div class="hero-more">총 ${changed.length}명 변동 · 상승 ${ups.length} · 하락 ${downs.length}</div>`;
-  }
-  el.innerHTML = html;
+  // 티어 라벨은 사이트 전역과 동일한 티어 배지(.tier-N)로 — 색 통일.
+  // 방향(상승/하락)은 화살표 색으로만 구분.
+  const item = (h, dir) => `<div class="tier-change-item ${dir}">
+    <span class="tc-indicator ${dir}">${dir === 'up' ? '▲' : '▼'}</span>
+    <span class="tc-name">${h['이름']}</span>
+    <span class="tc-tiers">${tierBadge(h['이전티어'], null)} <span class="tc-arrow">→</span> ${tierBadge(h['현재티어'], null)}</span>
+  </div>`;
+
+  const upCol = ups.length ? `<div class="tc-group">
+    <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
+    ${ups.map(h => item(h, 'up')).join('')}
+  </div>` : '';
+  const downCol = downs.length ? `<div class="tc-group">
+    <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
+    ${downs.map(h => item(h, 'down')).join('')}
+  </div>` : '';
+
+  el.innerHTML = `<div class="tc-cols">${upCol}${downCol}</div>`;
 }
 
 // ── Hero: 연도 평균 ──
@@ -1569,8 +1576,14 @@ function renderHeroAttendance(players) {
     return;
   }
 
-  const sortedAll = [...players].sort((a, b) => (b.rounds || 0) - (a.rounds || 0));
-  const maxRounds = sortedAll[0].rounds || 1;
+  // 2026 시즌 참여만 집계(전체 누적 아님) — yearRounds 기준
+  const sortedAll = [...players].filter(p => (p.yearRounds || 0) > 0)
+    .sort((a, b) => (b.yearRounds || 0) - (a.yearRounds || 0));
+  if (!sortedAll.length) {
+    el.innerHTML = `<div class="no-change-msg">2026 시즌 참여 데이터 없음</div>`;
+    return;
+  }
+  const maxRounds = sortedAll[0].yearRounds || 1;
   const HERO_LIMIT = 8;
   const sorted = sortedAll.slice(0, HERO_LIMIT);
 
@@ -1583,7 +1596,7 @@ function renderHeroAttendance(players) {
 
   const rows = sorted.map((p, i) => {
     const isLeader = i === 0;
-    const pct = Math.round(((p.rounds || 0) / maxRounds) * 100);
+    const pct = Math.round(((p.yearRounds || 0) / maxRounds) * 100);
     const leaderTag = isLeader ? `<span class="mp-leader-tag">최다참여</span>` : '';
     return `<div class="mp-part-item${isLeader ? ' leader' : ''}">
       <span class="mp-part-name${isLeader ? ' leader' : ''}">${p.name}</span>
@@ -1591,13 +1604,13 @@ function renderHeroAttendance(players) {
         <div class="mp-part-bar${isLeader ? ' leader' : ''}" style="width:${pct}%"></div>
       </div>
       ${leaderTag}
-      <span class="mp-part-count${isLeader ? ' leader' : ''}">${p.rounds ?? '—'}R</span>
-      <span class="mp-part-rate">${p.attendRate !== null ? p.attendRate + '%' : '—'}</span>
+      <span class="mp-part-count${isLeader ? ' leader' : ''}">${p.yearRounds ?? '—'}R</span>
+      <span class="mp-part-rate">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
     </div>`;
   }).join('');
 
   const more = sortedAll.length > HERO_LIMIT
-    ? `<div class="hero-more">전체 ${sortedAll.length}명 · 참가 현황 탭에서 전체 보기</div>` : '';
+    ? `<div class="hero-more">2026 참가 ${sortedAll.length}명 · 참가 현황 탭에서 전체 보기</div>` : '';
   el.innerHTML = header + rows + more;
 }
 
@@ -1722,7 +1735,7 @@ function renderMPOverview(players) {
       <div class="win-rate-bar">
         <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
       </div>
-      <div class="mp-item-sub" style="color:var(--text-muted);font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
+      <div class="mp-item-sub" style="color:${isTop ? 'var(--accent)' : 'var(--text-muted)'};font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
     </div>`;
   }).join('');
 }
