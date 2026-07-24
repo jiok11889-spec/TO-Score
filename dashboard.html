@@ -875,8 +875,8 @@
       .stat-value { font-size: 30px; }
       .stat-card  { padding: 12px 14px; }
 
-      /* 기존 상단 탭 숨김 (하단 탭으로 대체) */
-      .tabs { display: none; }
+      /* 기존 상단 탭 숨김 (하단 탭으로 대체) — JS 인라인 display:flex보다 우선 */
+      .tabs { display: none !important; }
 
       /* [3] 하단 고정 탭 네비 */
       .bottom-tab-nav {
@@ -1011,8 +1011,20 @@
 
 <div class="container">
 
-  <!-- 우선순위 섹션 -->
-  <div id="hero-section" style="display:none">
+  <div id="loading" class="loading"><div class="spinner"></div> 데이터 불러오는 중...</div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs" style="display:none">
+    <div class="tab active" data-tab="summary" data-short="요약">요약</div>
+    <div class="tab" data-tab="overview" data-short="현황">전체 현황</div>
+    <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
+    <div class="tab" data-tab="tier" data-short="티어">티어</div>
+    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
+    <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
+  </div>
+
+  <!-- ── 요약 ── -->
+  <div id="page-summary" class="page">
     <div style="margin-bottom:24px">
       <div class="section-label">최근 대회 결과</div>
       <div class="card accent-border">
@@ -1041,17 +1053,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div id="loading" class="loading"><div class="spinner"></div> 데이터 불러오는 중...</div>
-
-  <!-- Tabs -->
-  <div class="tabs" id="tabs" style="display:none">
-    <div class="tab active" data-tab="overview" data-short="현황">전체 현황</div>
-    <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
-    <div class="tab" data-tab="tier" data-short="티어">티어</div>
-    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
-    <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
   </div>
 
   <!-- ── 전체 현황 ── -->
@@ -1226,7 +1227,10 @@
 
 <!-- 하단 고정 탭 네비 (모바일 전용) -->
 <nav class="bottom-tab-nav" id="bottom-tab-nav">
-  <div class="bottom-tab-item active" data-tab="overview">
+  <div class="bottom-tab-item active" data-tab="summary">
+    <span class="btab-icon">★</span>요약
+  </div>
+  <div class="bottom-tab-item" data-tab="overview">
     <span class="btab-icon">▤</span>현황
   </div>
   <div class="bottom-tab-item" data-tab="ranking">
@@ -1288,7 +1292,6 @@ function findKey(obj, ...kws) {
 
 async function loadAll() {
   document.getElementById('loading').style.display = 'flex';
-  document.getElementById('hero-section').style.display = 'none';
   document.getElementById('tabs').style.display = 'none';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
@@ -1316,9 +1319,8 @@ async function loadAll() {
   }
 
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('hero-section').style.display = 'block';
   document.getElementById('tabs').style.display = 'flex';
-  document.getElementById('page-overview').classList.add('active');
+  document.getElementById('page-summary').classList.add('active');
 }
 
 function render() {
