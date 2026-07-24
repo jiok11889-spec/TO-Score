@@ -703,7 +703,7 @@
       font-weight: 500;
       font-size: 14px;
       letter-spacing: -0.01em;
-      color: #B0D4C4;
+      color: var(--text);
     }
     .mp-item-rate {
       font-family: 'DM Mono', monospace;
@@ -878,8 +878,8 @@
         transition: color 0.15s, border-color 0.15s;
       }
       .bottom-tab-item.active {
-        color: #00C878;
-        border-top-color: #00C878;
+        color: var(--accent);
+        border-top-color: var(--accent);
       }
       .bottom-tab-item .btab-icon { font-size: 16px; line-height: 1; }
       body { padding-bottom: 56px; }
@@ -1323,7 +1323,7 @@ function parseScoreDicts(dicts) {
   const s = dicts[0];
   const avgKey    = findKey(s, '누적평균');
   const tierKey   = findKey(s, '현재 티어', '티어');
-  const bestKey   = findKey(s, '개인 베스트');
+  const bestKey   = findKey(s, '베스트');
   const roundKey  = findKey(s, '라운드횟수', '라운드 횟수');
   const recentKey = findKey(s, '가장최근', '최근라운딩');
   const contestKeys = Object.keys(s).filter(k => /\d{2}' /.test(k) && !k.includes('매치'));
@@ -1349,7 +1349,7 @@ function parseScoreDicts(dicts) {
     return {
       name, avg,
       tier: PRO_PLAYERS.has(name) ? '0' : rawTier,
-      best: num(d[bestKey]),
+      best: (num(d[bestKey]) || 0) > 0 ? num(d[bestKey]) : null,  // 0/공백은 무효(신규 멤버 기본값)
       rounds: playedRounds,
       recent: num(d[recentKey]),
       yearAvg, yearRounds: yearScores.length,
@@ -1367,10 +1367,12 @@ function parseScoreDicts(dicts) {
 function parseRankDicts(dicts, tierMap = {}) {
   if (!dicts?.length) return [];
   const s = dicts[0];
-  const avgKey    = findKey(s, '누적평균');
+  // '누적평균 스코어 랭킹'(순위) 컬럼이 '누적평균 스코어 (A)'(실제값) 컬럼보다 앞에 있어서
+  // 단순 includes 매칭이면 랭킹 숫자를 값으로 잘못 읽는다 — '랭킹' 포함 컬럼은 제외.
+  const avgKey    = Object.keys(s).find(k => k.includes('누적평균') && !k.includes('랭킹'));
   const tierKey   = findKey(s, '티어');
   const recentKey = findKey(s, '최근');
-  const wAvgKey   = findKey(s, '가중평균');
+  const wAvgKey   = Object.keys(s).find(k => k.includes('가중평균') && !k.includes('랭킹'));
   const roundKey  = findKey(s, '라운드');
 
   return dicts.map(d => {
@@ -1667,7 +1669,7 @@ function renderTierChart(players) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { color: '#3A6650', font: { family: 'Space Grotesk', size: 12, weight: '500' }, padding: 10, boxWidth: 10 } }
+        legend: { position: 'right', labels: { color: 'rgba(236,241,238,0.30)', font: { family: 'Space Grotesk', size: 12, weight: '500' }, padding: 10, boxWidth: 10 } }
       }
     }
   });
@@ -1793,8 +1795,8 @@ function renderMPTable(players) {
       <td class="rank-num ${numCls}">${i + 1}</td>
       <td class="player-name">${p.name}</td>
       <td class="rounds-val">${p.count}</td>
-      <td class="rounds-val" style="color:#00C878">${p.win}</td>
-      <td class="rounds-val" style="color:#C87878">${p.loss}</td>
+      <td class="rounds-val">${p.win}</td>
+      <td class="rounds-val">${p.loss}</td>
       <td style="text-align:right;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${rateColor};font-variant-numeric:tabular-nums">${p.rate !== null ? p.rate + '%' : '—'}</td>
     </tr>`;
   }).join('');
@@ -1827,19 +1829,19 @@ function renderMPChart(players) {
 
   const eventCount = eventKeys.length;
   document.getElementById('mp-chart-summary').innerHTML = `
-    <div style="color:#6A9A84;font-size:13px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
+    <div style="color:var(--text-muted);font-size:13px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
     <div>
-      <span style="color:#00C878"><b>${clubWin}</b> 승</span>
-      <span style="color:#555;margin:0 8px">|</span>
+      <span style="color:var(--accent)"><b>${clubWin}</b> 승</span>
+      <span style="color:var(--divider);margin:0 8px">|</span>
       <span style="color:#C87878"><b>${clubLoss}</b> 패</span>
-      ${clubDraw ? `<span style="color:#555;margin:0 8px">|</span><span style="color:#6A9A84"><b>${clubDraw}</b> 무</span>` : ''}
+      ${clubDraw ? `<span style="color:var(--divider);margin:0 8px">|</span><span style="color:var(--text-muted)"><b>${clubDraw}</b> 무</span>` : ''}
     </div>
   `;
 
   const labels = ['승', '패', ...(clubDraw ? ['무'] : [])];
   const data   = [clubWin, clubLoss, ...(clubDraw ? [clubDraw] : [])];
-  const bgColors = ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(100,120,100,0.4)'];
-  const bdColors = ['#00C878', '#C87878', '#3A6650'];
+  const bgColors = ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
+  const bdColors = ['#00C878', '#C87878', 'rgba(255,255,255,0.30)'];
 
   const ctx = document.getElementById('mp-chart').getContext('2d');
   charts.mp = new Chart(ctx, {
@@ -1859,7 +1861,7 @@ function renderMPChart(players) {
         legend: {
           display: true,
           position: 'bottom',
-          labels: { color: '#B0D4C4', font: { family: 'DM Mono', size: 12 }, padding: 16 }
+          labels: { color: 'rgba(236,241,238,0.60)', font: { family: 'DM Mono', size: 12 }, padding: 16 }
         },
         tooltip: {
           callbacks: {
@@ -1896,9 +1898,10 @@ function renderAttendance(dicts) {
     }).join('');
     rows.push({ name, cells, count });
   }
+  // 참가 횟수 최다인 선수(공동 포함)만 강조 — 나머지는 값과 무관하게 중립
   const maxCount = Math.max(...rows.map(r => r.count));
   for (const r of rows) {
-    const cc = r.count === maxCount ? '#00C878' : 'rgba(0,200,120,0.40)';
+    const cc = r.count === maxCount ? 'var(--accent)' : 'var(--text-muted)';
     html += `<tr><td class="name-cell">${r.name}</td>${r.cells}
       <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:13px;color:${cc};font-variant-numeric:tabular-nums">${r.count}</td></tr>`;
   }
