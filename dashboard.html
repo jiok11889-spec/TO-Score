@@ -402,6 +402,18 @@
       text-align: right;
     }
 
+    /* ─── Hero 요약 카드 하단 '전체 N명' 표기 ─── */
+    .hero-more {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--text-faint);
+      text-align: center;
+      padding: 12px 0 2px;
+      margin-top: 8px;
+      border-top: 1px solid var(--divider);
+    }
+
     /* ─── Latest event result list ─── */
     .latest-event-title {
       font-family: 'Syne', sans-serif;
@@ -1001,13 +1013,13 @@
         </div>
       </div>
       <div>
-        <div class="section-label">2026 시즌 평균 스코어</div>
+        <div class="section-label">2026 시즌 평균 TOP</div>
         <div class="card accent-border">
           <div class="year-avg-list" id="year-avg-list"></div>
         </div>
       </div>
       <div>
-        <div class="section-label">전체 대회 참여현황</div>
+        <div class="section-label">대회 참여 TOP</div>
         <div class="card accent-border">
           <div class="mp-part-list" id="mp-part-list"></div>
         </div>
@@ -1483,11 +1495,13 @@ function renderHeroTierChange(history) {
   const ups   = changed.filter(h => parseInt(h['현재티어']) < parseInt(h['이전티어']));
   const downs = changed.filter(h => parseInt(h['현재티어']) > parseInt(h['이전티어']));
 
+  // 히어로는 요약 — 상승/하락 각 최대 3명씩만, 나머지는 하단에 총원 표기
+  const CAP = 3;
   let html = '';
   if (ups.length) {
     html += `<div class="tc-group">
       <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
-      ${ups.map(h => `<div class="tier-change-item up">
+      ${ups.slice(0, CAP).map(h => `<div class="tier-change-item up">
         <span class="tc-indicator up">▲</span>
         <span class="tc-name">${h['이름']}</span>
         <span class="tc-tiers">T${h['이전티어']} → <b class="up">T${h['현재티어']}</b></span>
@@ -1497,12 +1511,15 @@ function renderHeroTierChange(history) {
   if (downs.length) {
     html += `<div class="tc-group">
       <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
-      ${downs.map(h => `<div class="tier-change-item down">
+      ${downs.slice(0, CAP).map(h => `<div class="tier-change-item down">
         <span class="tc-indicator down">▼</span>
         <span class="tc-name">${h['이름']}</span>
         <span class="tc-tiers">T${h['이전티어']} → <b class="down">T${h['현재티어']}</b></span>
       </div>`).join('')}
     </div>`;
+  }
+  if (ups.length > CAP || downs.length > CAP) {
+    html += `<div class="hero-more">총 ${changed.length}명 변동 · 상승 ${ups.length} · 하락 ${downs.length}</div>`;
   }
   el.innerHTML = html;
 }
@@ -1527,7 +1544,8 @@ function renderHeroYearAvg(players) {
     <span style="width:24px;text-align:right">R</span>
   </div>`;
 
-  const rows = withYear.map((p, i) => {
+  const HERO_LIMIT = 8;
+  const rows = withYear.slice(0, HERO_LIMIT).map((p, i) => {
     const isFirst = i === 0;
     return `<div class="ya-item${isFirst ? ' first' : ''}">
       <span class="ya-rank${isFirst ? ' first' : ''}">${isFirst ? '1' : i + 1}</span>
@@ -1538,7 +1556,9 @@ function renderHeroYearAvg(players) {
     </div>`;
   }).join('');
 
-  el.innerHTML = header + rows;
+  const more = withYear.length > HERO_LIMIT
+    ? `<div class="hero-more">시즌 참가 ${withYear.length}명 · 랭킹 탭에서 전체 보기</div>` : '';
+  el.innerHTML = header + rows + more;
 }
 
 // ── Hero: 전체 대회 참여현황 ──
@@ -1549,8 +1569,10 @@ function renderHeroAttendance(players) {
     return;
   }
 
-  const sorted = [...players].sort((a, b) => (b.rounds || 0) - (a.rounds || 0));
-  const maxRounds = sorted[0].rounds || 1;
+  const sortedAll = [...players].sort((a, b) => (b.rounds || 0) - (a.rounds || 0));
+  const maxRounds = sortedAll[0].rounds || 1;
+  const HERO_LIMIT = 8;
+  const sorted = sortedAll.slice(0, HERO_LIMIT);
 
   const header = `<div style="display:flex;align-items:center;gap:10px;padding:0 0 6px;border-bottom:1px solid var(--divider);margin-bottom:2px">
     <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:72px">선수</span>
@@ -1574,7 +1596,9 @@ function renderHeroAttendance(players) {
     </div>`;
   }).join('');
 
-  el.innerHTML = header + rows;
+  const more = sortedAll.length > HERO_LIMIT
+    ? `<div class="hero-more">전체 ${sortedAll.length}명 · 참가 현황 탭에서 전체 보기</div>` : '';
+  el.innerHTML = header + rows + more;
 }
 
 // ── Summary ──
