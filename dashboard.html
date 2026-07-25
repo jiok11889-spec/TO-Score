@@ -274,7 +274,7 @@
       padding: 4px 8px;
     }
     .tc-group-label.up   { color: #2BAE86; background: rgba(43,174,134,0.07); border: 1px solid rgba(43,174,134,0.15); }
-    .tc-group-label.down { color: #848B94; background: rgba(255,255,255,0.03); border: 1px solid rgba(132,139,148,0.15); }
+    .tc-group-label.down { color: #9A9482; background: rgba(255,255,255,0.03); border: 1px solid rgba(154,148,130,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
@@ -285,7 +285,7 @@
       letter-spacing: 0;
     }
     .tc-count-badge.up   { background: rgba(43,174,134,0.10); color: #2BAE86; border: 1px solid rgba(43,174,134,0.25); }
-    .tc-count-badge.down { background: rgba(132,139,148,0.08); color: #848B94; border: 1px solid rgba(132,139,148,0.15); }
+    .tc-count-badge.down { background: rgba(154,148,130,0.08); color: #9A9482; border: 1px solid rgba(154,148,130,0.15); }
     .tier-change-item {
       display: flex;
       align-items: center;
@@ -297,7 +297,7 @@
     }
     .tier-change-item:first-of-type { border-top: none; }
     .tier-change-item.up   { background: rgba(43,174,134,0.06);  border-left: 2px solid rgba(43,174,134,0.30); }
-    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(132,139,148,0.22); }
+    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(154,148,130,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -307,7 +307,7 @@
       flex-shrink: 0;
     }
     .tc-indicator.up   { color: #2BAE86; }
-    .tc-indicator.down { color: #848B94; }
+    .tc-indicator.down { color: #9A9482; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
@@ -650,12 +650,12 @@
     /* 티어 팔레트(뉴트럴 실버) — 티어는 무채색 계조로만 서열 표현.
        색을 쓰는 것은 강조색 제이드 하나뿐이라, 1등 강조가 항상 유일한 '색'으로 읽힌다.
        다크 배경에서 T5까지 묻히지 않도록 명도가 아닌 밝기 폭을 좁게 잡음. */
-    .tier-0 { color: #D5DBE2; border-color: rgba(213,219,226,0.42); background: rgba(213,219,226,0.15); font-weight: 700; }
-    .tier-1 { color: #B9C0C8; border-color: rgba(185,192,200,0.40); background: rgba(185,192,200,0.14); }
-    .tier-2 { color: #9EA5AE; border-color: rgba(158,165,174,0.40); background: rgba(158,165,174,0.14); }
-    .tier-3 { color: #848B94; border-color: rgba(132,139,148,0.42); background: rgba(132,139,148,0.15); }
-    .tier-4 { color: #6B717A; border-color: rgba(107,113,122,0.46); background: rgba(107,113,122,0.17); }
-    .tier-5 { color: #565C64; border-color: rgba(86,92,100,0.50);   background: rgba(86,92,100,0.20); }
+    .tier-0 { color: #FDE6AB; border-color: rgba(253,230,171,0.42); background: rgba(253,230,171,0.14); font-weight: 700; }
+    .tier-1 { color: #E2D1A3; border-color: rgba(226,209,163,0.40); background: rgba(226,209,163,0.13); }
+    .tier-2 { color: #CABC99; border-color: rgba(202,188,153,0.40); background: rgba(202,188,153,0.13); }
+    .tier-3 { color: #B1A88E; border-color: rgba(177,168,142,0.42); background: rgba(177,168,142,0.14); }
+    .tier-4 { color: #9A9482; border-color: rgba(154,148,130,0.46); background: rgba(154,148,130,0.16); }
+    .tier-5 { color: #848076; border-color: rgba(132,128,118,0.50); background: rgba(132,128,118,0.18); }
 
     /* ─── Best list ─── */
     .best-list { display: flex; flex-direction: column; gap: 0; }
@@ -700,7 +700,7 @@
     .best-item.first .best-score { color: var(--accent); }
 
     /* ─── Chart ─── */
-    .chart-wrap { position: relative; height: 200px; }
+    .chart-wrap { position: relative; height: 230px; }   /* 하단 범례 공간 포함 */
 
     /* ─── MP win bar ─── */
     .win-rate-bar {
@@ -1253,6 +1253,30 @@
 <script>
 let DATA = {};
 let charts = {};
+// 탭이 보이게 될 때 차트를 다시 그리기 위한 콜백. 숨겨진(display:none) 탭에서
+// 생성된 Chart.js 캔버스는 컨테이너 크기를 0으로 잡고, 이후 resize()로도
+// 복구되지 않아 도넛이 점처럼 찌그러진다. 보이는 시점에 재생성이 유일한 해법.
+let redrawCharts = {};
+
+// 캔버스를 새 노드로 교체한 뒤 컨텍스트를 돌려준다. 크기가 0으로 굳은
+// 캔버스에 다시 그리면 그대로 0을 물려받으므로, 매번 새 캔버스에서 시작한다.
+function freshCanvas(id) {
+  const old = document.getElementById(id);
+  const next = document.createElement('canvas');
+  next.id = id;
+  old.replaceWith(next);
+  return next.getContext('2d');
+}
+
+// 해당 탭의 차트 컨테이너가 실제 크기를 가질 때까지 기다렸다가 그린다.
+// 탭 전환 직후에는 레이아웃이 아직 0일 수 있어 그대로 그리면 캔버스가 0x0으로 굳는다.
+function drawWhenSized(tabName, tries = 30) {
+  const page = document.getElementById('page-' + tabName);
+  const wrap = page && page.querySelector('.chart-wrap');
+  if (!wrap || !redrawCharts[tabName]) return;
+  if (wrap.offsetWidth > 0 && wrap.offsetHeight > 0) { redrawCharts[tabName](); return; }
+  if (tries > 0) setTimeout(() => drawWhenSized(tabName, tries - 1), 40);
+}
 let PRO_PLAYERS = new Set();
 
 function switchTab(tabName) {
@@ -1260,6 +1284,9 @@ function switchTab(tabName) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + tabName).classList.add('active');
   document.querySelectorAll('.bottom-tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  // 탭이 보이게 된 뒤 해당 탭의 차트를 재생성.
+  // requestAnimationFrame은 창/탭이 백그라운드면 아예 호출되지 않으므로 setTimeout 사용.
+  if (redrawCharts[tabName]) drawWhenSized(tabName);
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
@@ -1348,6 +1375,12 @@ function render() {
   renderMPTable(mpPlayers);
   renderMPChart(mpPlayers);
   renderAttendance(DATA.member);
+
+  // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
+  redrawCharts = {
+    overview:  () => renderTierChart(players),
+    matchplay: () => renderMPChart(mpPlayers),
+  };
 }
 
 // ── 파싱 ──
@@ -1688,16 +1721,16 @@ function renderTierChart(players) {
   // 티어 배지(.tier-0~.tier-5)와 동일한 팔레트 — 사이트 전체에서 티어 색이
   // 항상 같은 의미를 갖도록 통일(골드→에메랄드→시안→블루→바이올렛→슬레이트).
   const colors = {
-    '0': '#D5DBE2',
-    '1': '#B9C0C8',
-    '2': '#9EA5AE',
-    '3': '#848B94',
-    '4': '#6B717A',
-    '5': '#565C64'
+    '0': '#FDE6AB',
+    '1': '#E2D1A3',
+    '2': '#CABC99',
+    '3': '#B1A88E',
+    '4': '#9A9482',
+    '5': '#848076'
   };
 
   if (charts.tier) charts.tier.destroy();
-  charts.tier = new Chart(document.getElementById('tier-chart').getContext('2d'), {
+  charts.tier = new Chart(freshCanvas('tier-chart'), {
     type: 'doughnut',
     data: {
       labels: labels.map(t => `T${t}`),
@@ -1711,7 +1744,9 @@ function renderTierChart(players) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { color: 'rgba(236,241,238,0.30)', font: { family: 'Space Grotesk', size: 12, weight: '500' }, padding: 10, boxWidth: 10 } }
+        // 범례를 아래로 — 오른쪽 배치는 카드가 좁아지면(≈1100px 이하) 도넛을
+        // 짓눌러 점처럼 만들어버림. 아래 배치는 폭에 영향받지 않음.
+        legend: { position: 'bottom', labels: { color: 'rgba(236,241,238,0.30)', font: { family: 'Space Grotesk', size: 11, weight: '500' }, padding: 10, boxWidth: 9 } }
       }
     }
   });
@@ -1885,7 +1920,7 @@ function renderMPChart(players) {
   const bgColors = ['rgba(43,174,134,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
   const bdColors = ['#2BAE86', '#C87878', 'rgba(255,255,255,0.30)'];
 
-  const ctx = document.getElementById('mp-chart').getContext('2d');
+  const ctx = freshCanvas('mp-chart');
   charts.mp = new Chart(ctx, {
     type: 'doughnut',
     data: {
