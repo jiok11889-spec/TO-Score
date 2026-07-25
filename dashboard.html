@@ -346,10 +346,10 @@
     }
     .ya-header span {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       color: var(--text-muted);
     }
     .ya-item {
@@ -573,11 +573,11 @@
     .rank-table { width: 100%; border-collapse: collapse; }
     .rank-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 10px;
+      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-faint);
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
       text-align: left;
       padding: 6px 10px 10px;
       border-bottom: 1px solid var(--border);
@@ -757,10 +757,10 @@
     }
     .heatmap-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.12em;
       padding: 6px 4px;
       text-align: center;
       color: var(--text-muted);
@@ -790,7 +790,7 @@
     }
     .hm-no {
       font-family: 'DM Mono', monospace;
-      font-size: 12px;
+      font-size: 13px;                 /* .hm-yes와 같은 셀이므로 동일 크기 */
       color: var(--text-muted);
     }
 
@@ -1210,7 +1210,7 @@
           <div class="chart-wrap" style="height:240px">
             <canvas id="mp-chart"></canvas>
           </div>
-          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums"></div>
+          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums"></div>
         </div>
       </div>
     </div>
@@ -1593,10 +1593,10 @@ function renderHeroAttendance(players) {
   const sorted = sortedAll.slice(0, HERO_LIMIT);
 
   const header = `<div style="display:flex;align-items:center;gap:10px;padding:0 0 6px;border-bottom:1px solid var(--divider);margin-bottom:2px">
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:72px">선수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:72px">선수</span>
     <span style="flex:1"></span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
   </div>`;
 
   const rows = sorted.map((p, i) => {
