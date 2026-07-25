@@ -14,9 +14,9 @@
       --bg:             #0A0F0C;
       --surface:        rgba(255,255,255,0.020);  /* 중립 서페이스 (녹색 틴트 제거) */
       --surface-2:      #0B110E;
-      --accent:         #00C878;                  /* 골프 그린 액센트 1개 유지 */
-      --accent-dim:     rgba(0,200,120,0.10);
-      --accent-border:  rgba(0,200,120,0.22);
+      --accent:         #2BAE86;                  /* 골프 그린 액센트 1개 유지 */
+      --accent-dim:     rgba(43,174,134,0.10);
+      --accent-border:  rgba(43,174,134,0.22);
       --text:           #ECF1EE;                  /* 니어-화이트 */
       --text-sub:       rgba(236,241,238,0.60);   /* 흰색 램프 */
       --text-muted:     rgba(236,241,238,0.30);
@@ -65,7 +65,7 @@
     .header-accent-bar {
       width: 3px;
       height: 20px;
-      background: #00C878;
+      background: #2BAE86;
       border-radius: 2px;
       flex-shrink: 0;
     }
@@ -146,7 +146,7 @@
     .card.accent-border {
       border-color: var(--border);
       border-top: 1px solid var(--accent-border);
-      background: linear-gradient(180deg, rgba(0,200,120,0.035), rgba(255,255,255,0.010));
+      background: linear-gradient(180deg, rgba(43,174,134,0.035), rgba(255,255,255,0.010));
     }
 
     .card-title {
@@ -187,7 +187,7 @@
       border-top: 1px solid var(--divider);
     }
     .mp-part-item:first-child { border-top: none; }
-    .mp-part-item.leader { background: rgba(0,200,120,0.04); margin: 0 -14px; padding: 8px 14px; border-radius: 6px; border-top: none; margin-bottom: 2px; }
+    .mp-part-item.leader { background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015)); margin: 0 -10px; padding: 7px 10px; border-radius: 6px; border-top: none; }
     .mp-part-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
@@ -201,7 +201,7 @@
     .mp-part-bar-wrap {
       flex: 1;
       height: 3px;
-      background: rgba(0,200,120,0.08);
+      background: rgba(43,174,134,0.08);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -241,7 +241,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent);
-      border: 1px solid rgba(0,200,120,0.30);
+      border: 1px solid rgba(43,174,134,0.30);
       border-radius: 3px;
       padding: 1px 5px;
       flex-shrink: 0;
@@ -273,8 +273,8 @@
       border-radius: 4px;
       padding: 4px 8px;
     }
-    .tc-group-label.up   { color: #E0954A; background: rgba(224,149,74,0.07); border: 1px solid rgba(224,149,74,0.15); }
-    .tc-group-label.down { color: #64748B; background: rgba(255,255,255,0.03); border: 1px solid rgba(100,116,139,0.15); }
+    .tc-group-label.up   { color: #2BAE86; background: rgba(43,174,134,0.07); border: 1px solid rgba(43,174,134,0.15); }
+    .tc-group-label.down { color: #848B94; background: rgba(255,255,255,0.03); border: 1px solid rgba(132,139,148,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
@@ -284,8 +284,8 @@
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(224,149,74,0.10); color: #E0954A; border: 1px solid rgba(224,149,74,0.25); }
-    .tc-count-badge.down { background: rgba(148,163,184,0.08); color: #64748B; border: 1px solid rgba(148,163,184,0.15); }
+    .tc-count-badge.up   { background: rgba(43,174,134,0.10); color: #2BAE86; border: 1px solid rgba(43,174,134,0.25); }
+    .tc-count-badge.down { background: rgba(132,139,148,0.08); color: #848B94; border: 1px solid rgba(132,139,148,0.15); }
     .tier-change-item {
       display: flex;
       align-items: center;
@@ -296,8 +296,8 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(224,149,74,0.06);  border-left: 2px solid rgba(224,149,74,0.30); }
-    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(100,116,139,0.22); }
+    .tier-change-item.up   { background: rgba(43,174,134,0.06);  border-left: 2px solid rgba(43,174,134,0.30); }
+    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(132,139,148,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -306,12 +306,12 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #E0954A; }
-    .tc-indicator.down { color: #64748B; }
+    .tc-indicator.up   { color: #2BAE86; }
+    .tc-indicator.down { color: #848B94; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 13px;                 /* 다른 카드 리스트 선수명과 동일 */
       letter-spacing: -0.01em;
       flex: 1;
     }
@@ -361,9 +361,9 @@
     }
     .ya-item:first-of-type { border-top: none; }
     .ya-item.first {
-      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
-      margin: 0 -8px;
-      padding: 6px 8px;
+      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      margin: 0 -10px;
+      padding: 6px 10px;
       border-radius: 6px;
     }
     .ya-rank {
@@ -455,9 +455,9 @@
     }
     .le-item:nth-child(-n+2) { border-top: none; }
     .le-item.first {
-      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
-      margin: 0 -8px;
-      padding: 7px 8px;
+      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      margin: 0 -10px;
+      padding: 7px 10px;
       border-radius: 6px;
     }
     .le-rank {
@@ -483,7 +483,7 @@
     }
     .le-score {
       font-family: 'DM Mono', monospace;
-      font-size: 14px;
+      font-size: 13px;                 /* 카드 리스트 수치 공통 */
       font-weight: 500;
       color: var(--text-sub);
       font-variant-numeric: tabular-nums;
@@ -539,7 +539,7 @@
     }
     .stat-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 10px;
+      font-size: 11px;                 /* section-label과 동일한 아이브로우 크기 */
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.16em;
@@ -594,7 +594,7 @@
     /* 1위 행: 배경 전체 워시 + 그라데이션 음영이 있어야 "강조"로 인지된다(텍스트 색만으로는 부족).
        PRO 배지를 중립화해서 다른 그린과 안 겹치므로 다시 넣어도 번잡하지 않다. */
     .rank-table tbody tr.rank-first td {
-      background: linear-gradient(90deg, rgba(0,200,120,0.10), rgba(0,200,120,0.02));
+      background: linear-gradient(90deg, rgba(43,174,134,0.10), rgba(43,174,134,0.02));
       color: var(--accent);
     }
     .rank-table tbody tr.rank-first td:first-child { border-radius: 6px 0 0 6px; }
@@ -647,12 +647,15 @@
       font-weight: 500;
       border: 1px solid;
     }
-    .tier-0 { color: #00C878; border-color: rgba(0,200,120,0.40); background: rgba(0,200,120,0.20); font-weight: 700; }
-    .tier-1 { color: #5FC99A; border-color: rgba(95,201,154,0.25); background: rgba(95,201,154,0.12); }
-    .tier-2 { color: #D4A843; border-color: rgba(212,168,67,0.22);  background: rgba(212,168,67,0.10); }
-    .tier-3 { color: #6A8A7A; border-color: rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); }
-    .tier-4 { color: #4A6A5A; border-color: rgba(255,255,255,0.07); background: rgba(255,255,255,0.04); }
-    .tier-5 { color: #3A5A4A; border-color: rgba(255,255,255,0.05); background: rgba(255,255,255,0.03); }
+    /* 티어 팔레트(뉴트럴 실버) — 티어는 무채색 계조로만 서열 표현.
+       색을 쓰는 것은 강조색 제이드 하나뿐이라, 1등 강조가 항상 유일한 '색'으로 읽힌다.
+       다크 배경에서 T5까지 묻히지 않도록 명도가 아닌 밝기 폭을 좁게 잡음. */
+    .tier-0 { color: #D5DBE2; border-color: rgba(213,219,226,0.42); background: rgba(213,219,226,0.15); font-weight: 700; }
+    .tier-1 { color: #B9C0C8; border-color: rgba(185,192,200,0.40); background: rgba(185,192,200,0.14); }
+    .tier-2 { color: #9EA5AE; border-color: rgba(158,165,174,0.40); background: rgba(158,165,174,0.14); }
+    .tier-3 { color: #848B94; border-color: rgba(132,139,148,0.42); background: rgba(132,139,148,0.15); }
+    .tier-4 { color: #6B717A; border-color: rgba(107,113,122,0.46); background: rgba(107,113,122,0.17); }
+    .tier-5 { color: #565C64; border-color: rgba(86,92,100,0.50);   background: rgba(86,92,100,0.20); }
 
     /* ─── Best list ─── */
     .best-list { display: flex; flex-direction: column; gap: 0; }
@@ -665,9 +668,9 @@
     }
     .best-item:first-child { border-top: none; }
     .best-item.first {
-      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
-      margin: 0 -8px;
-      padding: 8px 8px;
+      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      margin: 0 -10px;
+      padding: 8px 10px;
       border-radius: 6px;
     }
     .best-rank {
@@ -687,7 +690,7 @@
     }
     .best-score {
       font-family: 'DM Mono', monospace;
-      font-size: 15px;
+      font-size: 13px;                 /* 카드 리스트 수치 공통 */
       font-weight: 500;
       color: var(--text-sub);
       font-variant-numeric: tabular-nums;
@@ -703,7 +706,7 @@
     .win-rate-bar {
       height: 2px;
       border-radius: 2px;
-      background: rgba(0,200,120,0.10);
+      background: rgba(43,174,134,0.10);
       overflow: hidden;
       margin-top: 5px;
     }
@@ -713,7 +716,7 @@
     .mp-item { padding: 8px 0; border-top: 1px solid var(--divider); }
     .mp-item:first-child { border-top: none; }
     .mp-item.leader {
-      background: linear-gradient(90deg, rgba(0,200,120,0.08), rgba(0,200,120,0.015));
+      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
       margin: 0 -10px;
       padding: 8px 10px;
       border-radius: 6px;
@@ -726,8 +729,8 @@
     }
     .mp-item-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
+      font-weight: 700;                /* 다른 카드 리스트 선수명과 동일 */
+      font-size: 13px;
       letter-spacing: -0.01em;
       color: var(--text);
     }
@@ -828,7 +831,7 @@
     }
     .spinner {
       width: 16px; height: 16px;
-      border: 1.5px solid rgba(0,200,120,0.15);
+      border: 1.5px solid rgba(43,174,134,0.15);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -1683,14 +1686,14 @@ function renderTierChart(players) {
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
   // 티어 배지(.tier-0~.tier-5)와 동일한 팔레트 — 사이트 전체에서 티어 색이
-  // 항상 같은 의미를 갖도록 통일. T0/T1도 서로 구분되게(밝은 그린/연한 그린).
+  // 항상 같은 의미를 갖도록 통일(골드→에메랄드→시안→블루→바이올렛→슬레이트).
   const colors = {
-    '0': '#00C878',
-    '1': '#5FC99A',
-    '2': '#D4A843',
-    '3': '#6A8A7A',
-    '4': '#4A6A5A',
-    '5': '#3A5A4A'
+    '0': '#D5DBE2',
+    '1': '#B9C0C8',
+    '2': '#9EA5AE',
+    '3': '#848B94',
+    '4': '#6B717A',
+    '5': '#565C64'
   };
 
   if (charts.tier) charts.tier.destroy();
@@ -1700,8 +1703,8 @@ function renderTierChart(players) {
       labels: labels.map(t => `T${t}`),
       datasets: [{
         data: labels.map(t => counts[t]),
-        backgroundColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
-        borderColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
+        backgroundColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
+        borderColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
         borderWidth: 1
       }]
     },
@@ -1879,8 +1882,8 @@ function renderMPChart(players) {
 
   const labels = ['승', '패', ...(clubDraw ? ['무'] : [])];
   const data   = [clubWin, clubLoss, ...(clubDraw ? [clubDraw] : [])];
-  const bgColors = ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
-  const bdColors = ['#00C878', '#C87878', 'rgba(255,255,255,0.30)'];
+  const bgColors = ['rgba(43,174,134,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
+  const bdColors = ['#2BAE86', '#C87878', 'rgba(255,255,255,0.30)'];
 
   const ctx = document.getElementById('mp-chart').getContext('2d');
   charts.mp = new Chart(ctx, {
