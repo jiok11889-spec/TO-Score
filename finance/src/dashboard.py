@@ -76,7 +76,11 @@ def load_all_payment_status():
             continue
         all_status[ym] = {m['name']: m['months'].get(ym, 0) for m in active}
     months = list(all_status.keys())
-    latest = months[-1] if months else ''
+    # 선납이 있으면 미래 월에도 값이 들어간다. 기본 표시는 실제 달을 넘지 않게 한다.
+    now = datetime.now()
+    cur = (now.year % 100, now.month)
+    past = [m for m in months if ym_sort_key(m) <= cur]
+    latest = (past or months)[-1] if months else ''
     return all_status, latest, all_member_names
 
 def load_wonjang_rows():
