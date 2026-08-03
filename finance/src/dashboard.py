@@ -130,7 +130,9 @@ def build_data():
         exp=expense_by_month.get(ym,0)
         cumulative+=inc-exp
         monthly.append({'month':ym,'income':int(inc),'expense':int(exp),'cumulative':int(cumulative)})
-    mwi=[m for m in monthly if m['income']>0]
+    # 선납은 미래 월에 잡혀 실제 월 수금액을 낮춰 보이게 하므로 평균에서 제외한다
+    _now=datetime.now(); _cur=(_now.year%100,_now.month)
+    mwi=[m for m in monthly if m['income']>0 and ym_sort_key(m['month'])<=_cur]
     def avg_n(n):
         sub=mwi[-n:] if len(mwi)>=n else mwi
         return int(sum(m['income'] for m in sub)/len(sub)) if sub else 0
