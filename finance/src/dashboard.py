@@ -1,5 +1,6 @@
 """TO-Score 회비 대시보드  |  python dashboard.py  →  http://localhost:8000"""
 import json, os, re
+from collections import Counter
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 from io import BytesIO
@@ -73,7 +74,7 @@ def load_all_payment_status():
     for _, ym in month_cols:
         if not any(ym in m['months'] for m in active):
             continue
-        all_status[ym] = {m['name']: ym in m['months'] for m in active}
+        all_status[ym] = {m['name']: m['months'].get(ym, 0) for m in active}
     months = list(all_status.keys())
     latest = months[-1] if months else ''
     return all_status, latest, all_member_names
@@ -135,10 +136,18 @@ def build_data():
     recent=sorted(valid,key=lambda r:r['일자'],reverse=True)[:10]
     recent_list=[{'date':r['일자'].strftime('%y년 %m월 %d일'),'type':r['분류2'],'amount':int(r['순액']),'memo':r['비고'],'is_income':r['분류1']=='입금'} for r in recent]
     member_names=[mt['name'] for mt in member_totals]
-    payment_by_month={
-        ym: [{'name':m,'paid':st.get(m,False)} for m in all_members if m in member_names]
-        for ym,st in all_pay_status.items()
-    }
+    def month_cards(st):
+        """그 달 가장 흔한 입금액을 정상 회비로 보고 완납/부분납부/미납을 가른다."""
+        names=[m for m in all_members if m in member_names]
+        paid_amts=[st.get(m,0) for m in names if st.get(m,0)>0]
+        fee=Counter(paid_amts).most_common(1)[0][0] if paid_amts else 0
+        cards=[]
+        for m in names:
+            a=st.get(m,0)
+            state='paid' if a>0 and a>=fee else ('partial' if a>0 else 'unpaid')
+            cards.append({'name':m,'paid':a>0,'state':state,'amount':int(a),'short':int(fee-a) if state=='partial' else 0})
+        return cards
+    payment_by_month={ym: month_cards(st) for ym,st in all_pay_status.items()}
     pay_months=list(payment_by_month.keys())
     now=datetime.now()
     fc_base_month=now.month; fc_base_year=int(str(now.year)[2:])
@@ -342,15 +351,19 @@ nav{position:sticky;top:0;z-index:50;background:rgba(8,8,8,0.8);backdrop-filter:
 .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .mc{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:10px;border:1px solid var(--line);}
 .mc.paid{background:var(--p-dim);border-color:rgba(75,158,255,0.2);}
+.mc.partial{background:var(--s3);border-color:rgba(75,158,255,0.34);}
 .mc.unpaid{background:var(--s3);}
 .mc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;}
 .mc.paid .mc-av{background:rgba(75,158,255,0.2);color:var(--p);}
+.mc.partial .mc-av{background:rgba(75,158,255,0.12);color:rgba(75,158,255,0.75);}
 .mc.unpaid .mc-av{background:rgba(255,255,255,0.06);color:var(--w3);}
 .mc-name{font-size:10px;letter-spacing:-0.2px;}
 .mc.paid .mc-name{color:var(--w);}
+.mc.partial .mc-name{color:var(--w);}
 .mc.unpaid .mc-name{color:var(--w3);}
 .mc-tag{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:500;letter-spacing:0.3px;}
 .mc.paid .mc-tag{background:rgba(75,158,255,0.15);color:var(--p);}
+.mc.partial .mc-tag{background:rgba(75,158,255,0.09);color:rgba(75,158,255,0.75);}
 .mc.unpaid .mc-tag{background:rgba(255,255,255,0.05);color:var(--w4);}
 .tl{display:flex;flex-direction:column;}
 .tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
@@ -623,18 +636,22 @@ function buildPaySelect(){
 function buildMembers(ym){
   ym=ym||D.summary.latest_ym;
   const ms=(D.payment_by_month[ym])||[];
-  const pc=ms.filter(m=>m.paid).length;
+  const pc=ms.filter(m=>m.state===\'paid\').length;
+  const pt=ms.filter(m=>m.state===\'partial\').length;
+  const extra=pt?` · <span style="color:var(--w2)">부분납부 ${pt}명</span>`:\'\';
   document.getElementById(\'pay-count\').innerHTML=ms.length
-    ?`<span style="color:#4B9EFF;font-weight:500">${pc}명</span> / ${ms.length}명 납부완료`
+    ?`<span style="color:#4B9EFF;font-weight:500">${pc}명</span> / ${ms.length}명 납부완료${extra}`
     :\'납부 데이터 없음\';
   const g=document.getElementById(\'mgrid\'); g.innerHTML=\'\';
   if(!ms.length){ g.innerHTML=\'<div class="empty-state">입금현황 시트에 데이터를 입력해 주세요.</div>\'; return; }
-  [...ms].sort((a,b)=>b.paid-a.paid).forEach(m=>{
-    const c=m.paid?\'paid\':\'unpaid\';
-    g.innerHTML+=`<div class="mc ${c}">
+  const rank={paid:0,partial:1,unpaid:2};
+  const tag={paid:\'납부\',partial:\'일부\',unpaid:\'미납\'};
+  [...ms].sort((a,b)=>rank[a.state]-rank[b.state]).forEach(m=>{
+    const title=m.state===\'partial\'?` title="${m.amount.toLocaleString(\'ko-KR\')}원 납부 · 잔여 ${m.short.toLocaleString(\'ko-KR\')}원"`:\'\';
+    g.innerHTML+=`<div class="mc ${m.state}"${title}>
       <div class="mc-av">${m.name[0]}</div>
       <div class="mc-name">${m.name}</div>
-      <span class="mc-tag">${m.paid?\'납부\':\'미납\'}</span>
+      <span class="mc-tag">${tag[m.state]}</span>
     </div>`;
   });
 }
