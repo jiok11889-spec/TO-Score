@@ -731,6 +731,27 @@ class Handler(BaseHTTPRequestHandler):
 if __name__=='__main__':
     import socket, webbrowser, threading, time, sys
 
+    # --check : 서버를 띄우지 않고 잔액·납부현황만 출력 (도구들의 검증용)
+    if '--check' in sys.argv:
+        import io as _io
+        sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        d = build_data(); s = d['summary']
+        print(f"잔액 {round(s['balance']):,}원  (수입 {round(s['total_in']):,} - 지출 {round(s['total_out']):,})")
+        print(f"최신월 {s['latest_ym']}")
+        # 선납으로 미래 월이 섞이므로 현재 달까지만 본다
+        _past = [m for m in d['pay_months'] if ym_sort_key(m) <= ym_sort_key(s['latest_ym'])]
+        for ym_ in _past[-2:]:
+            cs = d['payment_by_month'][ym_]
+            paid = [c['name'] for c in cs if c['state']=='paid']
+            part = [c for c in cs if c['state']=='partial']
+            un   = [c['name'] for c in cs if c['state']=='unpaid']
+            print(f"  {ym_}: 완납 {len(paid)} / 부분 {len(part)} / 미납 {len(un)} (총 {len(cs)}명)")
+            for c in part:
+                print(f"      부분납부 {c['name']} {c['amount']:,} (잔여 {c['short']:,})")
+            if un:
+                print(f"      미납: {', '.join(un)}")
+        raise SystemExit
+
     env_port = os.environ.get('PORT')
     if env_port:
         port = int(env_port)
