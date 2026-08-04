@@ -9,7 +9,7 @@ import json
 import csv
 import io
 import os
-from config import PRO_PLAYERS
+from config import PRO_PLAYERS, RETIRED_PLAYERS
 
 SHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
 GID = {
@@ -133,6 +133,59 @@ def parse_latest_event_date(rows):
             return v
     return None
 
+def mark_retired(records):
+    """탈퇴 여부를 표시한다. 기록은 지우지 않는다."""
+    for d in records:
+        d["탈퇴"] = d.get("이름", "").strip() in RETIRED_PLAYERS
+    return records
+
+
+def drop_retired(records):
+    """랭킹·집계용: 탈퇴 멤버를 제외한다."""
+    return [d for d in records if d.get("이름", "").strip() not in RETIRED_PLAYERS]
+
+
+def renumber_ranking(records):
+    """탈퇴자를 뺀 뒤 순위를 다시 매긴다(빈 번호가 생기지 않도록).
+
+    전체 랭킹은 누적평균 오름차순, 티어별 랭킹은 티어 안에서 가중평균 오름차순.
+    """
+    def col(rec, *keys):
+        for k in rec:
+            flat = k.replace("\n", "").replace(" ", "")
+            if any(flat.startswith(x) for x in keys):
+                return k
+        return None
+
+    if not records:
+        return records
+    c_all = col(records[0], "누적평균스코어랭킹")
+    c_avg = col(records[0], "누적평균스코어(A)")
+    c_tier = col(records[0], "티어")
+    c_wrank = col(records[0], "가중평균스코어랭킹")
+    c_wavg = col(records[0], "가중평균스코어(A+B)")
+
+    def f(v):
+        try:
+            return float(str(v).replace(",", ""))
+        except (TypeError, ValueError):
+            return float("inf")
+
+    if c_all and c_avg:
+        for i, r in enumerate(sorted(records, key=lambda x: f(x.get(c_avg))), 1):
+            if f(r.get(c_avg)) != float("inf"):
+                r[c_all] = str(i)
+    if c_wrank and c_wavg and c_tier:
+        groups = {}
+        for r in records:
+            groups.setdefault(str(r.get(c_tier, "")).strip(), []).append(r)
+        for g in groups.values():
+            for i, r in enumerate(sorted(g, key=lambda x: f(x.get(c_wavg))), 1):
+                if f(r.get(c_wavg)) != float("inf"):
+                    r[c_wrank] = str(i)
+    return records
+
+
 def get_all_data():
     score_rows     = fetch_csv_rows(GID["score"])
     ranking_rows   = fetch_csv_rows(GID["ranking"])
@@ -140,14 +193,16 @@ def get_all_data():
     member_rows    = fetch_csv_rows(GID["member"])
     tier_new_rows  = fetch_csv_rows(GID["tier_new"])
 
+    # 기록은 남기되 탈퇴 표시(score·matchplay·member), 랭킹·티어변동에서는 제외
     return {
-        "score":             parse_score_sheet(score_rows),
-        "ranking":           parse_ranking_sheet(ranking_rows),
-        "matchplay":         parse_matchplay_sheet(matchplay_rows),
-        "member":            parse_member_sheet(member_rows),
-        "tier_history":      parse_tier_history(tier_new_rows),
+        "score":             mark_retired(parse_score_sheet(score_rows)),
+        "ranking":           renumber_ranking(drop_retired(parse_ranking_sheet(ranking_rows))),
+        "matchplay":         mark_retired(parse_matchplay_sheet(matchplay_rows)),
+        "member":            mark_retired(parse_member_sheet(member_rows)),
+        "tier_history":      drop_retired(parse_tier_history(tier_new_rows)),
         "latest_event_date": parse_latest_event_date(tier_new_rows),
-        "pro_players":  sorted(PRO_PLAYERS),
+        "pro_players":       sorted(PRO_PLAYERS),
+        "retired_players":   sorted(RETIRED_PLAYERS),
     }
 
 class Handler(BaseHTTPRequestHandler):

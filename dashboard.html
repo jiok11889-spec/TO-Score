@@ -637,6 +637,13 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .retired-badge {
+      font-family:'Space Grotesk',sans-serif; font-size:10px; font-weight:600;
+      letter-spacing:0.05em; color: var(--text-muted);
+      background: rgba(255,255,255,0.03); border:1px solid var(--border);
+      border-radius:3px; padding:1px 4px; margin-left:4px; white-space:nowrap;
+    }
+
     /* ─── Tier badges ─── */
     .tier-badge {
       display: inline-block;
@@ -1278,6 +1285,7 @@ function drawWhenSized(tabName, tries = 30) {
   if (tries > 0) setTimeout(() => drawWhenSized(tabName, tries - 1), 40);
 }
 let PRO_PLAYERS = new Set();
+let RETIRED_PLAYERS = new Set();
 
 function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
@@ -1296,6 +1304,11 @@ document.querySelectorAll('.tab').forEach(tab => {
 document.querySelectorAll('.bottom-tab-item').forEach(item => {
   item.addEventListener('click', function() { switchTab(this.dataset.tab); });
 });
+
+function retiredBadge(name) {
+  return (name && RETIRED_PLAYERS.has(name))
+    ? ` <span class="retired-badge">탈퇴</span>` : '';
+}
 
 function tierBadge(tier, name) {
   const t = String(tier);
@@ -1338,6 +1351,7 @@ async function loadAll() {
     DATA.tierHistory = json.tier_history || [];
     DATA.latestEventDate = json.latest_event_date || null;
     PRO_PLAYERS      = new Set(json.pro_players || []);
+    RETIRED_PLAYERS  = new Set(json.retired_players || []);
 
     render();
     document.getElementById('last-updated').textContent =
@@ -1359,10 +1373,13 @@ function render() {
   const rankPlayers = parseRankDicts(DATA.rank, tierMap);
   const mpPlayers   = parseMPDicts(DATA.mp);
 
+  // 기록은 남기되 랭킹·집계에서는 탈퇴 멤버를 뺀다
+  const activePlayers = players.filter(p => !RETIRED_PLAYERS.has(p.name));
+
   renderLatestEvent(players);
   renderHeroTierChange(DATA.tierHistory);
-  renderHeroYearAvg(players);
-  renderHeroAttendance(players);
+  renderHeroYearAvg(activePlayers);
+  renderHeroAttendance(activePlayers);
   renderSummary(players);
   renderTop10(players);
   renderWeightedTop10(rankPlayers);
@@ -1676,7 +1693,7 @@ function renderTop10(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.rounds ?? '—'}R</td>
@@ -1693,7 +1710,7 @@ function renderWeightedTop10(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.wAvg.toFixed(1)}</td>
       <td class="rounds-val">${p.recent ?? '—'}</td>
@@ -1789,7 +1806,7 @@ function renderFullRanking(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.best ?? '—'}</td>
@@ -1807,7 +1824,7 @@ function renderWeightedFull(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.wAvg != null ? p.wAvg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
@@ -1820,7 +1837,7 @@ function renderWeightedFull(players) {
 function tierTableHTML(tp) {
   const rows = tp.map((p, i) => `<tr>
     <td class="rank-num${i === 0 ? ' first' : ''}">${i + 1}</td>
-    <td class="player-name">${p.name}</td>
+    <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
     <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
     <td class="rounds-val">${p.best ?? '—'}</td>
     <td class="rounds-val">${p.rounds ?? '—'}R</td>
@@ -1870,7 +1887,7 @@ function renderMPTable(players) {
     const rateColor = i === 0 ? 'var(--accent)' : 'var(--text-muted)';
     return `<tr${i === 0 ? ' class="rank-first"' : ''}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
       <td class="rounds-val">${p.count}</td>
       <td class="rounds-val">${p.win}</td>
       <td class="rounds-val">${p.loss}</td>
