@@ -117,7 +117,9 @@ def build_data():
     expense_by_cat={}; expense_by_month={}
     for r in rows:
         if r['분류1']=='출금' and r['차변']>0:
-            net = r['차변'] - max(r['대변'], 0)
+            # 음수 대변(환급·차감)도 유출로 반영해야 한다. max()로 잘라내면 그만큼 지출이
+            # 과소계상된다. 사군자와 동일한 처리(2026-08-04 통일). 현재 해당 행은 0건.
+            net = r['차변'] - (r['대변'] if r['대변'] else 0)
             expense_by_cat[r['분류2']]=expense_by_cat.get(r['분류2'],0)+net
             expense_by_month[r['연월']]=expense_by_month.get(r['연월'],0)+net
     total_in=sum(income_by_month.values())+sum(extra_income.values())
