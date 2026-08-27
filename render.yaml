@@ -11,7 +11,6 @@ services:
   - type: web
     name: to-score-finance
     runtime: python
-    plan: starter          # 유료 상시가동(슬립 없음). 무료로 되돌리려면 free 로 변경
     buildCommand: pip install -r finance/requirements.txt
     startCommand: python finance/src/dashboard.py
     envVars:
