@@ -81,6 +81,20 @@ def verify_chain(txns):
     return txns[0]["balance"] - txns[0]["amount"], txns[-1]["balance"]
 
 
+def find_cutoff(txns, book):
+    """1년치를 통째로 줘도, 장부 잔액과 일치하는 지점부터를 '신규 거래'로 본다.
+    그 지점 이전 거래는 이미 장부에 반영된 것으로 간주하고 건너뛴다."""
+    if txns[-1]["balance"] == book:
+        return len(txns)   # 이미 전부 반영됨 — 신규 거래 없음
+    for i, t in enumerate(txns):
+        if t["balance"] - t["amount"] == book:
+            return i
+    raise Stop(
+        f"장부 잔액({book:,}원)과 정확히 일치하는 지점을 통장 파일에서 찾지 못했습니다.\n"
+        f"  → 장부와 통장 사이에 반영 안 된 더 오래된 거래가 있거나, 조회 기간이 부족합니다.\n"
+        f"     차이를 임의로 메우지 않습니다. 기간을 더 넉넉히 잡아 다시 받아주세요.")
+
+
 # ── 장부 ───────────────────────────────────────────────────────────────
 
 def load_book():
@@ -278,20 +292,18 @@ def main():
 
     txns = read_bank(args[0], opt("--pw"))
     start, end = verify_chain(txns)
-    print(f"거래 {len(txns)}건 · 잔액 체인 검증 통과")
-    print(f"  첫 거래 직전 {start:,}원 → 최종 {end:,}원\n")
+    print(f"거래내역 원본 {len(txns)}건 읽음 ({txns[0]['date']} ~ {txns[-1]['date']}) · 잔액 체인 검증 통과")
 
     wb, ws, members, retired, months = load_book()
     book = dashboard_balance()
-    if start != book:
-        raise Stop(
-            f"장부와 통장이 어긋납니다.\n"
-            f"  통장 첫 거래 직전 : {start:,}원\n"
-            f"  현재 장부         : {book:,}원\n"
-            f"  차이              : {start-book:+,}원\n"
-            f"  → 이 구간에 장부에 없는 거래가 있습니다. 조회기간을 앞으로 늘려 다시 받으세요.\n"
-            f"     차액을 임의로 메우지 마십시오.")
-    print(f"장부 {book:,}원 = 통장 시작 잔액 · 일치\n")
+    cut = find_cutoff(txns, book)
+    txns = txns[cut:]
+    if cut:
+        print(f"  → 장부 잔액({book:,}원) 지점 확인, 이전 {cut}건은 이미 반영된 것으로 보고 건너뜀")
+    print(f"  신규 거래 {len(txns)}건 → 최종 {end:,}원\n")
+    if not txns:
+        print("반영할 신규 거래가 없습니다.")
+        return
 
     fee = standard_fee(ws, members, months)
     answers = read_answers(opt("--resolve"))
@@ -328,7 +340,8 @@ def main():
     for r, c, val, *_ in plan:
         ws.cell(row=r, column=c).value = val
     append_ledger(wb, ledger)
-    wb.save(XLSX)
+    from excel_safety import safe_save
+    safe_save(wb, XLSX)
     print(f"\n반영 완료 — 입금현황 {len(plan)}건, 원장 {len(ledger)}행")
     print(f"확인: python finance/src/dashboard.py --check")
 
