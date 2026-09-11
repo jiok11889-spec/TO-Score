@@ -11,35 +11,35 @@ SPREADSHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
 JSON_KEY_FILE = "kinetic-horizon-492311-s5-55bd3f137a39.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# 26년 7월 19일 5차 대회 스코어 — 세현CC (참가 20명 중 게스트 2명 제외 → 18명 기록)
-# 실타수(스코어 점수) 기준, 신페리오 net 아님. 김성환* = 김성환(92)
-# ※ 게스트 김태경(72)·박태민(102) 제외 → 인원(규칙 D N)에 미반영.
-# ※ 박진석(83)은 원래 멤버지만 TIER_MAP 미등록 → 시트에 행 있으면 스코어 기록됨.
-#    행 없으면 [!!] 미입력 → 시트에 행 추가 후 재실행. 기준스코어 생기면 N=37로 티어 재배분.
-# ※ 박정수(26년 7월 신규)는 2026-08-04에 시트 47행을 미리 만들어 뒀다(이름만 기입, 수식은 기존).
-#    규칙 E대로 첫 대회 참가 전까지 TIER_MAP 미등록. 6차 대회 스코어가 들어가면
-#    기준스코어가 생기므로 `python tier_calc.py`로 N=33 기준 재배분할 것.
-JUL_2026_SCORES = {
-    "박진석":      83,
-    "김성환(82)":      84,
-    "윤준원":      85,
-    "김현섭":      86,
-    "강현수":      88,
-    "홍경택":      88,
-    "권기표":      89,
-    "황인호":      89,
-    "이호준":      90,
-    "강충현":      91,
-    "나한영":      93,
-    "조현민":      94,
-    "류성준":      94,
-    "김성환(92)":  94,
-    "최원재":      94,
-    "임익준":      96,
-    "이건희":     106,
-    "이도영":     107,
+# 26년 9월 11일 6차 대회 스코어 — 360도 (임시10, 참가 16명 전원 멤버, 게스트 없음)
+# 실타수(스코어 점수) 기준, 신페리오 net 아님. 출처: 캡쳐/260911/ (360 Country Club 출력물)
+# ※ 출력물 "박현우" = 시트 "박헌우" (4차 대회와 동일 인물로 판단해 시트 이름으로 기록)
+# ※ 김성환 동명이인: 출력물엔 "김성환"만 표기 → 김성환(92)로 가정. 김성환(82)이면 키만 바꿀 것.
+# ※ 박정수(26년 7월 신규, 시트 47행 사전 등록)는 이번이 첫 대회 → 스코어 기록되면
+#    기준스코어가 생기므로 `python tier_calc.py --emit`으로 N=33 기준 재배분해 TIER_MAP 교체.
+SEP_2026_SCORES = {
+    "이형석":      73,
+    "박병우":      76,
+    "임승언":      77,
+    "윤석원":      80,
+    "이은광":      81,
+    "최창환":      83,
+    "나한영":      86,
+    "이도영":      92,
+    "옥지엽":      98,
+    "이준범":     101,
+    "권기표":     102,
+    "박헌우":     102,
+    "주홍석":     103,
+    "임익준":     104,
+    "김성환(92)": 108,
+    "박정수":     112,
 }
 
+# [6차 대회 9/11 반영 후 할 일] 아래 TIER_MAP은 아직 5차(7/19) 기준. update_scores.py 실행으로
+# 스코어가 들어가 기준스코어가 갱신되면 `python tier_calc.py --emit` 결과로 이 블록을 교체하고
+# 다시 실행해 '현재 티어'·'9회' 히스토리를 확정할 것. (박정수 첫 기록 → N=32→33)
+#
 # 5차 대회(7/19) 이후 기준스코어(누적평균×0.5 + 26년평균×0.5) 기반 티어 재정렬
 # 박진석(원래 멤버, 46행 버퍼행 신규 등록) 합류로 N=36→37, 규칙 D 재계산: R=N-35=2
 #   → T5+1, T4+1 순 적용이 원칙이나, 랭킹 21/22위 조성태·강충현 동점(96.0)이
@@ -84,10 +84,10 @@ TIER_MAP = {
 }
 
 NEW_MEMBERS = []
-EVENT_COL_NAME = "26' 5차 대회"
-EVENT_DATE = "7/19/2026"
-TIER_ROUND_COL = "8회"
-TIER_ROUND_DATE = "7/19/2026"
+EVENT_COL_NAME = "26' 6차 대회"
+EVENT_DATE = "9/11/2026"
+TIER_ROUND_COL = "9회"
+TIER_ROUND_DATE = "9/11/2026"
 
 
 def connect():
@@ -154,8 +154,8 @@ def update_score_sheet(spreadsheet):
         if not name:
             continue
 
-        if name in JUL_2026_SCORES:
-            score_updates.append((row_idx, score_col_1based, JUL_2026_SCORES[name]))
+        if name in SEP_2026_SCORES:
+            score_updates.append((row_idx, score_col_1based, SEP_2026_SCORES[name]))
             score_done.append(name)
 
         if tier_col_1based and name in TIER_MAP:
@@ -165,7 +165,7 @@ def update_score_sheet(spreadsheet):
 
     batch_update_cells(sheet, score_updates)
     print(f"  [OK] 스코어 입력: {len(score_done)}명")
-    score_missing = [n for n in JUL_2026_SCORES if n not in score_done]
+    score_missing = [n for n in SEP_2026_SCORES if n not in score_done]
     if score_missing:
         print(f"  [!!] 스코어 미입력 (시트에 없음): {score_missing}")
 
