@@ -1373,29 +1373,29 @@ function render() {
   const rankPlayers = parseRankDicts(DATA.rank, tierMap);
   const mpPlayers   = parseMPDicts(DATA.mp);
 
-  // 기록은 남기되 랭킹·집계에서는 탈퇴 멤버를 뺀다
+  // 기록은 남기되 랭킹·집계·티어 현황·총원에서는 탈퇴 멤버를 뺀다
   const activePlayers = players.filter(p => !RETIRED_PLAYERS.has(p.name));
 
   renderLatestEvent(players);
   renderHeroTierChange(DATA.tierHistory);
   renderHeroYearAvg(activePlayers);
   renderHeroAttendance(activePlayers);
-  renderSummary(players);
+  renderSummary(activePlayers);
   renderTop10(players);
   renderWeightedTop10(rankPlayers);
   renderBestList(players);
-  renderTierChart(players);
+  renderTierChart(activePlayers);
   renderMPOverview(mpPlayers);
   renderFullRanking(players);
   renderWeightedFull(rankPlayers);
-  renderTierSections(players);
+  renderTierSections(activePlayers);
   renderMPTable(mpPlayers);
   renderMPChart(mpPlayers);
   renderAttendance(DATA.member);
 
   // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
   redrawCharts = {
-    overview:  () => renderTierChart(players),
+    overview:  () => renderTierChart(activePlayers),
     matchplay: () => renderMPChart(mpPlayers),
   };
 }
