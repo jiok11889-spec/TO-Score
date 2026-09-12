@@ -11,20 +11,20 @@
   <style>
     :root {
       /* 골프 정체성(그린)은 유지하되, 구조는 중립 헤어라인 + 흰색 투명도 램프로 (사군자 원칙) */
-      --bg:             #121815;                  /* canvas */
+      --bg:             #0e1419;                  /* canvas (Obsidian Fairway) */
       /* 서페이스 사다리: 그림자 없이 헤어라인+명도만으로 위계 */
-      --surface-1:      #1A201D;                  /* 카드·패널 */
-      --surface-2:      #1F2522;                  /* 카드 위에 얹히는 요소·hover */
-      --surface-3:      #242A27;                  /* 가장 높은 리프트 */
-      --accent:         #2BAE86;                  /* 골프 그린 액센트 1개 유지 */
-      --accent-dim:     rgba(43,174,134,0.10);
-      --accent-border:  rgba(43,174,134,0.22);
-      --text:           #ECF1EE;                  /* 니어-화이트 */
-      --text-sub:       rgba(236,241,238,0.60);   /* 흰색 램프 */
-      --text-muted:     rgba(236,241,238,0.30);
-      --text-faint:     rgba(236,241,238,0.16);   /* 아이브로우/최옅음 */
-      --border:         rgba(255,255,255,0.07);   /* 중립 헤어라인 (그린 틴트 아님) */
-      --border-2:       rgba(255,255,255,0.12);
+      --surface-1:      #161c21;                  /* 카드·패널 */
+      --surface-2:      #1d2429;                  /* 카드 위에 얹히는 요소·hover */
+      --surface-3:      #252b30;                  /* 가장 높은 리프트 */
+      --accent:         #10b981;                  /* 에메랄드 시그니처 1개 */
+      --accent-dim:     rgba(16,185,129,0.10);
+      --accent-border:  rgba(16,185,129,0.24);
+      --text:           #f5f8fc;                  /* 니어-화이트 */
+      --text-sub:       #9ea8b3;                  /* 보조 텍스트 */
+      --text-muted:     #6b7682;                  /* 날짜·캡션 */
+      --text-faint:     rgba(245,248,252,0.16);   /* 아이브로우/최옅음 */
+      --border:         rgba(255,255,255,0.08);   /* 중립 헤어라인 */
+      --border-2:       rgba(255,255,255,0.13);
       --divider:        rgba(255,255,255,0.05);
       /* 라운드 스케일 */
       --r-xs:           4px;      /* 뱃지·칩 */
@@ -53,7 +53,7 @@
 
     /* ─── Header (스티키 블러 · 중립 헤어라인, 그린 액센트바=정체성 유지) ─── */
     .header {
-      background: rgba(18,24,21,0.82);
+      background: rgba(14,20,25,0.82);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border);
@@ -73,7 +73,7 @@
     .header-accent-bar {
       width: 3px;
       height: 20px;
-      background: #2BAE86;
+      background: #10b981;
       border-radius: 2px;
       flex-shrink: 0;
     }
@@ -154,7 +154,7 @@
     .card.accent-border {
       border-color: var(--border);
       border-top: 1px solid var(--accent-border);
-      background: linear-gradient(180deg, rgba(43,174,134,0.035), rgba(255,255,255,0.010)), var(--surface-1);
+      background: linear-gradient(180deg, rgba(16,185,129,0.035), rgba(255,255,255,0.010)), var(--surface-1);
     }
 
     .card-title {
@@ -195,7 +195,7 @@
       border-top: 1px solid var(--divider);
     }
     .mp-part-item:first-child { border-top: none; }
-    .mp-part-item.leader { background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015)); margin: 0 -10px; padding: 7px 10px; border-radius: 6px; border-top: none; }
+    .mp-part-item.leader { background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.015)); margin: 0 -10px; padding: 7px 10px; border-radius: 6px; border-top: none; }
     .mp-part-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
@@ -209,7 +209,7 @@
     .mp-part-bar-wrap {
       flex: 1;
       height: 3px;
-      background: rgba(43,174,134,0.08);
+      background: rgba(16,185,129,0.08);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -249,7 +249,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent);
-      border: 1px solid rgba(43,174,134,0.30);
+      border: 1px solid rgba(16,185,129,0.30);
       border-radius: var(--r-xs);
       padding: 1px 5px;
       flex-shrink: 0;
@@ -281,7 +281,7 @@
       border-radius: var(--r-xs);
       padding: 4px 8px;
     }
-    .tc-group-label.up   { color: #2BAE86; background: rgba(43,174,134,0.07); border: 1px solid rgba(43,174,134,0.15); }
+    .tc-group-label.up   { color: #10b981; background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.15); }
     .tc-group-label.down { color: #9A9482; background: var(--surface-2); border: 1px solid rgba(154,148,130,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
@@ -292,7 +292,7 @@
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(43,174,134,0.10); color: #2BAE86; border: 1px solid rgba(43,174,134,0.25); }
+    .tc-count-badge.up   { background: rgba(16,185,129,0.10); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
     .tc-count-badge.down { background: rgba(154,148,130,0.08); color: #9A9482; border: 1px solid rgba(154,148,130,0.15); }
     .tier-change-item {
       display: flex;
@@ -304,7 +304,7 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(43,174,134,0.06);  border-left: 2px solid rgba(43,174,134,0.30); }
+    .tier-change-item.up   { background: rgba(16,185,129,0.06);  border-left: 2px solid rgba(16,185,129,0.30); }
     .tier-change-item.down { background: var(--surface-2); border-left: 2px solid rgba(154,148,130,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
@@ -314,7 +314,7 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #2BAE86; }
+    .tc-indicator.up   { color: #10b981; }
     .tc-indicator.down { color: #9A9482; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
@@ -369,7 +369,7 @@
     }
     .ya-item:first-of-type { border-top: none; }
     .ya-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.015));
       margin: 0 -10px;
       padding: 6px 10px;
       border-radius: 6px;
@@ -463,7 +463,7 @@
     }
     .le-item:nth-child(-n+2) { border-top: none; }
     .le-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.015));
       margin: 0 -10px;
       padding: 7px 10px;
       border-radius: 6px;
@@ -503,6 +503,55 @@
     @media (max-width: 640px) {
       .le-grid { grid-template-columns: 1fr; }
       .le-item:nth-child(2) { border-top: 1px solid var(--divider); }
+    }
+
+    /* ─── 랭킹 세그먼트 (누적/가중/매치플레이) ─── */
+    .seg {
+      display: inline-flex; gap: 2px; padding: 3px;
+      background: var(--surface-1); border: 1px solid var(--border);
+      border-radius: var(--r-md); margin-bottom: 20px;
+    }
+    .seg-btn {
+      font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer;
+      background: transparent; color: var(--text-muted); transition: background 0.15s, color 0.15s;
+    }
+    .seg-btn:hover { color: var(--text-sub); }
+    .seg-btn.active { background: var(--surface-3); color: var(--accent); font-weight: 700; }
+    .rank-pane { display: none; }
+    .rank-pane.active { display: block; }
+
+    /* ─── 모바일 카드 (표에서 파생, 640px 이하에서만 표시) ─── */
+    .mobile-cards { display: none; }
+    .mcard {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px; border-radius: var(--r-lg);
+      background: var(--surface-2); border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .mcard.first { background: var(--accent-dim); border-color: var(--accent-border); }
+    .mcard-rank {
+      flex: 0 0 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
+      background: var(--surface-3); color: var(--text-sub);
+    }
+    .mcard.first .mcard-rank { background: var(--accent); color: #0e1419; font-weight: 700; }
+    .mcard-body { flex: 1 1 auto; min-width: 0; }
+    .mcard-name { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .mcard.first .mcard-name { color: var(--accent); }
+    .mcard-chips { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; }
+    .mchip { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-sub); font-variant-numeric: tabular-nums; }
+    .mchip-k { color: var(--text-muted); margin-right: 3px; }
+    .mcard-main { flex: 0 0 auto; text-align: right; }
+    .mcard-main-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .mcard.first .mcard-main-val { color: var(--accent); }
+    .mcard-main-lbl { font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; margin-top: 2px; }
+    @media (max-width: 640px) {
+      .mobile-cards { display: block; }
+      .cardified { display: none !important; }
+      .seg { display: flex; width: 100%; }
+      .seg-btn { flex: 1; padding: 8px 6px; }
     }
 
     /* ─── Tabs (중립 비활성 · 그린 활성) ─── */
@@ -604,7 +653,7 @@
     /* 1위 행: 배경 전체 워시 + 그라데이션 음영이 있어야 "강조"로 인지된다(텍스트 색만으로는 부족).
        PRO 배지를 중립화해서 다른 그린과 안 겹치므로 다시 넣어도 번잡하지 않다. */
     .rank-table tbody tr.rank-first td {
-      background: linear-gradient(90deg, rgba(43,174,134,0.10), rgba(43,174,134,0.02));
+      background: linear-gradient(90deg, rgba(16,185,129,0.10), rgba(16,185,129,0.02));
       color: var(--accent);
     }
     .rank-table tbody tr.rank-first td:first-child { border-radius: 6px 0 0 6px; }
@@ -685,7 +734,7 @@
     }
     .best-item:first-child { border-top: none; }
     .best-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.015));
       margin: 0 -10px;
       padding: 8px 10px;
       border-radius: 6px;
@@ -723,7 +772,7 @@
     .win-rate-bar {
       height: 2px;
       border-radius: 2px;
-      background: rgba(43,174,134,0.10);
+      background: rgba(16,185,129,0.10);
       overflow: hidden;
       margin-top: 5px;
     }
@@ -733,7 +782,7 @@
     .mp-item { padding: 8px 0; border-top: 1px solid var(--divider); }
     .mp-item:first-child { border-top: none; }
     .mp-item.leader {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
+      background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(16,185,129,0.015));
       margin: 0 -10px;
       padding: 8px 10px;
       border-radius: 6px;
@@ -848,7 +897,7 @@
     }
     .spinner {
       width: 16px; height: 16px;
-      border: 1.5px solid rgba(43,174,134,0.15);
+      border: 1.5px solid rgba(16,185,129,0.15);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -975,7 +1024,7 @@
 
       /* Chart height 축소 */
       .chart-wrap { height: 160px; }
-      #page-matchplay .chart-wrap { height: 200px; }
+      #page-ranking .rank-pane[data-pane="mp"] .chart-wrap { height: 200px; }
 
       /* [5] 티어 변동 카드 행 */
       .tier-change-item {
@@ -1039,12 +1088,34 @@
     <div class="tab" data-tab="overview" data-short="현황">전체 현황</div>
     <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
     <div class="tab" data-tab="tier" data-short="티어">티어</div>
-    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
     <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
   </div>
 
   <!-- ── 요약 ── -->
   <div id="page-summary" class="page">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">전체 멤버</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">등록 인원</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">시즌 라운드</div>
+        <div class="stat-value" id="stat-rounds">—</div>
+        <div class="stat-sub">누적 대회 수</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">최저 누적평균</div>
+        <div class="stat-value accent" id="stat-best-avg">—</div>
+        <div class="stat-sub" id="stat-best-name">—</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">개인 베스트</div>
+        <div class="stat-value accent" id="stat-best-score">—</div>
+        <div class="stat-sub" id="stat-best-score-name">—</div>
+      </div>
+    </div>
+
     <div style="margin-bottom:24px">
       <div class="section-label">최근 대회 결과</div>
       <div class="card accent-border">
@@ -1077,29 +1148,6 @@
 
   <!-- ── 전체 현황 ── -->
   <div id="page-overview" class="page">
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">전체 멤버</div>
-        <div class="stat-value" id="stat-total">—</div>
-        <div class="stat-sub">등록 인원</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">시즌 라운드</div>
-        <div class="stat-value" id="stat-rounds">—</div>
-        <div class="stat-sub">누적 대회 수</div>
-      </div>
-      <div class="stat-card highlight">
-        <div class="stat-label">최저 누적평균</div>
-        <div class="stat-value accent" id="stat-best-avg">—</div>
-        <div class="stat-sub" id="stat-best-name">—</div>
-      </div>
-      <div class="stat-card highlight">
-        <div class="stat-label">개인 베스트</div>
-        <div class="stat-value accent" id="stat-best-score">—</div>
-        <div class="stat-sub" id="stat-best-score-name">—</div>
-      </div>
-    </div>
-
     <div class="three-col">
       <div>
         <div class="section-label">누적평균 TOP 10</div>
@@ -1157,8 +1205,12 @@
 
   <!-- ── 랭킹 ── -->
   <div id="page-ranking" class="page">
-    <div class="two-col">
-      <div>
+    <div class="seg" id="rank-seg" role="tablist">
+      <button class="seg-btn active" data-seg="avg">누적평균</button>
+      <button class="seg-btn" data-seg="weighted">가중평균</button>
+      <button class="seg-btn" data-seg="mp">매치플레이</button>
+    </div>
+    <div class="rank-pane active" data-pane="avg">
         <div class="section-label">누적평균 전체 랭킹</div>
         <div class="card">
           <div class="mobile-table-scroll">
@@ -1173,8 +1225,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div>
+    </div>
+    <div class="rank-pane" data-pane="weighted">
         <div class="section-label">가중평균 전체 랭킹</div>
         <div class="card">
           <div class="mobile-table-scroll">
@@ -1189,30 +1241,15 @@
             </div>
           </div>
         </div>
-      </div>
     </div>
-  </div>
-
-  <!-- ── 티어 ── -->
-  <div id="page-tier" class="page">
-    <div class="section-label">티어별 현황</div>
-    <div class="card">
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:rgba(236,241,238,0.45);margin-bottom:10px">
-        기준스코어 = 누적평균 × 0.5 + 26년 평균 × 0.5 · 티어는 기준스코어 오름차순으로 배정 (PRO는 T0 고정)
-      </div>
-      <div id="tier-sections"></div>
-    </div>
-  </div>
-
-  <!-- ── 매치플레이 ── -->
-  <div id="page-matchplay" class="page">
-    <div class="two-col">
-      <div>
+    <div class="rank-pane" data-pane="mp">
+      <div class="two-col">
+        <div>
         <div class="section-label">매치플레이 랭킹</div>
         <div class="card">
           <div class="mobile-table-scroll">
             <div class="table-scroll" style="max-height:500px">
-              <table class="rank-table" id="mp-table">
+              <table class="rank-table" id="mp-table" data-main="5">
                 <thead><tr>
                   <th>#</th><th>선수</th>
                   <th class="right">횟수</th><th class="right">승</th>
@@ -1223,8 +1260,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div>
+        </div>
+        <div>
         <div class="section-label">전체 승/패 현황</div>
         <div class="card">
           <div class="chart-wrap" style="height:240px">
@@ -1232,7 +1269,19 @@
           </div>
           <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums"></div>
         </div>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── 티어 ── -->
+  <div id="page-tier" class="page">
+    <div class="section-label">티어별 현황</div>
+    <div class="card">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:rgba(245,248,252,0.45);margin-bottom:10px">
+        기준스코어 = 누적평균 × 0.5 + 26년 평균 × 0.5 · 티어는 기준스코어 오름차순으로 배정 (PRO는 T0 고정)
+      </div>
+      <div id="tier-sections"></div>
     </div>
   </div>
 
@@ -1261,9 +1310,6 @@
   </div>
   <div class="bottom-tab-item" data-tab="tier">
     <span class="btab-icon">◈</span>티어
-  </div>
-  <div class="bottom-tab-item" data-tab="matchplay">
-    <span class="btab-icon">⚔</span>MP
   </div>
   <div class="bottom-tab-item" data-tab="attendance">
     <span class="btab-icon">≡</span>참가
@@ -1408,9 +1454,57 @@ function render() {
 
   // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
   redrawCharts = {
-    overview:  () => renderTierChart(activePlayers),
-    matchplay: () => renderMPChart(mpPlayers),
+    overview: () => renderTierChart(activePlayers),
+    ranking:  () => { if (currentSeg === 'mp') renderMPChart(mpPlayers); },
   };
+  cardifyAll();
+}
+
+// ── 랭킹 탭 세그먼트 (누적평균 / 가중평균 / 매치플레이) ──
+let currentSeg = 'avg';
+function switchSeg(seg) {
+  currentSeg = seg;
+  document.querySelectorAll('#rank-seg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.seg === seg));
+  document.querySelectorAll('#page-ranking .rank-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === seg));
+  if (seg === 'mp') drawWhenSized('ranking');
+}
+document.querySelectorAll('#rank-seg .seg-btn').forEach(b => b.addEventListener('click', () => switchSeg(b.dataset.seg)));
+
+// ── 모바일 카드 변환 (640px 이하에서만 표시, 표는 CSS로 숨김) ──
+// 표를 진실로 두고 카드는 표에서 파생한다. 주값 = data-main 열 또는 첫 .score-val 셀.
+function cardifyAll() {
+  document.querySelectorAll('.mobile-cards').forEach(el => el.remove());
+  document.querySelectorAll('table.rank-table').forEach(table => {
+    const ths = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    const rows = [...table.querySelectorAll('tbody tr')];
+    if (!rows.length) return;
+    const cards = rows.map(tr => {
+      const tds = [...tr.children];
+      let mainIdx = table.dataset.main != null ? +table.dataset.main : tds.findIndex(td => td.classList.contains('score-val'));
+      if (mainIdx < 0) mainIdx = tds.length - 1;
+      const tierIdx = tds.findIndex((td, i) => i > 1 && td.querySelector('.tier-badge'));
+      const chips = tds.map((td, i) => {
+        if (i <= 1 || i === mainIdx || i === tierIdx) return '';
+        const v = td.textContent.trim();
+        return v ? `<span class="mchip"><span class="mchip-k">${ths[i] || ''}</span>${v}</span>` : '';
+      }).join('');
+      const first = tr.classList.contains('rank-first') || tds[0].classList.contains('first');
+      return `<div class="mcard${first ? ' first' : ''}">
+        <div class="mcard-rank">${tds[0].textContent.trim()}</div>
+        <div class="mcard-body">
+          <div class="mcard-name">${tds[1].innerHTML}${tierIdx >= 0 ? ' ' + tds[tierIdx].innerHTML : ''}</div>
+          <div class="mcard-chips">${chips}</div>
+        </div>
+        <div class="mcard-main">
+          <div class="mcard-main-val">${tds[mainIdx].textContent.trim()}</div>
+          <div class="mcard-main-lbl">${ths[mainIdx] || ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+    const host = table.closest('.table-scroll') || table;
+    host.classList.add('cardified');
+    host.insertAdjacentHTML('afterend', `<div class="mobile-cards">${cards}</div>`);
+  });
 }
 
 // ── 파싱 ──
@@ -1768,8 +1862,8 @@ function renderTierChart(players) {
       labels: labels.map(t => `T${t}`),
       datasets: [{
         data: labels.map(t => counts[t]),
-        backgroundColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
-        borderColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
+        backgroundColor: labels.map(t => colors[t] || 'rgba(16,185,129,0.08)'),
+        borderColor: labels.map(t => colors[t] || 'rgba(16,185,129,0.08)'),
         borderWidth: 1
       }]
     },
@@ -1778,7 +1872,7 @@ function renderTierChart(players) {
       plugins: {
         // 범례를 아래로 — 오른쪽 배치는 카드가 좁아지면(≈1100px 이하) 도넛을
         // 짓눌러 점처럼 만들어버림. 아래 배치는 폭에 영향받지 않음.
-        legend: { position: 'bottom', labels: { color: 'rgba(236,241,238,0.30)', font: { family: 'Space Grotesk', size: 11, weight: '500' }, padding: 10, boxWidth: 9 } }
+        legend: { position: 'bottom', labels: { color: 'rgba(245,248,252,0.30)', font: { family: 'Space Grotesk', size: 11, weight: '500' }, padding: 10, boxWidth: 9 } }
       }
     }
   });
@@ -1957,8 +2051,8 @@ function renderMPChart(players) {
 
   const labels = ['승', '패', ...(clubDraw ? ['무'] : [])];
   const data   = [clubWin, clubLoss, ...(clubDraw ? [clubDraw] : [])];
-  const bgColors = ['rgba(43,174,134,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
-  const bdColors = ['#2BAE86', '#C87878', 'rgba(255,255,255,0.30)'];
+  const bgColors = ['rgba(16,185,129,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
+  const bdColors = ['#10b981', '#C87878', 'rgba(255,255,255,0.30)'];
 
   const ctx = freshCanvas('mp-chart');
   charts.mp = new Chart(ctx, {
@@ -1978,7 +2072,7 @@ function renderMPChart(players) {
         legend: {
           display: true,
           position: 'bottom',
-          labels: { color: 'rgba(236,241,238,0.60)', font: { family: 'DM Mono', size: 12 }, padding: 16 }
+          labels: { color: 'rgba(245,248,252,0.60)', font: { family: 'DM Mono', size: 12 }, padding: 16 }
         },
         tooltip: {
           callbacks: {
