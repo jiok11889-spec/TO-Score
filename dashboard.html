@@ -26,6 +26,15 @@
       --border:         rgba(255,255,255,0.08);   /* 중립 헤어라인 */
       --border-2:       rgba(255,255,255,0.13);
       --divider:        rgba(255,255,255,0.05);
+      /* 글자 크기 체계 — 이 8단계만 쓴다 (px 직접 지정 금지) */
+      --fs-micro:       10px;     /* 하단 탭 라벨 */
+      --fs-cap:         11px;     /* 캡션·칩·아이브로우 */
+      --fs-aux:         12px;     /* 보조 텍스트·섹션 제목 */
+      --fs-body:        13px;     /* 본문·표 */
+      --fs-sub:         15px;     /* 이름·소제목 */
+      --fs-title:       20px;     /* 화면 제목·카드 주값 */
+      --fs-num:         26px;     /* 큰 숫자 */
+      --fs-hero:        44px;     /* 요약 지표 */
       /* 라운드 스케일 */
       --r-xs:           4px;      /* 뱃지·칩 */
       --r-sm:           6px;      /* 인라인 태그 */
@@ -47,7 +56,7 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      font-size: 15px;
+      font-size: var(--fs-sub);
       line-height: 1.5;
     }
 
@@ -80,7 +89,7 @@
     .header-brand h1 {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 19px;
+      font-size: var(--fs-title);
       letter-spacing: -0.01em;
       text-transform: uppercase;
       color: var(--text);
@@ -88,7 +97,7 @@
     }
     .header-brand .header-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
+      font-size: var(--fs-cap);
       font-weight: 500;
       color: var(--text-faint);
       text-transform: uppercase;
@@ -102,7 +111,7 @@
     }
     .updated-text {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--text-muted);
     }
     .live-dot {
@@ -119,7 +128,7 @@
       padding: 6px 14px;
       border-radius: var(--r-md);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       cursor: pointer;
       transition: border-color 0.15s, color 0.15s;
@@ -130,17 +139,17 @@
     }
 
     /* ─── Container ─── */
-    .container { padding: 40px 32px 96px; max-width: 1320px; margin: 0 auto; }
+    .container { padding: 40px 32px 96px; max-width: 1100px; margin: 0 auto; }
 
     /* ─── Section label (아이브로우: 중립·자간, 헤비 그린 언더라인 제거) ─── */
     .section-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
+      font-size: var(--fs-aux);
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-faint);
-      margin-bottom: 14px;
+      letter-spacing: 0.14em;
+      color: var(--text-sub);
+      margin-bottom: 12px;
     }
 
     /* ─── Cards (박스보다 여백: 중립 헤어라인·옅은 서페이스) ─── */
@@ -159,7 +168,7 @@
 
     .card-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 700;
       color: var(--text-sub);
       margin-bottom: 12px;
@@ -174,7 +183,7 @@
     }
     .hero-grid-2 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 18px;
       margin-bottom: 40px;
     }
@@ -199,7 +208,7 @@
     .mp-part-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       color: var(--text);
       width: 72px;
@@ -222,7 +231,7 @@
     .mp-part-bar.leader { background: var(--accent); }
     .mp-part-count {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 28px;
@@ -234,7 +243,7 @@
     .mp-part-item.leader .mp-part-rate { color: var(--accent); }
     .mp-part-rate {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 36px;
@@ -244,7 +253,7 @@
     }
     .mp-leader-tag {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: var(--fs-aux);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -256,7 +265,7 @@
     }
     .mp-part-cta {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: var(--fs-aux);
       color: var(--text-muted);
       padding-top: 10px;
       border-top: 1px solid var(--divider);
@@ -270,7 +279,7 @@
     .tc-group:last-child { margin-bottom: 0; }
     .tc-group-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: var(--fs-aux);
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -285,7 +294,7 @@
     .tc-group-label.down { color: #9A9482; background: var(--surface-2); border: 1px solid rgba(154,148,130,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       border-radius: var(--r-pill);
       padding: 2px 10px;
@@ -308,7 +317,7 @@
     .tier-change-item.down { background: var(--surface-2); border-left: 2px solid rgba(154,148,130,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       width: 16px;
       text-align: center;
@@ -319,7 +328,7 @@
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;                 /* 다른 카드 리스트 선수명과 동일 */
+      font-size: var(--fs-body);                 /* 다른 카드 리스트 선수명과 동일 */
       letter-spacing: -0.01em;
       flex: 1;
     }
@@ -330,10 +339,10 @@
       gap: 6px;
       flex-shrink: 0;
     }
-    .tc-arrow { color: var(--text-faint); font-family: 'DM Mono', monospace; font-size: 12px; }
+    .tc-arrow { color: var(--text-faint); font-family: 'DM Mono', monospace; font-size: var(--fs-aux); }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--text-muted);
       padding: 16px 0;
       text-align: center;
@@ -354,7 +363,7 @@
     }
     .ya-header span {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: var(--fs-cap);                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -376,25 +385,25 @@
     }
     .ya-rank {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 20px;
       text-align: right;
       flex-shrink: 0;
     }
-    .ya-rank.first { color: var(--accent); font-size: 13px; }
+    .ya-rank.first { color: var(--accent); font-size: var(--fs-body); }
     .ya-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       color: var(--text);
       flex: 1;
     }
     .ya-score {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-sub);
       font-variant-numeric: tabular-nums;
@@ -407,7 +416,7 @@
     .ya-item.first .ya-rounds { color: var(--accent); }
     .ya-attend {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 34px;
@@ -416,7 +425,7 @@
     }
     .ya-rounds {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 24px;
@@ -426,7 +435,7 @@
     /* ─── Hero 요약 카드 하단 '전체 N명' 표기 ─── */
     .hero-more {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
+      font-size: var(--fs-cap);
       letter-spacing: 0.04em;
       color: var(--text-faint);
       text-align: center;
@@ -438,14 +447,14 @@
     /* ─── Latest event result list ─── */
     .latest-event-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
+      font-size: var(--fs-sub);
       font-weight: 700;
       color: var(--text);
       margin-bottom: 2px;
     }
     .latest-event-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: var(--fs-aux);
       color: var(--text-muted);
       margin-bottom: 14px;
     }
@@ -470,7 +479,7 @@
     }
     .le-rank {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 20px;
@@ -481,7 +490,7 @@
     .le-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       color: var(--text);
       flex: 1;
@@ -491,7 +500,7 @@
     }
     .le-score {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* 카드 리스트 수치 공통 */
+      font-size: var(--fs-body);                 /* 카드 리스트 수치 공통 */
       font-weight: 500;
       color: var(--text-sub);
       font-variant-numeric: tabular-nums;
@@ -512,12 +521,25 @@
       border-radius: var(--r-md); margin-bottom: 20px;
     }
     .seg-btn {
-      font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 500;
+      font-family: 'Space Grotesk', sans-serif; font-size: var(--fs-body); font-weight: 500;
       padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer;
       background: transparent; color: var(--text-muted); transition: background 0.15s, color 0.15s;
     }
     .seg-btn:hover { color: var(--text-sub); }
     .seg-btn.active { background: var(--surface-3); color: var(--accent); font-weight: 700; }
+    .att-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 32px; }
+    .att-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+    .att-rank { flex: 0 0 22px; font-family: 'DM Mono', monospace; font-size: var(--fs-aux); color: var(--text-muted); }
+    .att-name { flex: 0 0 96px; font-size: var(--fs-body); font-weight: 600; color: var(--text); }
+    .att-bar { flex: 1; height: 6px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
+    .att-bar > i { display: block; height: 100%; background: var(--accent); opacity: 0.85; }
+    .att-val { flex: 0 0 84px; text-align: right; font-family: 'DM Mono', monospace; font-size: var(--fs-body); color: var(--text-sub); font-variant-numeric: tabular-nums; }
+    .att-item.top .att-name, .att-item.top .att-val { color: var(--accent); }
+    .att-details { margin-top: 16px; }
+    .att-details summary { cursor: pointer; font-size: var(--fs-aux); color: var(--text-sub); padding: 8px 0; }
+    @media (max-width: 640px) { .att-list { grid-template-columns: 1fr; } }
+    .tier-chart-wrap { height: 220px; max-width: 480px; margin: 0 auto; }
+    .formula-note { font-family: 'DM Mono', monospace; font-size: var(--fs-aux); color: var(--text-sub); margin-bottom: 10px; }
     .rank-pane { display: none; }
     .rank-pane.active { display: block; }
 
@@ -533,20 +555,20 @@
     .mcard-rank {
       flex: 0 0 30px; height: 30px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
+      font-family: 'DM Mono', monospace; font-size: var(--fs-body); font-weight: 500;
       background: var(--surface-3); color: var(--text-sub);
     }
     .mcard.first .mcard-rank { background: var(--accent); color: #0e1419; font-weight: 700; }
     .mcard-body { flex: 1 1 auto; min-width: 0; }
-    .mcard-name { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .mcard-name { font-size: var(--fs-sub); font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .mcard.first .mcard-name { color: var(--accent); }
     .mcard-chips { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; }
-    .mchip { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-sub); font-variant-numeric: tabular-nums; }
+    .mchip { font-family: 'DM Mono', monospace; font-size: var(--fs-cap); color: var(--text-sub); font-variant-numeric: tabular-nums; }
     .mchip-k { color: var(--text-muted); margin-right: 3px; }
     .mcard-main { flex: 0 0 auto; text-align: right; }
-    .mcard-main-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .mcard-main-val { font-family: 'DM Mono', monospace; font-size: var(--fs-title); font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1; }
     .mcard.first .mcard-main-val { color: var(--accent); }
-    .mcard-main-lbl { font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; margin-top: 2px; }
+    .mcard-main-lbl { font-size: var(--fs-micro); color: var(--text-muted); letter-spacing: 0.04em; margin-top: 2px; }
     @media (max-width: 640px) {
       .mobile-cards { display: block; }
       .cardified { display: none !important; }
@@ -563,7 +585,7 @@
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       padding: 12px 18px;
       color: var(--text-muted);
@@ -596,7 +618,7 @@
     }
     .stat-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* section-label과 동일한 아이브로우 크기 */
+      font-size: var(--fs-cap);                 /* section-label과 동일한 아이브로우 크기 */
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.16em;
@@ -605,7 +627,7 @@
     }
     .stat-value {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 58px;
+      font-size: var(--fs-hero);
       font-weight: 500;
       color: var(--text);
       letter-spacing: -0.032em;
@@ -617,7 +639,7 @@
     .stat-unit { letter-spacing: 0; margin-left: 0.04em; }
     .stat-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: var(--fs-aux);
       font-weight: 400;
       color: var(--text-muted);
       margin-top: 8px;
@@ -632,7 +654,7 @@
     .rank-table { width: 100%; border-collapse: collapse; }
     .rank-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: var(--fs-cap);                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -661,26 +683,26 @@
 
     .rank-num {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 26px;
       font-variant-numeric: tabular-nums;
     }
-    .rank-num.first { color: var(--accent); font-size: 16px; font-weight: 700; }
+    .rank-num.first { color: var(--accent); font-size: var(--fs-sub); font-weight: 700; }
     .rank-num.top3  { color: var(--text-sub); }
 
     .player-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 15px;
+      font-size: var(--fs-sub);
       letter-spacing: -0.01em;
       color: var(--text);
     }
     .rank-first .player-name { color: var(--accent); font-weight: 700; }
     .score-val {
       font-family: 'DM Mono', monospace;
-      font-size: 15px;
+      font-size: var(--fs-sub);
       font-weight: 500;
       text-align: right;
       color: var(--text-sub);
@@ -689,7 +711,7 @@
     .score-val.accent { color: var(--accent); }
     .rounds-val {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       text-align: right;
       color: var(--text-muted);
@@ -697,7 +719,7 @@
     }
 
     .retired-badge {
-      font-family:'Space Grotesk',sans-serif; font-size:10px; font-weight:600;
+      font-family:'Space Grotesk',sans-serif; font-size:var(--fs-micro); font-weight:600;
       letter-spacing:0.05em; color: var(--text-muted);
       background: var(--surface-2); border:1px solid var(--border);
       border-radius:var(--r-xs); padding:1px 4px; margin-left:4px; white-space:nowrap;
@@ -709,7 +731,7 @@
       padding: 2px 7px;
       border-radius: var(--r-xs);
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       border: 1px solid;
     }
@@ -741,7 +763,7 @@
     }
     .best-rank {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       color: var(--text-muted);
       width: 16px;
@@ -749,14 +771,14 @@
     .best-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       flex: 1;
       color: var(--text);
     }
     .best-score {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* 카드 리스트 수치 공통 */
+      font-size: var(--fs-body);                 /* 카드 리스트 수치 공통 */
       font-weight: 500;
       color: var(--text-sub);
       font-variant-numeric: tabular-nums;
@@ -796,19 +818,19 @@
     .mp-item-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;                /* 다른 카드 리스트 선수명과 동일 */
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       color: var(--text);
     }
     .mp-item-rate {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       font-weight: 500;
       font-variant-numeric: tabular-nums;
     }
     .mp-item-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--text-muted);
       margin-top: 3px;
     }
@@ -818,12 +840,12 @@
     .heatmap-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: var(--fs-body);
       min-width: 600px;
     }
     .heatmap-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: var(--fs-cap);                 /* 전 표·리스트 열 제목 공통 */
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -841,7 +863,7 @@
     .heatmap-table td.name-cell {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: var(--fs-body);
       letter-spacing: -0.01em;
       text-align: left;
       padding-left: 6px;
@@ -850,13 +872,13 @@
     }
     .hm-yes {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--accent);
       font-weight: 500;
     }
     .hm-no {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* .hm-yes와 같은 셀이므로 동일 크기 */
+      font-size: var(--fs-body);                 /* .hm-yes와 같은 셀이므로 동일 크기 */
       color: var(--text-muted);
     }
 
@@ -874,12 +896,12 @@
     }
     .tier-header .tier-count {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--text-muted);
     }
     .tier-header .tier-avg {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: var(--fs-body);
       color: var(--text-muted);
       margin-left: auto;
     }
@@ -892,7 +914,7 @@
       padding: 80px;
       color: var(--text-muted);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: var(--fs-body);
       gap: 10px;
     }
     .spinner {
@@ -924,10 +946,10 @@
         padding: 12px 16px;
         gap: 4px;
       }
-      .header-brand h1 { font-size: 18px; }
-      .header-brand .header-sub { font-size: 10px; }
-      .updated-text { font-size: 11px; }
-      .refresh-btn { padding: 5px 10px; font-size: 12px; }
+      .header-brand h1 { font-size: var(--fs-title); }
+      .header-brand .header-sub { font-size: var(--fs-micro); }
+      .updated-text { font-size: var(--fs-cap); }
+      .refresh-btn { padding: 5px 10px; font-size: var(--fs-aux); }
 
       /* Container */
       .container { padding: 12px 10px; }
@@ -941,7 +963,7 @@
 
       /* Stat grid: 4열 → 2열 */
       .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .stat-value { font-size: 30px; }
+      .stat-value { font-size: var(--fs-num); }
       .stat-card  { padding: 12px 14px; }
 
       /* 기존 상단 탭 숨김 (하단 탭으로 대체) — JS 인라인 display:flex보다 우선 */
@@ -966,7 +988,7 @@
         align-items: center;
         justify-content: center;
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--text-muted);
         gap: 3px;
         min-height: 44px;
@@ -978,11 +1000,11 @@
         color: var(--accent);
         border-top-color: var(--accent);
       }
-      .bottom-tab-item .btab-icon { font-size: 16px; line-height: 1; }
+      .bottom-tab-item .btab-icon { font-size: var(--fs-sub); line-height: 1; }
       body { padding-bottom: 56px; }
 
       /* Section label */
-      .section-label { font-size: 12px; margin-bottom: 6px; }
+      .section-label { font-size: var(--fs-aux); margin-bottom: 6px; }
 
       /* Card padding 축소 */
       .card { padding: 12px 10px; }
@@ -998,10 +1020,10 @@
       .tier-badge { white-space: nowrap; }
 
       /* Tables: 작은 폰트 */
-      .rank-table th { font-size: 11px; padding: 5px 6px; }
+      .rank-table th { font-size: var(--fs-cap); padding: 5px 6px; }
       .rank-table td { padding: 7px 6px; }
-      .player-name { font-size: 13px; }
-      .score-val   { font-size: 13px; }
+      .player-name { font-size: var(--fs-body); }
+      .score-val   { font-size: var(--fs-body); }
 
       /* 다열 테이블 가로 스크롤 래퍼 */
       .mobile-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -1036,28 +1058,28 @@
         white-space: nowrap;
       }
       .tc-name {
-        font-size: 14px;
+        font-size: var(--fs-body);
         white-space: nowrap;
         min-width: 60px;
       }
       .tc-tiers { white-space: nowrap; }
 
       /* MP part list */
-      .mp-part-name  { width: 56px; font-size: 12px; }
-      .mp-part-count { font-size: 12px; }
-      .mp-part-rate  { font-size: 12px; }
+      .mp-part-name  { width: 56px; font-size: var(--fs-aux); }
+      .mp-part-count { font-size: var(--fs-aux); }
+      .mp-part-rate  { font-size: var(--fs-aux); }
 
       /* Year avg */
-      .ya-name   { font-size: 12px; }
-      .ya-score  { font-size: 12px; }
-      .ya-attend { font-size: 12px; }
-      .ya-rounds { font-size: 12px; }
+      .ya-name   { font-size: var(--fs-aux); }
+      .ya-score  { font-size: var(--fs-aux); }
+      .ya-attend { font-size: var(--fs-aux); }
+      .ya-rounds { font-size: var(--fs-aux); }
     }
 
     @media (max-width: 400px) {
-      .stat-value { font-size: 26px; }
-      .header-brand h1 { font-size: 15px; }
-      .bottom-tab-item { font-size: 9px; }
+      .stat-value { font-size: var(--fs-num); }
+      .header-brand h1 { font-size: var(--fs-sub); }
+      .bottom-tab-item { font-size: var(--fs-micro); }
     }
   </style>
 </head>
@@ -1085,7 +1107,6 @@
   <!-- Tabs -->
   <div class="tabs" id="tabs" style="display:none">
     <div class="tab active" data-tab="summary" data-short="요약">요약</div>
-    <div class="tab" data-tab="overview" data-short="현황">전체 현황</div>
     <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
     <div class="tab" data-tab="tier" data-short="티어">티어</div>
     <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
@@ -1143,61 +1164,10 @@
           <div class="mp-part-list" id="mp-part-list"></div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ── 전체 현황 ── -->
-  <div id="page-overview" class="page">
-    <div class="three-col">
-      <div>
-        <div class="section-label">누적평균 TOP 10</div>
-        <div class="card">
-          <div class="mobile-table-scroll">
-            <div class="table-scroll">
-              <table class="rank-table" id="top10-table">
-                <thead><tr>
-                  <th>#</th><th>선수</th><th>티어</th>
-                  <th class="right">평균</th><th class="right">라운드</th>
-                </tr></thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="section-label">티어 분포</div>
-        <div class="card">
-          <div class="chart-wrap"><canvas id="tier-chart"></canvas></div>
-        </div>
-      </div>
       <div>
         <div class="section-label">개인 베스트 TOP 5</div>
         <div class="card accent-border">
           <div class="best-list" id="best-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="two-col">
-      <div>
-        <div class="section-label">가중평균 TOP 10 <span style="text-transform:none;letter-spacing:0;font-family:'DM Mono',monospace">(누적평균 + 최근) ÷ 2</span></div>
-        <div class="card">
-          <div class="mobile-table-scroll">
-            <table class="rank-table" id="weighted-table">
-              <thead><tr>
-                <th>#</th><th>선수</th><th>티어</th>
-                <th class="right">가중평균</th><th class="right">최근</th>
-              </tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="section-label">매치플레이 TOP 5</div>
-        <div class="card">
-          <div id="mp-overview"></div>
         </div>
       </div>
     </div>
@@ -1267,7 +1237,7 @@
           <div class="chart-wrap" style="height:240px">
             <canvas id="mp-chart"></canvas>
           </div>
-          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums"></div>
+          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:var(--fs-body);font-variant-numeric:tabular-nums"></div>
         </div>
         </div>
       </div>
@@ -1276,9 +1246,13 @@
 
   <!-- ── 티어 ── -->
   <div id="page-tier" class="page">
+    <div class="section-label">티어 분포</div>
+    <div class="card" style="margin-bottom:24px">
+      <div class="chart-wrap tier-chart-wrap"><canvas id="tier-chart"></canvas></div>
+    </div>
     <div class="section-label">티어별 현황</div>
     <div class="card">
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:rgba(245,248,252,0.45);margin-bottom:10px">
+      <div class="formula-note">
         기준스코어 = 누적평균 × 0.5 + 26년 평균 × 0.5 · 티어는 기준스코어 오름차순으로 배정 (PRO는 T0 고정)
       </div>
       <div id="tier-sections"></div>
@@ -1287,11 +1261,15 @@
 
   <!-- ── 참가 현황 ── -->
   <div id="page-attendance" class="page">
-    <div class="section-label">대회별 참가 현황</div>
+    <div class="section-label">2026 참석률</div>
     <div class="card full-col">
-      <div class="heatmap-wrap">
-        <div id="attendance-table"></div>
-      </div>
+      <div class="att-list" id="attendance-cards"></div>
+      <details class="att-details">
+        <summary>대회별 참가표 펼치기 (25년~)</summary>
+        <div class="heatmap-wrap">
+          <div id="attendance-table"></div>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -1301,9 +1279,6 @@
 <nav class="bottom-tab-nav" id="bottom-tab-nav">
   <div class="bottom-tab-item active" data-tab="summary">
     <span class="btab-icon">★</span>요약
-  </div>
-  <div class="bottom-tab-item" data-tab="overview">
-    <span class="btab-icon">▤</span>현황
   </div>
   <div class="bottom-tab-item" data-tab="ranking">
     <span class="btab-icon">↑</span>랭킹
@@ -1373,7 +1348,7 @@ function tierBadge(tier, name) {
   const t = String(tier);
   const labels = { '0':'T0','1':'T1','2':'T2','3':'T3','4':'T4','5':'T5' };
   const proBadge = (name && PRO_PLAYERS.has(name))
-    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-xs);padding:1px 5px">PRO</span>`
+    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:var(--fs-cap);font-weight:700;letter-spacing:0.06em;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-xs);padding:1px 5px">PRO</span>`
     : '';
   return `<span class="tier-badge tier-${t}">${labels[t] || t}</span>${proBadge}`;
 }
@@ -1440,11 +1415,8 @@ function render() {
   renderHeroYearAvg(activePlayers);
   renderHeroAttendance(activePlayers);
   renderSummary(activePlayers);
-  renderTop10(activePlayers);
-  renderWeightedTop10(rankPlayers);
   renderBestList(activePlayers);
   renderTierChart(activePlayers);
-  renderMPOverview(mpPlayers);
   renderFullRanking(activePlayers);
   renderWeightedFull(rankPlayers);
   renderTierSections(activePlayers);
@@ -1454,7 +1426,7 @@ function render() {
 
   // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
   redrawCharts = {
-    overview: () => renderTierChart(activePlayers),
+    tier:     () => renderTierChart(activePlayers),
     ranking:  () => { if (currentSeg === 'mp') renderMPChart(mpPlayers); },
   };
   cardifyAll();
@@ -1752,10 +1724,10 @@ function renderHeroAttendance(players) {
   const sorted = sortedAll.slice(0, HERO_LIMIT);
 
   const header = `<div style="display:flex;align-items:center;gap:10px;padding:0 0 6px;border-bottom:1px solid var(--divider);margin-bottom:2px">
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:72px">선수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:var(--fs-cap);font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:72px">선수</span>
     <span style="flex:1"></span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:var(--fs-cap);font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:var(--fs-cap);font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
   </div>`;
 
   const rows = sorted.map((p, i) => {
@@ -1791,40 +1763,6 @@ function renderSummary(players) {
     document.getElementById('stat-best-score').textContent = wb[0].best;
     document.getElementById('stat-best-score-name').textContent = wb[0].name;
   }
-}
-
-// ── TOP 10 ──
-function renderTop10(players) {
-  const tbody = document.querySelector('#top10-table tbody');
-  tbody.innerHTML = players.slice(0, 10).map((p, i) => {
-    const rowCls  = i === 0 ? ' class="rank-first"' : '';
-    const numCls  = i === 0 ? 'first' : i < 3 ? 'top3' : '';
-    const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
-    return `<tr${rowCls}>
-      <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
-      <td>${tierBadge(p.tier, p.name)}</td>
-      <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
-      <td class="rounds-val">${p.rounds ?? '—'}R</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── 가중평균 TOP 10 ──
-function renderWeightedTop10(players) {
-  const tbody = document.querySelector('#weighted-table tbody');
-  tbody.innerHTML = players.slice(0, 10).map((p, i) => {
-    const rowCls  = i === 0 ? ' class="rank-first"' : '';
-    const numCls  = i === 0 ? 'first' : i < 3 ? 'top3' : '';
-    const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
-    return `<tr${rowCls}>
-      <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
-      <td>${tierBadge(p.tier, p.name)}</td>
-      <td class="${scoreCls}">${p.wAvg.toFixed(1)}</td>
-      <td class="rounds-val">${p.recent ?? '—'}</td>
-    </tr>`;
-  }).join('');
 }
 
 // ── 개인 베스트 ──
@@ -1876,34 +1814,6 @@ function renderTierChart(players) {
       }
     }
   });
-}
-
-// ── MP 요약 ──
-function renderMPOverview(players) {
-  const el = document.getElementById('mp-overview');
-  // 승리 기록이 있는 선수만 TOP5 후보로 — 0승(패만 있거나 무만 있는)인
-  // 선수가 표본이 적다는 이유만으로 순위표에 끼는 것을 방지.
-  const withWin = players.filter(p => (p.win || 0) > 0);
-  if (!withWin.length) {
-    el.innerHTML = `<div class="no-change-msg">승리 기록 있는 선수 없음</div>`;
-    return;
-  }
-  el.innerHTML = withWin.slice(0, 5).map((p, i) => {
-    const isTop = i === 0;
-    const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
-    const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
-    const nameColor = isTop ? 'var(--accent)' : 'var(--text)';
-    return `<div class="mp-item${isTop ? ' leader' : ''}">
-      <div class="mp-item-header">
-        <span class="mp-item-name" style="color:${nameColor}">${p.name}</span>
-        <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
-      </div>
-      <div class="win-rate-bar">
-        <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
-      </div>
-      <div class="mp-item-sub" style="color:${isTop ? 'var(--accent)' : 'var(--text-muted)'};font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
-    </div>`;
-  }).join('');
 }
 
 // ── 전체 랭킹 ──
@@ -2008,7 +1918,7 @@ function renderMPTable(players) {
       <td class="rounds-val">${p.count}</td>
       <td class="rounds-val">${p.win}</td>
       <td class="rounds-val">${p.loss}</td>
-      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${rateColor};font-variant-numeric:tabular-nums">${p.rate !== null ? p.rate + '%' : '—'}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:var(--fs-body);font-weight:500;color:${rateColor};font-variant-numeric:tabular-nums">${p.rate !== null ? p.rate + '%' : '—'}</td>
     </tr>`;
   }).join('');
 }
@@ -2040,7 +1950,7 @@ function renderMPChart(players) {
 
   const eventCount = eventKeys.length;
   document.getElementById('mp-chart-summary').innerHTML = `
-    <div style="color:var(--text-muted);font-size:13px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
+    <div style="color:var(--text-muted);font-size:var(--fs-body);margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
     <div>
       <span style="color:var(--accent)"><b>${clubWin}</b> 승</span>
       <span style="color:var(--divider);margin:0 8px">|</span>
@@ -2114,9 +2024,26 @@ function renderAttendance(dicts) {
   for (const r of rows) {
     const cc = r.count === maxCount ? 'var(--accent)' : 'var(--text-muted)';
     html += `<tr><td class="name-cell">${r.name}</td>${r.cells}
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:13px;color:${cc};font-variant-numeric:tabular-nums">${r.count}</td></tr>`;
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:var(--fs-body);color:${cc};font-variant-numeric:tabular-nums">${r.count}</td></tr>`;
   }
   document.getElementById('attendance-table').innerHTML = html + '</tbody></table>';
+
+  // 올해 참석률 카드 — 탈퇴자 제외, 참석률 → 참석 횟수 순
+  const yearKeys = contestKeys.filter(k => k.startsWith("26'"));
+  const cards = dicts.map(d => {
+    const name = d['이름']?.trim();
+    if (!name || RETIRED_PLAYERS.has(name)) return null;
+    const cnt = yearKeys.filter(k => d[k]?.trim().toUpperCase() === 'YES').length;
+    return { name, cnt, rate: yearKeys.length ? Math.round(cnt / yearKeys.length * 100) : 0 };
+  }).filter(Boolean).sort((a, b) => b.rate - a.rate || a.name.localeCompare(b.name, 'ko'));
+  const topRate = cards.length ? cards[0].rate : 0;
+  document.getElementById('attendance-cards').innerHTML = cards.map((c, i) => `
+    <div class="att-item${c.rate === topRate ? ' top' : ''}">
+      <div class="att-rank">${i + 1}</div>
+      <div class="att-name">${c.name}</div>
+      <div class="att-bar"><i style="width:${c.rate}%"></i></div>
+      <div class="att-val">${c.cnt}/${yearKeys.length} · ${c.rate}%</div>
+    </div>`).join('');
 }
 
 loadAll();
