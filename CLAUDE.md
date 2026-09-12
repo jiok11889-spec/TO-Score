@@ -137,6 +137,30 @@ push 하면 Render 자동 배포. 대시보드는 서버가 Sheets 데이터를 
 
 ---
 
+## 모바일에서 끝까지 진행하기 (claude.ai/code 클라우드 세션)
+
+클라우드 세션은 **git에 있는 파일만** 받는다. 구글 시트 키 파일은 gitignore라 없으므로, 아래 1회 설정 없이는
+시트에 쓰는 스크립트(update_scores.py / tier_calc.py / audit_scores.py)가 `[ERR] 구글 시트 키를 찾을 수 없습니다`로 멈춘다.
+
+**1회 설정 (사용자가 직접, PC에서)**
+1. claude.ai/code → 환경(Environment) 설정 → 환경변수(secret) 추가
+2. 이름 `GOOGLE_SA_JSON`, 값 = 저장소 루트 `kinetic-horizon-492311-s5-55bd3f137a39.json` 파일 내용 전체(JSON 한 덩어리)
+3. 저장. 스크립트는 `sheets_auth.py`가 이 변수를 먼저 읽는다 (파일 경로를 쓰려면 `GOOGLE_SA_JSON_FILE`).
+
+**세션 시작 시 (에이전트가 자동으로)**
+```
+pip install -r requirements.txt
+git pull
+```
+그다음 0단계 체크리스트 → 워크플로우 그대로. 저장소 `.claude/agents/tio.md`가 같이 커밋돼 있어 "티오야 스코어 업데이트하자"로 부를 수 있다.
+
+**스코어 업데이트**: 스코어카드 사진을 채팅에 첨부 → 세션이 알려주는 첨부 경로의 파일을 `캡쳐/YYMMDD/`로 복사 → 1~4단계 → `git push` (Render 자동 배포. 시트 값은 push 없이도 대시보드에 즉시 반영).
+
+**회비 정산**: 카카오뱅크 거래내역 xlsx를 첨부 → `python finance/src/apply_bank.py <첨부경로> --pw <비밀번호>` → 검증 후 `--apply` → 커밋·push.
+비밀번호는 명령줄에 들어가므로 세션 기록에 남는다. 통장 파일 자체는 커밋하지 않는다(finance/in, out은 ignore).
+
+**막히면**: 키 오류면 1회 설정 미완료. 첨부가 안 되면 PC에서 `캡쳐/`에 넣고 push한 뒤 모바일에서 pull.
+
 ## 파일 구조
 
 ```

@@ -17,12 +17,11 @@ import sys
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
 import gspread
-from google.oauth2.service_account import Credentials
+from sheets_auth import credentials as sa_credentials
 
 from config import PRO_PLAYERS, RETIRED_PLAYERS
 
 SPREADSHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
-JSON_KEY_FILE = "kinetic-horizon-492311-s5-55bd3f137a39.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
           "https://www.googleapis.com/auth/drive"]
 SHEET = "스코어 집계 (입력)"
@@ -32,7 +31,7 @@ TIERS = [1, 2, 3, 4, 5]
 
 
 def connect():
-    creds = Credentials.from_service_account_file(JSON_KEY_FILE, scopes=SCOPES)
+    creds = sa_credentials(SCOPES)
     return gspread.authorize(creds).open_by_key(SPREADSHEET_ID)
 
 

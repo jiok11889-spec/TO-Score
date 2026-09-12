@@ -1,5 +1,5 @@
 import gspread
-from google.oauth2.service_account import Credentials
+from sheets_auth import credentials as sa_credentials
 from gspread.utils import rowcol_to_a1
 import time
 import sys
@@ -8,7 +8,6 @@ from config import PRO_PLAYERS
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 SPREADSHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
-JSON_KEY_FILE = "kinetic-horizon-492311-s5-55bd3f137a39.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # 26년 9월 11일 6차 대회 스코어 — 360도 (임시10, 참가 16명 전원 멤버, 게스트 없음)
@@ -77,7 +76,7 @@ TIER_ROUND_DATE = "9/11/2026"
 
 
 def connect():
-    creds = Credentials.from_service_account_file(JSON_KEY_FILE, scopes=SCOPES)
+    creds = sa_credentials(SCOPES)
     client = gspread.authorize(creds)
     return client.open_by_key(SPREADSHEET_ID)
 

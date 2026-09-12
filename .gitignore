@@ -7,11 +7,13 @@
 __pycache__/
 *.pyc
 
-# Claude local settings
-.claude/
+# Claude local settings (agents 폴더만 커밋 — 클라우드 세션에서 '티오' 에이전트를 쓰기 위함)
+.claude/*
+!.claude/agents/
 finance/out/
 
 # 다른 프로젝트 사본(사군자 실명 장부 포함) — 커밋 금지
 참고_Sagunja Finance/
 # 엑셀 수정 전 자동 백업(임시)
 finance/data/backups/
+finance/in/
