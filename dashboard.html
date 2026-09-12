@@ -1154,6 +1154,35 @@
       .page.rise { animation: none; }
       .live-dot { animation: none; }
     }
+
+    /* ═══ D++ : 스켈레톤·접기·아이콘 세트·라벨 크기 통일 ═══ */
+    .loading { flex-direction: column; align-items: stretch; padding: 8px 0 0; gap: 12px; }
+    .sk { background: var(--surface-1); border-radius: var(--r-lg); animation: skpulse 1.4s ease-in-out infinite; }
+    .sk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+    .sk-stat { height: 56px; }
+    .sk-title { height: 14px; width: 96px; border-radius: 7px; margin-top: 8px; }
+    .sk-card { height: 300px; }
+    .sk-short { height: 140px; }
+    @keyframes skpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+    .refresh-btn { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+    .refresh-btn svg { display: block; }
+
+    .le-item.le-more, .tier-change-item.tc-more { display: none; }
+    .le-grid.open .le-item.le-more, .tier-change-list.open .tier-change-item.tc-more { display: flex; }
+    .fold-toggle { grid-column: 1 / -1; text-align: center; font-size: var(--fs-aux); color: var(--text-sub); padding: 12px 0 2px; cursor: pointer; border-top: 1px solid var(--divider); margin-top: 6px; }
+    .fold-toggle:hover { color: var(--text); }
+
+    .btab-icon svg { display: block; }
+    @media (max-width: 768px) { .bottom-tab-item .btab-icon { font-size: 0; line-height: 0; } }
+
+    /* 보조 라벨은 전부 12px 하나로 — 제목 15 · 이름 15 · 본문 13 · 보조 12 · 숫자만 크게 */
+    .stat-label, .stat-sub, .le-hero-sub, .latest-event-sub, .mcard-main-lbl, .mchip, .mchip-k,
+    .tier-count, .tier-avg, .att-val, .att-rank, .tc-group-label, .tc-count-badge, .updated-text,
+    .le-rank, .mcard-rank, .rank-table th, .fold-toggle, .formula-note, .att-details summary { font-size: var(--fs-aux); }
+    .page:not(#page-tier) .tier-badge, .pro-badge { font-size: var(--fs-aux); letter-spacing: 0; }
+    .mcard-main-lbl { letter-spacing: 0; margin-top: 3px; }
+    .stat-label { margin-bottom: 4px; }
+    .stat-sub { margin-top: 3px; }
   </style>
 </head>
 <body>
@@ -1169,13 +1198,21 @@
   <div class="header-right">
     <span class="updated-text" id="last-updated">loading...</span>
     <div class="live-dot"></div>
-    <button class="refresh-btn" onclick="loadAll()">↻ 새로고침</button>
+    <button class="refresh-btn" onclick="loadAll(true)" aria-label="새로고침" title="새로고침">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"></path><path d="M20 4v5h-5"></path></svg>
+    </button>
   </div>
 </div>
 
 <div class="container">
 
-  <div id="loading" class="loading"><div class="spinner"></div> 데이터 불러오는 중...</div>
+  <div id="loading" class="loading">
+    <div class="sk-grid"><div class="sk sk-stat"></div><div class="sk sk-stat"></div><div class="sk sk-stat"></div><div class="sk sk-stat"></div></div>
+    <div class="sk sk-title"></div>
+    <div class="sk sk-card"></div>
+    <div class="sk sk-title"></div>
+    <div class="sk sk-card sk-short"></div>
+  </div>
 
   <!-- Tabs -->
   <div class="tabs" id="tabs" style="display:none">
@@ -1399,19 +1436,19 @@
 <!-- 하단 고정 탭 네비 (모바일 전용) -->
 <nav class="bottom-tab-nav" id="bottom-tab-nav">
   <div class="bottom-tab-item active" data-tab="summary">
-    <span class="btab-icon">★</span>요약
+    <span class="btab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"></path><path d="M6.5 10v9h11v-9"></path></svg></span>요약
   </div>
   <div class="bottom-tab-item" data-tab="overview">
-    <span class="btab-icon">▤</span>현황
+    <span class="btab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"></rect><rect x="13" y="4" width="7" height="7" rx="1.5"></rect><rect x="4" y="13" width="7" height="7" rx="1.5"></rect><rect x="13" y="13" width="7" height="7" rx="1.5"></rect></svg></span>현황
   </div>
   <div class="bottom-tab-item" data-tab="ranking">
-    <span class="btab-icon">↑</span>랭킹
+    <span class="btab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V12"></path><path d="M12 19V5"></path><path d="M19 19v-9"></path></svg></span>랭킹
   </div>
   <div class="bottom-tab-item" data-tab="tier">
-    <span class="btab-icon">◈</span>티어
+    <span class="btab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 9 8-4 8 4-8 4-8-4Z"></path><path d="m4 13 8 4 8-4"></path><path d="m4 17 8 4 8-4"></path></svg></span>티어
   </div>
   <div class="bottom-tab-item" data-tab="attendance">
-    <span class="btab-icon">≡</span>참가
+    <span class="btab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></span>참가
   </div>
 </nav>
 
@@ -1494,10 +1531,14 @@ function findKey(obj, ...kws) {
   return null;
 }
 
-async function loadAll() {
-  document.getElementById('loading').style.display = 'flex';
-  document.getElementById('tabs').style.display = 'none';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+let lastLoadAt = 0;
+// silent=true: 화면을 비우지 않고 현재 탭을 유지한 채 조용히 데이터만 갱신
+async function loadAll(silent = false) {
+  if (!silent) {
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('tabs').style.display = 'none';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  }
 
   try {
     const res = await fetch('/api/data');
@@ -1518,16 +1559,29 @@ async function loadAll() {
     document.getElementById('last-updated').textContent =
       new Date().toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) + ' 기준';
   } catch(e) {
+    if (silent) return;  // 조용한 갱신 실패는 기존 화면 유지
     document.getElementById('loading').innerHTML =
       `<span style="color:#C87878">로드 실패: ${e.message}</span>`;
     return;
   }
+  lastLoadAt = Date.now();
 
+  if (silent) {
+    const cur = document.querySelector('.page.active');
+    if (cur && redrawCharts[cur.id.replace('page-', '')]) drawWhenSized(cur.id.replace('page-', ''));
+    return;
+  }
   document.getElementById('loading').style.display = 'none';
   document.getElementById('tabs').style.display = 'flex';
   document.getElementById('page-summary').classList.add('active', 'rise');
   countUp(document.querySelector('.le-hero-score'));
 }
+
+// 앱으로 돌아왔을 때(1분 이상 지났으면) · 5분마다 조용히 갱신
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && lastLoadAt && Date.now() - lastLoadAt > 60 * 1000) loadAll(true);
+});
+setInterval(() => { if (!document.hidden && lastLoadAt) loadAll(true); }, 5 * 60 * 1000);
 
 function render() {
   const players     = parseScoreDicts(DATA.score);
@@ -1780,12 +1834,17 @@ function renderLatestEvent(players) {
         <div class="le-hero-sub">우승 · ${tierBadge(w.tier, w.name)}</div>
       </div>
     </div>`;
-  listEl.innerHTML = hero + entries.slice(1).map((e, i) => `<div class="le-item">
+  const SHOW = 5;  // 우승자 포함 5명까지 기본 표시
+  const rest = entries.slice(1);
+  listEl.classList.remove('open');
+  listEl.innerHTML = hero + rest.map((e, i) => `<div class="le-item${i + 2 > SHOW ? ' le-more' : ''}">
       <span class="le-rank">${i + 2}</span>
       <span class="le-name">${e.name}</span>
       ${tierBadge(e.tier, e.name)}
       <span class="le-score">${e.score}</span>
-    </div>`).join('');
+    </div>`).join('') + (entries.length > SHOW
+      ? `<div class="fold-toggle" onclick="const g=this.parentNode;g.classList.toggle('open');this.textContent=g.classList.contains('open')?'접기':'${entries.length}명 전체 보기'">${entries.length}명 전체 보기</div>`
+      : '');
 }
 
 // ── Hero: 티어 변동 ──
@@ -1809,16 +1868,21 @@ function renderHeroTierChange(history) {
     <span class="tc-tiers">${tierBadge(h['이전티어'], null)} <span class="tc-arrow">→</span> ${tierBadge(h['현재티어'], null)}</span>
   </div>`;
 
+  const SHOW = 3;  // 그룹당 3명까지 기본 표시
+  const items = (list, dir) => list.map((h, i) => item(h, dir).replace('class="tier-change-item', `class="tier-change-item${i >= SHOW ? ' tc-more' : ''}`)).join('');
   const upCol = ups.length ? `<div class="tc-group">
     <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
-    ${ups.map(h => item(h, 'up')).join('')}
+    ${items(ups, 'up')}
   </div>` : '';
   const downCol = downs.length ? `<div class="tc-group">
     <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
-    ${downs.map(h => item(h, 'down')).join('')}
+    ${items(downs, 'down')}
   </div>` : '';
-
-  el.innerHTML = `<div class="tc-cols">${upCol}${downCol}</div>`;
+  const hidden = Math.max(0, ups.length - SHOW) + Math.max(0, downs.length - SHOW);
+  el.classList.remove('open');
+  el.innerHTML = `<div class="tc-cols">${upCol}${downCol}</div>` + (hidden
+    ? `<div class="fold-toggle" onclick="const g=this.parentNode;g.classList.toggle('open');this.textContent=g.classList.contains('open')?'접기':'${changed.length}명 전체 보기'">${changed.length}명 전체 보기</div>`
+    : '');
 }
 
 // ── Hero: 연도 평균 ──
