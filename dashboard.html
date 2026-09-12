@@ -1381,9 +1381,9 @@ function render() {
   const players     = parseScoreDicts(DATA.score);
   const tierMap     = Object.fromEntries(players.map(p => [p.name, p.tier]));
   const rankPlayers = parseRankDicts(DATA.rank, tierMap);
-  const mpPlayers   = parseMPDicts(DATA.mp);
+  const mpPlayers   = parseMPDicts(DATA.mp).filter(p => !RETIRED_PLAYERS.has(p.name));
 
-  // 기록은 남기되 랭킹·집계·티어 현황·총원에서는 탈퇴 멤버를 뺀다
+  // 탈퇴 멤버는 모든 랭킹·집계·티어 현황·총원에서 뺀다. 최근 대회 결과(실제 참가 기록)만 남긴다
   const activePlayers = players.filter(p => !RETIRED_PLAYERS.has(p.name));
 
   renderLatestEvent(players);
@@ -1391,12 +1391,12 @@ function render() {
   renderHeroYearAvg(activePlayers);
   renderHeroAttendance(activePlayers);
   renderSummary(activePlayers);
-  renderTop10(players);
+  renderTop10(activePlayers);
   renderWeightedTop10(rankPlayers);
-  renderBestList(players);
+  renderBestList(activePlayers);
   renderTierChart(activePlayers);
   renderMPOverview(mpPlayers);
-  renderFullRanking(players);
+  renderFullRanking(activePlayers);
   renderWeightedFull(rankPlayers);
   renderTierSections(activePlayers);
   renderMPTable(mpPlayers);
