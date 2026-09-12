@@ -183,7 +183,7 @@
     }
     .hero-grid-2 {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 18px;
       margin-bottom: 40px;
     }
@@ -538,7 +538,6 @@
     .att-details { margin-top: 16px; }
     .att-details summary { cursor: pointer; font-size: var(--fs-aux); color: var(--text-sub); padding: 8px 0; }
     @media (max-width: 640px) { .att-list { grid-template-columns: 1fr; } }
-    .tier-chart-wrap { height: 220px; max-width: 480px; margin: 0 auto; }
     .formula-note { font-family: 'DM Mono', monospace; font-size: var(--fs-aux); color: var(--text-sub); margin-bottom: 10px; }
     .rank-pane { display: none; }
     .rank-pane.active { display: block; }
@@ -1107,6 +1106,7 @@
   <!-- Tabs -->
   <div class="tabs" id="tabs" style="display:none">
     <div class="tab active" data-tab="summary" data-short="요약">요약</div>
+    <div class="tab" data-tab="overview" data-short="현황">전체 현황</div>
     <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
     <div class="tab" data-tab="tier" data-short="티어">티어</div>
     <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
@@ -1164,10 +1164,61 @@
           <div class="mp-part-list" id="mp-part-list"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── 전체 현황 ── -->
+  <div id="page-overview" class="page">
+    <div class="three-col">
+      <div>
+        <div class="section-label">누적평균 TOP 10</div>
+        <div class="card">
+          <div class="mobile-table-scroll">
+            <div class="table-scroll">
+              <table class="rank-table" id="top10-table">
+                <thead><tr>
+                  <th>#</th><th>선수</th><th>티어</th>
+                  <th class="right">평균</th><th class="right">라운드</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">티어 분포</div>
+        <div class="card">
+          <div class="chart-wrap"><canvas id="tier-chart"></canvas></div>
+        </div>
+      </div>
       <div>
         <div class="section-label">개인 베스트 TOP 5</div>
         <div class="card accent-border">
           <div class="best-list" id="best-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="section-label">가중평균 TOP 10 <span style="text-transform:none;letter-spacing:0;font-family:'DM Mono',monospace">(누적평균 + 최근) ÷ 2</span></div>
+        <div class="card">
+          <div class="mobile-table-scroll">
+            <table class="rank-table" id="weighted-table">
+              <thead><tr>
+                <th>#</th><th>선수</th><th>티어</th>
+                <th class="right">가중평균</th><th class="right">최근</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">매치플레이 TOP 5</div>
+        <div class="card">
+          <div id="mp-overview"></div>
         </div>
       </div>
     </div>
@@ -1246,10 +1297,6 @@
 
   <!-- ── 티어 ── -->
   <div id="page-tier" class="page">
-    <div class="section-label">티어 분포</div>
-    <div class="card" style="margin-bottom:24px">
-      <div class="chart-wrap tier-chart-wrap"><canvas id="tier-chart"></canvas></div>
-    </div>
     <div class="section-label">티어별 현황</div>
     <div class="card">
       <div class="formula-note">
@@ -1279,6 +1326,9 @@
 <nav class="bottom-tab-nav" id="bottom-tab-nav">
   <div class="bottom-tab-item active" data-tab="summary">
     <span class="btab-icon">★</span>요약
+  </div>
+  <div class="bottom-tab-item" data-tab="overview">
+    <span class="btab-icon">▤</span>현황
   </div>
   <div class="bottom-tab-item" data-tab="ranking">
     <span class="btab-icon">↑</span>랭킹
@@ -1415,8 +1465,11 @@ function render() {
   renderHeroYearAvg(activePlayers);
   renderHeroAttendance(activePlayers);
   renderSummary(activePlayers);
+  renderTop10(activePlayers);
+  renderWeightedTop10(rankPlayers);
   renderBestList(activePlayers);
   renderTierChart(activePlayers);
+  renderMPOverview(mpPlayers);
   renderFullRanking(activePlayers);
   renderWeightedFull(rankPlayers);
   renderTierSections(activePlayers);
@@ -1426,7 +1479,7 @@ function render() {
 
   // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
   redrawCharts = {
-    tier:     () => renderTierChart(activePlayers),
+    overview: () => renderTierChart(activePlayers),
     ranking:  () => { if (currentSeg === 'mp') renderMPChart(mpPlayers); },
   };
   cardifyAll();
@@ -1766,6 +1819,68 @@ function renderSummary(players) {
 }
 
 // ── 개인 베스트 ──
+// ── TOP 10 ──
+function renderTop10(players) {
+  const tbody = document.querySelector('#top10-table tbody');
+  tbody.innerHTML = players.slice(0, 10).map((p, i) => {
+    const rowCls  = i === 0 ? ' class="rank-first"' : '';
+    const numCls  = i === 0 ? 'first' : i < 3 ? 'top3' : '';
+    const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
+    return `<tr${rowCls}>
+      <td class="rank-num ${numCls}">${i + 1}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td>${tierBadge(p.tier, p.name)}</td>
+      <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
+      <td class="rounds-val">${p.rounds ?? '—'}R</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── 가중평균 TOP 10 ──
+function renderWeightedTop10(players) {
+  const tbody = document.querySelector('#weighted-table tbody');
+  tbody.innerHTML = players.slice(0, 10).map((p, i) => {
+    const rowCls  = i === 0 ? ' class="rank-first"' : '';
+    const numCls  = i === 0 ? 'first' : i < 3 ? 'top3' : '';
+    const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
+    return `<tr${rowCls}>
+      <td class="rank-num ${numCls}">${i + 1}</td>
+      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td>${tierBadge(p.tier, p.name)}</td>
+      <td class="${scoreCls}">${p.wAvg.toFixed(1)}</td>
+      <td class="rounds-val">${p.recent ?? '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── MP 요약 ──
+function renderMPOverview(players) {
+  const el = document.getElementById('mp-overview');
+  // 승리 기록이 있는 선수만 TOP5 후보로 — 0승(패만 있거나 무만 있는)인
+  // 선수가 표본이 적다는 이유만으로 순위표에 끼는 것을 방지.
+  const withWin = players.filter(p => (p.win || 0) > 0);
+  if (!withWin.length) {
+    el.innerHTML = `<div class="no-change-msg">승리 기록 있는 선수 없음</div>`;
+    return;
+  }
+  el.innerHTML = withWin.slice(0, 5).map((p, i) => {
+    const isTop = i === 0;
+    const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
+    const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
+    const nameColor = isTop ? 'var(--accent)' : 'var(--text)';
+    return `<div class="mp-item${isTop ? ' leader' : ''}">
+      <div class="mp-item-header">
+        <span class="mp-item-name" style="color:${nameColor}">${p.name}</span>
+        <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
+      </div>
+      <div class="win-rate-bar">
+        <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
+      </div>
+      <div class="mp-item-sub" style="color:${isTop ? 'var(--accent)' : 'var(--text-muted)'};font-size:var(--fs-body)">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
+    </div>`;
+  }).join('');
+}
+
 function renderBestList(players) {
   const el = document.getElementById('best-list');
   const sorted = [...players].filter(p => p.best !== null).sort((a,b) => a.best - b.best).slice(0, 5);
