@@ -117,7 +117,7 @@
     .live-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--text-sub);
       animation: pulse 2.5s infinite;
     }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
@@ -134,8 +134,8 @@
       transition: border-color 0.15s, color 0.15s;
     }
     .refresh-btn:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
+      border-color: var(--border-2);
+      color: var(--text);
     }
 
     /* ─── Container ─── */
@@ -593,7 +593,7 @@
       transition: color 0.15s, border-color 0.15s;
     }
     .tab:hover { color: var(--text-sub); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); font-weight: 700; }
 
     /* ─── Stat cards (에디토리얼 위계: 중립 라벨 · 지배적 숫자 · 헤어라인) ─── */
     .stat-grid {
@@ -1134,7 +1134,25 @@
       .bottom-tab-nav { border-top: none; background: rgba(16,20,24,0.92); }
       .bottom-tab-item { border-top: none; font-family: 'Noto Sans KR', sans-serif; }
       .bottom-tab-item.active { color: var(--text); }
-      .bottom-tab-item.active .btab-icon { color: var(--accent); }
+      .bottom-tab-item.active .btab-icon { color: var(--text); }
+    }
+
+    /* ═══ D+ : 움직임 하나(자리 잡기) · 행마다 숫자 하나 · 색은 데이터에만 ═══ */
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .page.rise { animation: rise 0.2s ease-out both; }
+    .mcard-chips { display: none; }
+    .mcard.open .mcard-chips { display: flex; }
+    .mcard.has-more { cursor: pointer; }
+    .mcard.has-more .mcard-main { padding-right: 14px; position: relative; }
+    .mcard.has-more .mcard-main::after {
+      content: ''; position: absolute; right: 0; top: 50%; width: 6px; height: 6px;
+      border-right: 1.5px solid var(--text-muted); border-bottom: 1.5px solid var(--text-muted);
+      transform: translateY(-70%) rotate(45deg); transition: transform 0.15s;
+    }
+    .mcard.open .mcard-main::after { transform: translateY(-30%) rotate(-135deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .page.rise { animation: none; }
+      .live-dot { animation: none; }
     }
   </style>
 </head>
@@ -1430,7 +1448,10 @@ let RETIRED_PLAYERS = new Set();
 function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + tabName).classList.add('active');
+  const page = document.getElementById('page-' + tabName);
+  page.classList.add('active');
+  // 자리 잡기 애니메이션을 매번 다시 재생 (클래스 제거→리플로우→추가)
+  page.classList.remove('rise'); void page.offsetWidth; page.classList.add('rise');
   document.querySelectorAll('.bottom-tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   // 탭이 보이게 된 뒤 해당 탭의 차트를 재생성.
   // requestAnimationFrame은 창/탭이 백그라운드면 아예 호출되지 않으므로 setTimeout 사용.
@@ -1504,7 +1525,8 @@ async function loadAll() {
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('tabs').style.display = 'flex';
-  document.getElementById('page-summary').classList.add('active');
+  document.getElementById('page-summary').classList.add('active', 'rise');
+  countUp(document.querySelector('.le-hero-score'));
 }
 
 function render() {
@@ -1541,6 +1563,23 @@ function render() {
   cardifyAll();
 }
 
+// ── 큰 숫자 하나만 0에서 올라와 멈춤 (첫 표시 때만, 감속 곡선, 0.6초) ──
+function countUp(el) {
+  if (!el || el.dataset.counted) return;
+  const target = parseFloat(el.textContent);
+  if (isNaN(target) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.dataset.counted = '1';
+  const decimals = (el.textContent.split('.')[1] || '').length;
+  // requestAnimationFrame은 탭이 뒤에 있으면 멈추므로 setTimeout으로 진행하고, 끝값은 반드시 보장
+  const t0 = Date.now();
+  (function step() {
+    const k = Math.min(1, (Date.now() - t0) / 600);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.textContent = (target * e).toFixed(decimals);
+    if (k < 1) setTimeout(step, 16); else el.textContent = target.toFixed(decimals);
+  })();
+}
+
 // ── 랭킹 탭 세그먼트 (누적평균 / 가중평균 / 매치플레이) ──
 let currentSeg = 'avg';
 function switchSeg(seg) {
@@ -1570,7 +1609,7 @@ function cardifyAll() {
         return v ? `<span class="mchip"><span class="mchip-k">${ths[i] || ''}</span>${v}</span>` : '';
       }).join('');
       const first = tr.classList.contains('rank-first') || tds[0].classList.contains('first');
-      return `<div class="mcard${first ? ' first' : ''}">
+      return `<div class="mcard${first ? ' first' : ''}${chips ? ' has-more' : ''}" onclick="this.classList.toggle('open')">
         <div class="mcard-rank">${tds[0].textContent.trim()}</div>
         <div class="mcard-body">
           <div class="mcard-name">${tds[1].innerHTML}${tierIdx >= 0 ? ' ' + tds[tierIdx].innerHTML : ''}</div>
