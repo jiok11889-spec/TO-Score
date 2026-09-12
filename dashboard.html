@@ -963,7 +963,7 @@
 
       /* 티어 페이지 테이블 */
       .tier-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .tier-section .rank-table { min-width: 300px; }
+      .tier-section .rank-table { min-width: 620px; }
 
       /* Heatmap */
       .heatmap-wrap {
@@ -1197,6 +1197,9 @@
   <div id="page-tier" class="page">
     <div class="section-label">티어별 현황</div>
     <div class="card">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:rgba(236,241,238,0.45);margin-bottom:10px">
+        기준스코어 = 누적평균 × 0.5 + 26년 평균 × 0.5 · 티어는 기준스코어 오름차순으로 배정 (PRO는 T0 고정)
+      </div>
       <div id="tier-sections"></div>
     </div>
   </div>
@@ -1419,6 +1422,7 @@ function parseScoreDicts(dicts) {
   const bestKey   = findKey(s, '베스트');
   const roundKey  = findKey(s, '라운드횟수', '라운드 횟수');
   const recentKey = findKey(s, '가장최근', '최근라운딩');
+  const baseKey   = findKey(s, '기준스코어');   // 티어 배정 근거 = 누적평균×0.5 + 26년평균×0.5 (시트 계산값)
   const contestKeys = Object.keys(s).filter(k => /\d{2}' /.test(k) && !k.includes('매치'));
   const yearKeys    = contestKeys.filter(k => k.startsWith("26'"));
 
@@ -1445,6 +1449,7 @@ function parseScoreDicts(dicts) {
       best: (num(d[bestKey]) || 0) > 0 ? num(d[bestKey]) : null,  // 0/공백은 무효(신규 멤버 기본값)
       rounds: playedRounds,
       recent: num(d[recentKey]),
+      base: num(d[baseKey]),
       yearAvg, yearRounds: yearScores.length,
       attendRate, yearAttendRate,
       scores: contestKeys.map(k => ({ name: k, score: num(d[k]) })),
@@ -1848,21 +1853,28 @@ function tierTableHTML(tp) {
   const rows = tp.map((p, i) => `<tr>
     <td class="rank-num${i === 0 ? ' first' : ''}">${i + 1}</td>
     <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
-    <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
+    <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.base != null ? p.base.toFixed(1) : '—'}</td>
+    <td class="rounds-val">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
+    <td class="rounds-val">${p.yearAvg != null ? p.yearAvg.toFixed(1) : '—'}</td>
     <td class="rounds-val">${p.best ?? '—'}</td>
+    <td class="rounds-val">${p.recent ?? '—'}</td>
     <td class="rounds-val">${p.rounds ?? '—'}R</td>
   </tr>`).join('');
   return `<table class="rank-table">
     <colgroup>
       <col style="width:40px">
       <col>
-      <col style="width:120px">
-      <col style="width:100px">
-      <col style="width:80px">
+      <col style="width:96px">
+      <col style="width:88px">
+      <col style="width:88px">
+      <col style="width:72px">
+      <col style="width:72px">
+      <col style="width:72px">
     </colgroup>
     <thead><tr>
       <th>#</th><th>선수</th>
-      <th class="right">누적평균</th><th class="right">베스트</th><th class="right">라운드</th>
+      <th class="right">기준스코어</th><th class="right">누적평균</th><th class="right">26년 평균</th>
+      <th class="right">베스트</th><th class="right">최근</th><th class="right">라운드</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
@@ -1875,14 +1887,15 @@ function renderTierSections(players) {
   const tierNames = { '0':'T0 · 스페셜','1':'T1','2':'T2','3':'T3','4':'T4','5':'T5' };
 
   document.getElementById('tier-sections').innerHTML = Object.keys(byTier).sort().map(tier => {
-    const tp  = byTier[tier].sort((a,b) => (a.avg ?? Infinity) - (b.avg ?? Infinity));
-    const withAvg = tp.filter(p => p.avg != null);
-    const avg = withAvg.length ? withAvg.reduce((s,p) => s+p.avg, 0) / withAvg.length : null;
+    // 티어 배정 기준인 기준스코어 순. 기준스코어 없는 신규 멤버는 맨 아래
+    const tp  = byTier[tier].sort((a,b) => (a.base ?? Infinity) - (b.base ?? Infinity));
+    const withBase = tp.filter(p => p.base != null);
+    const avg = withBase.length ? withBase.reduce((s,p) => s+p.base, 0) / withBase.length : null;
     return `<div class="tier-section">
       <div class="tier-header">
         <span class="tier-badge tier-${tier}">${tierNames[tier] || 'T'+tier}</span>
         <span class="tier-count">${tp.length}명</span>
-        <span class="tier-avg">${avg != null ? avg.toFixed(1) + ' avg' : '—'}</span>
+        <span class="tier-avg">${avg != null ? '기준 ' + avg.toFixed(1) + ' avg' : '—'}</span>
       </div>
       ${tierTableHTML(tp)}
     </div>`;
