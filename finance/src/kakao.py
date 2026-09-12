@@ -9,7 +9,10 @@
     kakao_message.txt     카톡에 붙여넣을 문구
 
 당월 미납뿐 아니라 **누적 미납**(몇 달째 밀렸는지)을 표시한다.
-선납(미래 달까지 미리 낸 사람)은 미납으로 잡지 않는다.
+
+정산 대상은 **직전 달**이다(대시보드의 latest_ym은 현재 달까지 잡으므로 쓰지 않는다).
+선납(미래 달까지 미리 낸 사람)은 미납으로 잡지 않고,
+"N월분 선입금"으로 따로 표시한다. 회비에 못 미친 선입금도 잔여액과 함께 표시한다.
 """
 import io
 import json
@@ -19,6 +22,7 @@ import sys
 import time
 import urllib.request
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 import openpyxl
@@ -58,9 +62,20 @@ def read_sheet():
     return [m for _, m in months], members
 
 
-def build_message(latest, balance, account):
+def settle_month(months, members):
+    """정산 대상 = 직전 달. 선납으로 채워진 이후 달은 대상이 아니다."""
+    live = [m for m in months if any(x["months"][m] > 0 for x in members)]
+    t = datetime.now()
+    prev = (t.year % 100, t.month - 1) if t.month > 1 else (t.year % 100 - 1, 12)
+    done = [m for m in live if ym_key(m) <= prev]
+    return done[-1] if done else live[-1]
+
+
+def build_message(balance, account):
     months, members = read_sheet()
+    latest = settle_month(months, members)
     upto = [m for m in months if ym_key(m) <= ym_key(latest)]
+    ahead = [m for m in months if ym_key(m) > ym_key(latest)]
 
     amts = [m["months"][latest] for m in members if m["months"][latest] > 0]
     fee = Counter(amts).most_common(1)[0][0] if amts else 0
@@ -85,6 +100,17 @@ def build_message(latest, balance, account):
             chronic.append((m["name"], gaps, sum(fee - m["months"][ym] for ym in gaps)))
     chronic.sort(key=lambda x: -len(x[1]))
 
+    # 선입금: 사람별로 '어느 달까지 냈는지'로 묶는다 (달마다 쪼개면 문구가 길어진다)
+    nxt = ahead[0] if ahead else None
+    pre_next, pre_far, pre_part = [], [], []
+    for m in members:
+        got = [ym for ym in ahead if fee and m["months"][ym] >= fee]
+        if got:
+            (pre_next if got[-1] == nxt else pre_far).append((m["name"], got[-1]))
+        short = [(ym, m["months"][ym]) for ym in ahead if 0 < m["months"][ym] < fee]
+        pre_part += [(m["name"], ym, v) for ym, v in short]
+    pre_far.sort(key=lambda x: ym_key(x[1]), reverse=True)
+
     mm = latest.split()[-1]
     L = [f"티오방 {mm} 회비입출내역입니다 ⛳", "",
          f"▪ 현재 잔액 : {balance:,}원",
@@ -94,11 +120,21 @@ def build_message(latest, balance, account):
         for i in range(0, len(none), 4):
             L.append(" ".join(none[i:i + 4]))
         L.append("")
+    if pre_next:
+        names = [n for n, _ in pre_next]
+        L.append(f"▪ {nxt.split()[-1]}분 선입금 ({len(names)}명)")
+        for i in range(0, len(names), 4):
+            L.append(" ".join(names[i:i + 4]))
+        L.append("")
+    for n, last in pre_far:
+        L.append(f"※ {n}님 {last}분까지 선입금")
     for n, v in partial:
         L.append(f"※ {n}님 {v:,}원 부분납부 (잔여 {fee - v:,}원)")
     for n, gaps, short in chronic:
         L.append(f"※ {n}님 {len(gaps)}개월 미납 ({', '.join(g.split()[-1] for g in gaps)}) — 총 {short:,}원")
-    if partial or chronic:
+    for n, ym, v in pre_part:
+        L.append(f"※ {n}님 {ym.split()[-1]}분 {v:,}원 선입금 (잔여 {fee - v:,}원)")
+    if partial or chronic or pre_far or pre_part:
         L.append("")
     L += ["▪ 입금계좌",
           f"카카오뱅크 {account['number']} ({account['holder']})", "", SITE]
@@ -157,8 +193,7 @@ def main():
         else:
             raise SystemExit("대시보드 서버가 뜨지 않았습니다.")
 
-        msg = build_message(d["summary"]["latest_ym"], round(d["summary"]["balance"]),
-                            d["account"])
+        msg = build_message(round(d["summary"]["balance"]), d["account"])
         (OUT / "kakao_message.txt").write_text(msg, encoding="utf-8")
         capture(url)
     finally:

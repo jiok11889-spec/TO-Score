@@ -6,33 +6,21 @@
   <title>사군자 티오방 스코어 대시보드</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      /* 골프 정체성(그린)은 유지하되, 구조는 중립 헤어라인 + 흰색 투명도 램프로 (사군자 원칙) */
-      --bg:             #121815;                  /* canvas */
-      /* 서페이스 사다리: 그림자 없이 헤어라인+명도만으로 위계 */
-      --surface-1:      #1A201D;                  /* 카드·패널 */
-      --surface-2:      #1F2522;                  /* 카드 위에 얹히는 요소·hover */
-      --surface-3:      #242A27;                  /* 가장 높은 리프트 */
-      --accent:         #2BAE86;                  /* 골프 그린 액센트 1개 유지 */
-      --accent-dim:     rgba(43,174,134,0.10);
-      --accent-border:  rgba(43,174,134,0.22);
-      --text:           #ECF1EE;                  /* 니어-화이트 */
-      --text-sub:       rgba(236,241,238,0.60);   /* 흰색 램프 */
-      --text-muted:     rgba(236,241,238,0.30);
-      --text-faint:     rgba(236,241,238,0.16);   /* 아이브로우/최옅음 */
-      --border:         rgba(255,255,255,0.07);   /* 중립 헤어라인 (그린 틴트 아님) */
-      --border-2:       rgba(255,255,255,0.12);
+      --bg:             #080F0C;
+      --surface:        #0F1C16;
+      --surface-2:      #0C1610;
+      --accent:         #00C878;
+      --accent-border:  rgba(0,200,120,0.28);
+      --text:           #FFFFFF;
+      --text-sub:       #B0D4C4;
+      --text-muted:     #3A6650;
+      --border:         rgba(0,200,120,0.10);
       --divider:        rgba(255,255,255,0.05);
-      /* 라운드 스케일 */
-      --r-xs:           4px;      /* 뱃지·칩 */
-      --r-sm:           6px;      /* 인라인 태그 */
-      --r-md:           8px;      /* 버튼·인풋 */
-      --r-lg:           12px;     /* 카드 */
-      --r-xl:           16px;     /* 패널 */
-      --r-pill:         9999px;
+      --radius:         8px;
     }
 
     * {
@@ -51,13 +39,11 @@
       line-height: 1.5;
     }
 
-    /* ─── Header (스티키 블러 · 중립 헤어라인, 그린 액센트바=정체성 유지) ─── */
+    /* ─── Header ─── */
     .header {
-      background: rgba(18,24,21,0.82);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: var(--surface-2);
       border-bottom: 1px solid var(--border);
-      padding: 18px 32px;
+      padding: 16px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -73,13 +59,13 @@
     .header-accent-bar {
       width: 3px;
       height: 20px;
-      background: #2BAE86;
+      background: #00C878;
       border-radius: 2px;
       flex-shrink: 0;
     }
     .header-brand h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
       font-size: 19px;
       letter-spacing: -0.01em;
       text-transform: uppercase;
@@ -88,11 +74,11 @@
     }
     .header-brand .header-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 500;
-      color: var(--text-faint);
+      color: #3A6650;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.12em;
       display: block;
     }
     .header-right {
@@ -117,7 +103,7 @@
       border: 1px solid var(--border);
       color: var(--text-muted);
       padding: 6px 14px;
-      border-radius: var(--r-md);
+      border-radius: var(--radius);
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
       font-weight: 500;
@@ -130,38 +116,35 @@
     }
 
     /* ─── Container ─── */
-    .container { padding: 40px 32px 96px; max-width: 1320px; margin: 0 auto; }
+    .container { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
 
-    /* ─── Section label (아이브로우: 중립·자간, 헤비 그린 언더라인 제거) ─── */
+    /* ─── Section label (above cards) ─── */
     .section-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-faint);
-      margin-bottom: 14px;
+      letter-spacing: 0.10em;
+      color: #2A4A38;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,200,120,0.07);
     }
 
-    /* ─── Cards (박스보다 여백: 중립 헤어라인·옅은 서페이스) ─── */
+    /* ─── Cards ─── */
     .card {
-      background: var(--surface-1);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 18px 20px;
+      border-radius: var(--radius);
+      padding: 12px 14px;
     }
-    /* 강조는 그린 풀-보더 남발 대신, 상단 얇은 액센트 라인 하나로 절제 */
-    .card.accent-border {
-      border-color: var(--border);
-      border-top: 1px solid var(--accent-border);
-      background: linear-gradient(180deg, rgba(43,174,134,0.035), rgba(255,255,255,0.010)), var(--surface-1);
-    }
+    .card.accent-border { border-color: var(--accent-border); }
 
     .card-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Syne', sans-serif;
       font-size: 13px;
       font-weight: 700;
-      color: var(--text-sub);
+      color: var(--accent);
       margin-bottom: 12px;
     }
 
@@ -169,20 +152,8 @@
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 40px;
-    }
-    .hero-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 40px;
-    }
-    /* 티어 변동: 상승|하락 2단 — 전원 표시해도 세로로 길어지지 않게 */
-    .tc-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     /* ─── Matchplay participation card ─── */
@@ -195,7 +166,7 @@
       border-top: 1px solid var(--divider);
     }
     .mp-part-item:first-child { border-top: none; }
-    .mp-part-item.leader { background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015)); margin: 0 -10px; padding: 7px 10px; border-radius: 6px; border-top: none; }
+    .mp-part-item.leader { background: rgba(0,200,120,0.04); margin: 0 -14px; padding: 8px 14px; border-radius: 6px; border-top: none; margin-bottom: 2px; }
     .mp-part-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
@@ -209,7 +180,7 @@
     .mp-part-bar-wrap {
       flex: 1;
       height: 3px;
-      background: rgba(43,174,134,0.08);
+      background: rgba(0,200,120,0.08);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -231,7 +202,6 @@
       flex-shrink: 0;
     }
     .mp-part-count.leader { color: var(--accent); }
-    .mp-part-item.leader .mp-part-rate { color: var(--accent); }
     .mp-part-rate {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -249,8 +219,8 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent);
-      border: 1px solid rgba(43,174,134,0.30);
-      border-radius: var(--r-xs);
+      border: 1px solid rgba(0,200,120,0.30);
+      border-radius: 3px;
       padding: 1px 5px;
       flex-shrink: 0;
     }
@@ -278,22 +248,22 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      border-radius: var(--r-xs);
+      border-radius: 4px;
       padding: 4px 8px;
     }
-    .tc-group-label.up   { color: #2BAE86; background: rgba(43,174,134,0.07); border: 1px solid rgba(43,174,134,0.15); }
-    .tc-group-label.down { color: #9A9482; background: var(--surface-2); border: 1px solid rgba(154,148,130,0.15); }
+    .tc-group-label.up   { color: #D4A843; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.15); }
+    .tc-group-label.down { color: #64748B; background: rgba(255,255,255,0.03); border: 1px solid rgba(100,116,139,0.15); }
     .tc-count-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
       font-weight: 500;
-      border-radius: var(--r-pill);
+      border-radius: 20px;
       padding: 2px 10px;
       text-transform: none;
       letter-spacing: 0;
     }
-    .tc-count-badge.up   { background: rgba(43,174,134,0.10); color: #2BAE86; border: 1px solid rgba(43,174,134,0.25); }
-    .tc-count-badge.down { background: rgba(154,148,130,0.08); color: #9A9482; border: 1px solid rgba(154,148,130,0.15); }
+    .tc-count-badge.up   { background: rgba(212,168,67,0.10); color: #D4A843; border: 1px solid rgba(212,168,67,0.25); }
+    .tc-count-badge.down { background: rgba(148,163,184,0.08); color: #64748B; border: 1px solid rgba(148,163,184,0.15); }
     .tier-change-item {
       display: flex;
       align-items: center;
@@ -304,8 +274,8 @@
       border-top: 1px solid var(--divider);
     }
     .tier-change-item:first-of-type { border-top: none; }
-    .tier-change-item.up   { background: rgba(43,174,134,0.06);  border-left: 2px solid rgba(43,174,134,0.30); }
-    .tier-change-item.down { background: var(--surface-2); border-left: 2px solid rgba(154,148,130,0.22); }
+    .tier-change-item.up   { background: rgba(251,191,36,0.06);  border-left: 2px solid rgba(251,191,36,0.30); }
+    .tier-change-item.down { background: rgba(255,255,255,0.03); border-left: 2px solid rgba(100,116,139,0.22); }
     .tc-indicator {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -314,23 +284,25 @@
       text-align: center;
       flex-shrink: 0;
     }
-    .tc-indicator.up   { color: #2BAE86; }
-    .tc-indicator.down { color: #9A9482; }
+    .tc-indicator.up   { color: #D4A843; }
+    .tc-indicator.down { color: #64748B; }
     .tc-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 13px;                 /* 다른 카드 리스트 선수명과 동일 */
+      font-size: 15px;
       letter-spacing: -0.01em;
       flex: 1;
     }
-    .tc-name { color: var(--text); }
+    .tier-change-item.up   .tc-name { color: #E8D08A; }
+    .tier-change-item.down .tc-name { color: #94A3B8; }
     .tc-tiers {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
     }
-    .tc-arrow { color: var(--text-faint); font-family: 'DM Mono', monospace; font-size: 12px; }
+    .tier-change-item.up   .tc-tiers { color: #7A6020; }
+    .tier-change-item.down .tc-tiers { color: #3A4A5A; }
+    .tc-tiers b.up   { color: #D4A843; font-weight: 500; }
+    .tc-tiers b.down { color: #64748B; font-weight: 500; }
     .no-change-msg {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
@@ -354,10 +326,10 @@
     }
     .ya-header span {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: 12px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
     }
     .ya-item {
@@ -368,12 +340,6 @@
       border-top: 1px solid var(--divider);
     }
     .ya-item:first-of-type { border-top: none; }
-    .ya-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
-      margin: 0 -10px;
-      padding: 6px 10px;
-      border-radius: 6px;
-    }
     .ya-rank {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -401,10 +367,7 @@
       width: 38px;
       text-align: right;
     }
-    .ya-item.first .ya-name,
-    .ya-item.first .ya-score,
-    .ya-item.first .ya-attend,
-    .ya-item.first .ya-rounds { color: var(--accent); }
+    .ya-item.first .ya-score { color: var(--accent); }
     .ya-attend {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -423,198 +386,103 @@
       text-align: right;
     }
 
-    /* ─── Hero 요약 카드 하단 '전체 N명' 표기 ─── */
-    .hero-more {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.04em;
-      color: var(--text-faint);
-      text-align: center;
-      padding: 12px 0 2px;
-      margin-top: 8px;
-      border-top: 1px solid var(--divider);
-    }
-
-    /* ─── Latest event result list ─── */
-    .latest-event-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-    .latest-event-sub {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-    .le-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 24px;
-    }
-    .le-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 7px 2px;
-      border-top: 1px solid var(--divider);
-    }
-    .le-item:nth-child(-n+2) { border-top: none; }
-    .le-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
-      margin: 0 -10px;
-      padding: 7px 10px;
-      border-radius: 6px;
-    }
-    .le-rank {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      width: 20px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-    .le-rank.first { color: var(--accent); }
-    .le-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .le-score {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* 카드 리스트 수치 공통 */
-      font-weight: 500;
-      color: var(--text-sub);
-      font-variant-numeric: tabular-nums;
-      width: 34px;
-      text-align: right;
-    }
-    .le-item.first .le-name  { color: var(--accent); }
-    .le-item.first .le-score { color: var(--accent); }
-    @media (max-width: 640px) {
-      .le-grid { grid-template-columns: 1fr; }
-      .le-item:nth-child(2) { border-top: 1px solid var(--divider); }
-    }
-
-    /* ─── Tabs (중립 비활성 · 그린 활성) ─── */
+    /* ─── Tabs ─── */
     .tabs {
       display: flex;
-      gap: 4px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(0,200,120,0.08);
+      margin-bottom: 16px;
     }
     .tab {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
-      font-weight: 500;
-      padding: 12px 18px;
-      color: var(--text-muted);
+      font-weight: 400;
+      padding: 10px 16px;
+      color: #3A6650;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
-      letter-spacing: 0.01em;
       transition: color 0.15s, border-color 0.15s;
     }
     .tab:hover { color: var(--text-sub); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+    .tab.active { color: #00C878; border-bottom-color: #00C878; font-weight: 700; }
 
-    /* ─── Stat cards (에디토리얼 위계: 중립 라벨 · 지배적 숫자 · 헤어라인) ─── */
+    /* ─── Stat cards ─── */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 40px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
     .stat-card {
-      background: transparent;
-      border: none;
-      border-top: 1px solid var(--border);
-      border-radius: 0;
-      padding: 18px 4px 4px;
+      background: #0F1C16;
+      border: 1px solid rgba(0,200,120,0.12);
+      border-radius: var(--radius);
+      padding: 12px 14px;
     }
-    /* 강조 지표만 유일한 액센트 서페이스 */
-    .stat-card.highlight {
-      border-top-color: var(--accent-border);
-    }
+    .stat-card.highlight { border-color: rgba(0,200,120,0.12); }
     .stat-label {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* section-label과 동일한 아이브로우 크기 */
+      font-size: 13px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-faint);
-      margin-bottom: 14px;
+      letter-spacing: 0.08em;
+      color: #3A6650;
+      margin-bottom: 8px;
     }
     .stat-value {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 58px;
+      font-family: 'DM Mono', monospace;
+      font-size: 48px;
       font-weight: 500;
-      color: var(--text);
-      letter-spacing: -0.032em;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
     .stat-value.accent { color: var(--accent); }
-    /* 한글 단위는 음수 트래킹 제외 (라틴 전용 스펙이라 한글이 숫자에 붙음) */
-    .stat-unit { letter-spacing: 0; margin-left: 0.04em; }
     .stat-sub {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 8px;
+      color: #3A6650;
+      margin-top: 4px;
     }
 
     /* ─── Grid layouts ─── */
-    .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 24px; margin-bottom: 24px; }
-    .three-col { display: grid; grid-template-columns: 2fr 1fr 1fr;   gap: 24px; margin-bottom: 24px; }
-    .full-col  { margin-bottom: 24px; }
+    .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 8px; margin-bottom: 8px; }
+    .three-col { display: grid; grid-template-columns: 2fr 1fr 1fr;   gap: 8px; margin-bottom: 8px; }
+    .full-col  { margin-bottom: 8px; }
 
-    /* ─── Tables (스트라이핑 제거 · 헤어라인 행 · 중립 헤더) ─── */
+    /* ─── Tables ─── */
     .rank-table { width: 100%; border-collapse: collapse; }
     .rank-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: 13px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      color: #2A4A38;
       text-align: left;
-      padding: 6px 10px 10px;
-      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--divider);
     }
     .rank-table th.right { text-align: right; }
     .rank-table td {
-      padding: 11px 10px;
-      border-bottom: 1px solid var(--divider);
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
       color: var(--text-sub);
       transition: background 150ms;
     }
     .rank-table tr:last-child td { border-bottom: none; }
-    .rank-table tbody tr:hover      td { background: var(--surface-2); }
-    /* 1위 행: 배경 전체 워시 + 그라데이션 음영이 있어야 "강조"로 인지된다(텍스트 색만으로는 부족).
-       PRO 배지를 중립화해서 다른 그린과 안 겹치므로 다시 넣어도 번잡하지 않다. */
-    .rank-table tbody tr.rank-first td {
-      background: linear-gradient(90deg, rgba(43,174,134,0.10), rgba(43,174,134,0.02));
-      color: var(--accent);
-    }
-    .rank-table tbody tr.rank-first td:first-child { border-radius: 6px 0 0 6px; }
-    .rank-table tbody tr.rank-first td:last-child  { border-radius: 0 6px 6px 0; }
+    .rank-table tbody tr:nth-child(odd)  td { background: rgba(255,255,255,0.015); }
+    .rank-table tbody tr:nth-child(even) td { background: transparent; }
+    .rank-table tbody tr:hover           td { background: rgba(0,200,120,0.05); }
+    .rank-table tbody tr.rank-first      td { background: rgba(0,200,120,0.06); }
 
     .rank-num {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
       font-weight: 500;
-      color: var(--text-muted);
+      color: #6A9A84;
       width: 26px;
       font-variant-numeric: tabular-nums;
     }
@@ -647,32 +515,22 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .retired-badge {
-      font-family:'Space Grotesk',sans-serif; font-size:10px; font-weight:600;
-      letter-spacing:0.05em; color: var(--text-muted);
-      background: var(--surface-2); border:1px solid var(--border);
-      border-radius:var(--r-xs); padding:1px 4px; margin-left:4px; white-space:nowrap;
-    }
-
     /* ─── Tier badges ─── */
     .tier-badge {
       display: inline-block;
       padding: 2px 7px;
-      border-radius: var(--r-xs);
+      border-radius: 4px;
       font-family: 'DM Mono', monospace;
       font-size: 13px;
       font-weight: 500;
       border: 1px solid;
     }
-    /* 티어 팔레트(뉴트럴 실버) — 티어는 무채색 계조로만 서열 표현.
-       색을 쓰는 것은 강조색 제이드 하나뿐이라, 1등 강조가 항상 유일한 '색'으로 읽힌다.
-       다크 배경에서 T5까지 묻히지 않도록 명도가 아닌 밝기 폭을 좁게 잡음. */
-    .tier-0 { color: #FDE6AB; border-color: rgba(253,230,171,0.42); background: rgba(253,230,171,0.14); font-weight: 700; }
-    .tier-1 { color: #E2D1A3; border-color: rgba(226,209,163,0.40); background: rgba(226,209,163,0.13); }
-    .tier-2 { color: #CABC99; border-color: rgba(202,188,153,0.40); background: rgba(202,188,153,0.13); }
-    .tier-3 { color: #B1A88E; border-color: rgba(177,168,142,0.42); background: rgba(177,168,142,0.14); }
-    .tier-4 { color: #9A9482; border-color: rgba(154,148,130,0.46); background: rgba(154,148,130,0.16); }
-    .tier-5 { color: #848076; border-color: rgba(132,128,118,0.50); background: rgba(132,128,118,0.18); }
+    .tier-0 { color: #00C878; border-color: rgba(0,200,120,0.40); background: rgba(0,200,120,0.20); font-weight: 700; }
+    .tier-1 { color: #00C878; border-color: rgba(0,200,120,0.25); background: rgba(0,200,120,0.12); }
+    .tier-2 { color: #D4A843; border-color: rgba(212,168,67,0.22);  background: rgba(212,168,67,0.10); }
+    .tier-3 { color: #6A8A7A; border-color: rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); }
+    .tier-4 { color: #4A6A5A; border-color: rgba(255,255,255,0.07); background: rgba(255,255,255,0.04); }
+    .tier-5 { color: #3A5A4A; border-color: rgba(255,255,255,0.05); background: rgba(255,255,255,0.03); }
 
     /* ─── Best list ─── */
     .best-list { display: flex; flex-direction: column; gap: 0; }
@@ -684,12 +542,6 @@
       border-top: 1px solid var(--divider);
     }
     .best-item:first-child { border-top: none; }
-    .best-item.first {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
-      margin: 0 -10px;
-      padding: 8px 10px;
-      border-radius: 6px;
-    }
     .best-rank {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
@@ -707,23 +559,20 @@
     }
     .best-score {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* 카드 리스트 수치 공통 */
+      font-size: 15px;
       font-weight: 500;
-      color: var(--text-sub);
+      color: var(--accent);
       font-variant-numeric: tabular-nums;
     }
-    .best-item.first .best-rank,
-    .best-item.first .best-name,
-    .best-item.first .best-score { color: var(--accent); }
 
     /* ─── Chart ─── */
-    .chart-wrap { position: relative; height: 230px; }   /* 하단 범례 공간 포함 */
+    .chart-wrap { position: relative; height: 200px; }
 
     /* ─── MP win bar ─── */
     .win-rate-bar {
       height: 2px;
       border-radius: 2px;
-      background: rgba(43,174,134,0.10);
+      background: rgba(0,200,120,0.10);
       overflow: hidden;
       margin-top: 5px;
     }
@@ -732,12 +581,6 @@
     /* ─── MP item ─── */
     .mp-item { padding: 8px 0; border-top: 1px solid var(--divider); }
     .mp-item:first-child { border-top: none; }
-    .mp-item.leader {
-      background: linear-gradient(90deg, rgba(43,174,134,0.08), rgba(43,174,134,0.015));
-      margin: 0 -10px;
-      padding: 8px 10px;
-      border-radius: 6px;
-    }
     .mp-item-header {
       display: flex;
       justify-content: space-between;
@@ -746,10 +589,10 @@
     }
     .mp-item-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;                /* 다른 카드 리스트 선수명과 동일 */
-      font-size: 13px;
+      font-weight: 500;
+      font-size: 14px;
       letter-spacing: -0.01em;
-      color: var(--text);
+      color: #B0D4C4;
     }
     .mp-item-rate {
       font-family: 'DM Mono', monospace;
@@ -774,10 +617,10 @@
     }
     .heatmap-table th {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;                 /* 전 표·리스트 열 제목 공통 */
+      font-size: 12px;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.06em;
       padding: 6px 4px;
       text-align: center;
       color: var(--text-muted);
@@ -807,7 +650,7 @@
     }
     .hm-no {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;                 /* .hm-yes와 같은 셀이므로 동일 크기 */
+      font-size: 12px;
       color: var(--text-muted);
     }
 
@@ -817,11 +660,11 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
-      background: var(--surface-2);
-      border-radius: var(--r-md);
+      padding: 8px 10px;
+      background: rgba(0,200,120,0.03);
+      border-radius: 6px;
       border: 1px solid var(--border);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .tier-header .tier-count {
       font-family: 'Space Grotesk', sans-serif;
@@ -848,7 +691,7 @@
     }
     .spinner {
       width: 16px; height: 16px;
-      border: 1.5px solid rgba(43,174,134,0.15);
+      border: 1.5px solid rgba(0,200,120,0.15);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -884,19 +727,17 @@
       .container { padding: 12px 10px; }
 
       /* [2] 3단/2단 컬럼 → 세로 스택 */
-      .hero-grid   { grid-template-columns: 1fr; gap: 10px; }
-      .hero-grid-2 { grid-template-columns: 1fr; gap: 10px; }
-      .tc-cols     { grid-template-columns: 1fr; gap: 14px; }
-      .two-col     { grid-template-columns: 1fr; }
-      .three-col   { grid-template-columns: 1fr; }
+      .hero-grid  { grid-template-columns: 1fr; gap: 10px; }
+      .two-col    { grid-template-columns: 1fr; }
+      .three-col  { grid-template-columns: 1fr; }
 
       /* Stat grid: 4열 → 2열 */
       .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .stat-value { font-size: 30px; }
       .stat-card  { padding: 12px 14px; }
 
-      /* 기존 상단 탭 숨김 (하단 탭으로 대체) — JS 인라인 display:flex보다 우선 */
-      .tabs { display: none !important; }
+      /* 기존 상단 탭 숨김 (하단 탭으로 대체) */
+      .tabs { display: none; }
 
       /* [3] 하단 고정 탭 네비 */
       .bottom-tab-nav {
@@ -904,10 +745,8 @@
         position: fixed;
         bottom: 0; left: 0; right: 0;
         height: 56px;
-        background: rgba(19,26,23,0.92);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid var(--border);
+        background: #0C1610;
+        border-top: 1px solid rgba(0,200,120,0.10);
         z-index: 999;
       }
       .bottom-tab-item {
@@ -918,7 +757,7 @@
         justify-content: center;
         font-family: 'Space Grotesk', sans-serif;
         font-size: 10px;
-        color: var(--text-muted);
+        color: #2A4A38;
         gap: 3px;
         min-height: 44px;
         cursor: pointer;
@@ -926,8 +765,8 @@
         transition: color 0.15s, border-color 0.15s;
       }
       .bottom-tab-item.active {
-        color: var(--accent);
-        border-top-color: var(--accent);
+        color: #00C878;
+        border-top-color: #00C878;
       }
       .bottom-tab-item .btab-icon { font-size: 16px; line-height: 1; }
       body { padding-bottom: 56px; }
@@ -1031,48 +870,39 @@
 
 <div class="container">
 
-  <div id="loading" class="loading"><div class="spinner"></div> 데이터 불러오는 중...</div>
-
-  <!-- Tabs -->
-  <div class="tabs" id="tabs" style="display:none">
-    <div class="tab active" data-tab="summary" data-short="요약">요약</div>
-    <div class="tab" data-tab="overview" data-short="현황">전체 현황</div>
-    <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
-    <div class="tab" data-tab="tier" data-short="티어">티어</div>
-    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
-    <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
-  </div>
-
-  <!-- ── 요약 ── -->
-  <div id="page-summary" class="page">
-    <div style="margin-bottom:24px">
-      <div class="section-label">최근 대회 결과</div>
-      <div class="card accent-border">
-        <div class="latest-event-title" id="latest-event-title">—</div>
-        <div class="latest-event-sub" id="latest-event-sub"></div>
-        <div class="le-grid" id="latest-event-list"></div>
-      </div>
-    </div>
-    <div style="margin-bottom:24px">
-      <div class="section-label">최근 대회 티어 변동</div>
-      <div class="card accent-border">
-        <div class="tier-change-list" id="tier-change-list"></div>
-      </div>
-    </div>
-    <div class="hero-grid-2">
+  <!-- 우선순위 섹션 -->
+  <div id="hero-section" style="display:none">
+    <div class="hero-grid">
       <div>
-        <div class="section-label">2026 시즌 평균 TOP</div>
+        <div class="section-label">최근 대회 티어 변동</div>
+        <div class="card accent-border">
+          <div class="tier-change-list" id="tier-change-list"></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">2026 시즌 평균 스코어</div>
         <div class="card accent-border">
           <div class="year-avg-list" id="year-avg-list"></div>
         </div>
       </div>
       <div>
-        <div class="section-label">2026 참여 TOP</div>
+        <div class="section-label">전체 대회 참여현황</div>
         <div class="card accent-border">
           <div class="mp-part-list" id="mp-part-list"></div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="loading" class="loading"><div class="spinner"></div> 데이터 불러오는 중...</div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs" style="display:none">
+    <div class="tab active" data-tab="overview" data-short="현황">전체 현황</div>
+    <div class="tab" data-tab="ranking" data-short="랭킹">랭킹</div>
+    <div class="tab" data-tab="tier" data-short="티어">티어</div>
+    <div class="tab" data-tab="matchplay" data-short="MP">매치플레이</div>
+    <div class="tab" data-tab="attendance" data-short="참가">참가 현황</div>
   </div>
 
   <!-- ── 전체 현황 ── -->
@@ -1227,7 +1057,7 @@
           <div class="chart-wrap" style="height:240px">
             <canvas id="mp-chart"></canvas>
           </div>
-          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums"></div>
+          <div id="mp-chart-summary" style="text-align:center;padding:12px 0 4px;font-family:'DM Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums"></div>
         </div>
       </div>
     </div>
@@ -1247,10 +1077,7 @@
 
 <!-- 하단 고정 탭 네비 (모바일 전용) -->
 <nav class="bottom-tab-nav" id="bottom-tab-nav">
-  <div class="bottom-tab-item active" data-tab="summary">
-    <span class="btab-icon">★</span>요약
-  </div>
-  <div class="bottom-tab-item" data-tab="overview">
+  <div class="bottom-tab-item active" data-tab="overview">
     <span class="btab-icon">▤</span>현황
   </div>
   <div class="bottom-tab-item" data-tab="ranking">
@@ -1270,41 +1097,13 @@
 <script>
 let DATA = {};
 let charts = {};
-// 탭이 보이게 될 때 차트를 다시 그리기 위한 콜백. 숨겨진(display:none) 탭에서
-// 생성된 Chart.js 캔버스는 컨테이너 크기를 0으로 잡고, 이후 resize()로도
-// 복구되지 않아 도넛이 점처럼 찌그러진다. 보이는 시점에 재생성이 유일한 해법.
-let redrawCharts = {};
-
-// 캔버스를 새 노드로 교체한 뒤 컨텍스트를 돌려준다. 크기가 0으로 굳은
-// 캔버스에 다시 그리면 그대로 0을 물려받으므로, 매번 새 캔버스에서 시작한다.
-function freshCanvas(id) {
-  const old = document.getElementById(id);
-  const next = document.createElement('canvas');
-  next.id = id;
-  old.replaceWith(next);
-  return next.getContext('2d');
-}
-
-// 해당 탭의 차트 컨테이너가 실제 크기를 가질 때까지 기다렸다가 그린다.
-// 탭 전환 직후에는 레이아웃이 아직 0일 수 있어 그대로 그리면 캔버스가 0x0으로 굳는다.
-function drawWhenSized(tabName, tries = 30) {
-  const page = document.getElementById('page-' + tabName);
-  const wrap = page && page.querySelector('.chart-wrap');
-  if (!wrap || !redrawCharts[tabName]) return;
-  if (wrap.offsetWidth > 0 && wrap.offsetHeight > 0) { redrawCharts[tabName](); return; }
-  if (tries > 0) setTimeout(() => drawWhenSized(tabName, tries - 1), 40);
-}
 let PRO_PLAYERS = new Set();
-let RETIRED_PLAYERS = new Set();
 
 function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + tabName).classList.add('active');
   document.querySelectorAll('.bottom-tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
-  // 탭이 보이게 된 뒤 해당 탭의 차트를 재생성.
-  // requestAnimationFrame은 창/탭이 백그라운드면 아예 호출되지 않으므로 setTimeout 사용.
-  if (redrawCharts[tabName]) drawWhenSized(tabName);
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
@@ -1315,16 +1114,11 @@ document.querySelectorAll('.bottom-tab-item').forEach(item => {
   item.addEventListener('click', function() { switchTab(this.dataset.tab); });
 });
 
-function retiredBadge(name) {
-  return (name && RETIRED_PLAYERS.has(name))
-    ? ` <span class="retired-badge">탈퇴</span>` : '';
-}
-
 function tierBadge(tier, name) {
   const t = String(tier);
   const labels = { '0':'T0','1':'T1','2':'T2','3':'T3','4':'T4','5':'T5' };
   const proBadge = (name && PRO_PLAYERS.has(name))
-    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-xs);padding:1px 5px">PRO</span>`
+    ? ` <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:#00C878;background:rgba(0,200,120,0.10);border:1px solid rgba(0,200,120,0.30);border-radius:3px;padding:1px 5px">PRO</span>`
     : '';
   return `<span class="tier-badge tier-${t}">${labels[t] || t}</span>${proBadge}`;
 }
@@ -1345,6 +1139,7 @@ function findKey(obj, ...kws) {
 
 async function loadAll() {
   document.getElementById('loading').style.display = 'flex';
+  document.getElementById('hero-section').style.display = 'none';
   document.getElementById('tabs').style.display = 'none';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
@@ -1359,9 +1154,7 @@ async function loadAll() {
     DATA.mp          = json.matchplay    || [];
     DATA.member      = json.member       || [];
     DATA.tierHistory = json.tier_history || [];
-    DATA.latestEventDate = json.latest_event_date || null;
     PRO_PLAYERS      = new Set(json.pro_players || []);
-    RETIRED_PLAYERS  = new Set(json.retired_players || []);
 
     render();
     document.getElementById('last-updated').textContent =
@@ -1373,8 +1166,9 @@ async function loadAll() {
   }
 
   document.getElementById('loading').style.display = 'none';
+  document.getElementById('hero-section').style.display = 'block';
   document.getElementById('tabs').style.display = 'flex';
-  document.getElementById('page-summary').classList.add('active');
+  document.getElementById('page-overview').classList.add('active');
 }
 
 function render() {
@@ -1383,31 +1177,21 @@ function render() {
   const rankPlayers = parseRankDicts(DATA.rank, tierMap);
   const mpPlayers   = parseMPDicts(DATA.mp);
 
-  // 기록은 남기되 랭킹·집계·티어 현황·총원에서는 탈퇴 멤버를 뺀다
-  const activePlayers = players.filter(p => !RETIRED_PLAYERS.has(p.name));
-
-  renderLatestEvent(players);
   renderHeroTierChange(DATA.tierHistory);
-  renderHeroYearAvg(activePlayers);
-  renderHeroAttendance(activePlayers);
-  renderSummary(activePlayers);
+  renderHeroYearAvg(players);
+  renderHeroAttendance(players);
+  renderSummary(players);
   renderTop10(players);
   renderWeightedTop10(rankPlayers);
   renderBestList(players);
-  renderTierChart(activePlayers);
+  renderTierChart(players);
   renderMPOverview(mpPlayers);
   renderFullRanking(players);
   renderWeightedFull(rankPlayers);
-  renderTierSections(activePlayers);
+  renderTierSections(players);
   renderMPTable(mpPlayers);
   renderMPChart(mpPlayers);
   renderAttendance(DATA.member);
-
-  // 차트가 있는 탭은 보이게 될 때 다시 그린다 (위 redrawCharts 주석 참고)
-  redrawCharts = {
-    overview:  () => renderTierChart(activePlayers),
-    matchplay: () => renderMPChart(mpPlayers),
-  };
 }
 
 // ── 파싱 ──
@@ -1416,7 +1200,7 @@ function parseScoreDicts(dicts) {
   const s = dicts[0];
   const avgKey    = findKey(s, '누적평균');
   const tierKey   = findKey(s, '현재 티어', '티어');
-  const bestKey   = findKey(s, '베스트');
+  const bestKey   = findKey(s, '개인 베스트');
   const roundKey  = findKey(s, '라운드횟수', '라운드 횟수');
   const recentKey = findKey(s, '가장최근', '최근라운딩');
   const contestKeys = Object.keys(s).filter(k => /\d{2}' /.test(k) && !k.includes('매치'));
@@ -1442,7 +1226,7 @@ function parseScoreDicts(dicts) {
     return {
       name, avg,
       tier: PRO_PLAYERS.has(name) ? '0' : rawTier,
-      best: (num(d[bestKey]) || 0) > 0 ? num(d[bestKey]) : null,  // 0/공백은 무효(신규 멤버 기본값)
+      best: num(d[bestKey]),
       rounds: playedRounds,
       recent: num(d[recentKey]),
       yearAvg, yearRounds: yearScores.length,
@@ -1460,12 +1244,10 @@ function parseScoreDicts(dicts) {
 function parseRankDicts(dicts, tierMap = {}) {
   if (!dicts?.length) return [];
   const s = dicts[0];
-  // '누적평균 스코어 랭킹'(순위) 컬럼이 '누적평균 스코어 (A)'(실제값) 컬럼보다 앞에 있어서
-  // 단순 includes 매칭이면 랭킹 숫자를 값으로 잘못 읽는다 — '랭킹' 포함 컬럼은 제외.
-  const avgKey    = Object.keys(s).find(k => k.includes('누적평균') && !k.includes('랭킹'));
+  const avgKey    = findKey(s, '누적평균');
   const tierKey   = findKey(s, '티어');
   const recentKey = findKey(s, '최근');
-  const wAvgKey   = Object.keys(s).find(k => k.includes('가중평균') && !k.includes('랭킹'));
+  const wAvgKey   = findKey(s, '가중평균');
   const roundKey  = findKey(s, '라운드');
 
   return dicts.map(d => {
@@ -1517,52 +1299,6 @@ function parseMPDicts(dicts) {
   }).filter(Boolean).sort((a, b) => (b.win||0) - (a.win||0) || (b.rate||0) - (a.rate||0));
 }
 
-// ── Hero: 최근 대회 결과 ──
-function renderLatestEvent(players) {
-  const titleEl = document.getElementById('latest-event-title');
-  const subEl   = document.getElementById('latest-event-sub');
-  const listEl  = document.getElementById('latest-event-list');
-
-  const allKeys = (players[0]?.scores || []).map(s => s.name);
-  // 뒤에서부터 실제로 한 명이라도 스코어가 있는 첫 컬럼 = 최근 대회
-  let latestKey = null;
-  for (let i = allKeys.length - 1; i >= 0; i--) {
-    if (players.some(p => p.scores.find(s => s.name === allKeys[i])?.score != null)) {
-      latestKey = allKeys[i];
-      break;
-    }
-  }
-
-  if (!latestKey) {
-    titleEl.textContent = '최근 대회 데이터 없음';
-    subEl.textContent = '';
-    listEl.innerHTML = '';
-    return;
-  }
-
-  const entries = players
-    .map(p => ({ name: p.name, tier: p.tier, score: p.scores.find(s => s.name === latestKey)?.score ?? null }))
-    .filter(e => e.score != null)
-    .sort((a, b) => a.score - b.score);
-
-  // "7/19/2026" -> "7/19"
-  const rawDate = DATA.latestEventDate;
-  const shortDate = rawDate ? rawDate.split('/').slice(0, 2).join('/') : null;
-
-  titleEl.textContent = shortDate ? `${latestKey} (${shortDate})` : latestKey;
-  subEl.textContent = `${entries.length}명 참가`;
-
-  listEl.innerHTML = entries.map((e, i) => {
-    const isFirst = i === 0;
-    return `<div class="le-item${isFirst ? ' first' : ''}">
-      <span class="le-rank${isFirst ? ' first' : ''}">${i + 1}</span>
-      <span class="le-name">${e.name}</span>
-      ${tierBadge(e.tier, e.name)}
-      <span class="le-score">${e.score}</span>
-    </div>`;
-  }).join('');
-}
-
 // ── Hero: 티어 변동 ──
 function renderHeroTierChange(history) {
   const el = document.getElementById('tier-change-list');
@@ -1576,24 +1312,28 @@ function renderHeroTierChange(history) {
   const ups   = changed.filter(h => parseInt(h['현재티어']) < parseInt(h['이전티어']));
   const downs = changed.filter(h => parseInt(h['현재티어']) > parseInt(h['이전티어']));
 
-  // 티어 라벨은 사이트 전역과 동일한 티어 배지(.tier-N)로 — 색 통일.
-  // 방향(상승/하락)은 화살표 색으로만 구분.
-  const item = (h, dir) => `<div class="tier-change-item ${dir}">
-    <span class="tc-indicator ${dir}">${dir === 'up' ? '▲' : '▼'}</span>
-    <span class="tc-name">${h['이름']}</span>
-    <span class="tc-tiers">${tierBadge(h['이전티어'], null)} <span class="tc-arrow">→</span> ${tierBadge(h['현재티어'], null)}</span>
-  </div>`;
-
-  const upCol = ups.length ? `<div class="tc-group">
-    <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
-    ${ups.map(h => item(h, 'up')).join('')}
-  </div>` : '';
-  const downCol = downs.length ? `<div class="tc-group">
-    <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
-    ${downs.map(h => item(h, 'down')).join('')}
-  </div>` : '';
-
-  el.innerHTML = `<div class="tc-cols">${upCol}${downCol}</div>`;
+  let html = '';
+  if (ups.length) {
+    html += `<div class="tc-group">
+      <div class="tc-group-label up">▲ 티어 상승 <span class="tc-count-badge up">${ups.length}명</span></div>
+      ${ups.map(h => `<div class="tier-change-item up">
+        <span class="tc-indicator up">▲</span>
+        <span class="tc-name">${h['이름']}</span>
+        <span class="tc-tiers">T${h['이전티어']} → <b class="up">T${h['현재티어']}</b></span>
+      </div>`).join('')}
+    </div>`;
+  }
+  if (downs.length) {
+    html += `<div class="tc-group">
+      <div class="tc-group-label down">▼ 티어 하락 <span class="tc-count-badge down">${downs.length}명</span></div>
+      ${downs.map(h => `<div class="tier-change-item down">
+        <span class="tc-indicator down">▼</span>
+        <span class="tc-name">${h['이름']}</span>
+        <span class="tc-tiers">T${h['이전티어']} → <b class="down">T${h['현재티어']}</b></span>
+      </div>`).join('')}
+    </div>`;
+  }
+  el.innerHTML = html;
 }
 
 // ── Hero: 연도 평균 ──
@@ -1616,21 +1356,19 @@ function renderHeroYearAvg(players) {
     <span style="width:24px;text-align:right">R</span>
   </div>`;
 
-  const HERO_LIMIT = 8;
-  const rows = withYear.slice(0, HERO_LIMIT).map((p, i) => {
+  const rows = withYear.map((p, i) => {
     const isFirst = i === 0;
+    const attendColor = (p.yearAttendRate||0) >= 80 ? '#00C878' : 'var(--text-muted)';
     return `<div class="ya-item${isFirst ? ' first' : ''}">
       <span class="ya-rank${isFirst ? ' first' : ''}">${isFirst ? '1' : i + 1}</span>
       <span class="ya-name">${p.name}</span>
       <span class="ya-score">${p.yearAvg.toFixed(1)}</span>
-      <span class="ya-attend">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
+      <span class="ya-attend" style="color:${attendColor}">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
       <span class="ya-rounds">${p.yearRounds}R</span>
     </div>`;
   }).join('');
 
-  const more = withYear.length > HERO_LIMIT
-    ? `<div class="hero-more">시즌 참가 ${withYear.length}명 · 랭킹 탭에서 전체 보기</div>` : '';
-  el.innerHTML = header + rows + more;
+  el.innerHTML = header + rows;
 }
 
 // ── Hero: 전체 대회 참여현황 ──
@@ -1641,27 +1379,19 @@ function renderHeroAttendance(players) {
     return;
   }
 
-  // 2026 시즌 참여만 집계(전체 누적 아님) — yearRounds 기준
-  const sortedAll = [...players].filter(p => (p.yearRounds || 0) > 0)
-    .sort((a, b) => (b.yearRounds || 0) - (a.yearRounds || 0));
-  if (!sortedAll.length) {
-    el.innerHTML = `<div class="no-change-msg">2026 시즌 참여 데이터 없음</div>`;
-    return;
-  }
-  const maxRounds = sortedAll[0].yearRounds || 1;
-  const HERO_LIMIT = 8;
-  const sorted = sortedAll.slice(0, HERO_LIMIT);
+  const sorted = [...players].sort((a, b) => (b.rounds || 0) - (a.rounds || 0));
+  const maxRounds = sorted[0].rounds || 1;
 
   const header = `<div style="display:flex;align-items:center;gap:10px;padding:0 0 6px;border-bottom:1px solid var(--divider);margin-bottom:2px">
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:72px">선수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:72px">선수</span>
     <span style="flex:1"></span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
-    <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:36px;text-align:right">횟수</span>
+    <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);width:36px;text-align:right">참석률</span>
   </div>`;
 
   const rows = sorted.map((p, i) => {
     const isLeader = i === 0;
-    const pct = Math.round(((p.yearRounds || 0) / maxRounds) * 100);
+    const pct = Math.round(((p.rounds || 0) / maxRounds) * 100);
     const leaderTag = isLeader ? `<span class="mp-leader-tag">최다참여</span>` : '';
     return `<div class="mp-part-item${isLeader ? ' leader' : ''}">
       <span class="mp-part-name${isLeader ? ' leader' : ''}">${p.name}</span>
@@ -1669,21 +1399,19 @@ function renderHeroAttendance(players) {
         <div class="mp-part-bar${isLeader ? ' leader' : ''}" style="width:${pct}%"></div>
       </div>
       ${leaderTag}
-      <span class="mp-part-count${isLeader ? ' leader' : ''}">${p.yearRounds ?? '—'}R</span>
-      <span class="mp-part-rate">${p.yearAttendRate !== null ? p.yearAttendRate + '%' : '—'}</span>
+      <span class="mp-part-count${isLeader ? ' leader' : ''}">${p.rounds ?? '—'}R</span>
+      <span class="mp-part-rate">${p.attendRate !== null ? p.attendRate + '%' : '—'}</span>
     </div>`;
   }).join('');
 
-  const more = sortedAll.length > HERO_LIMIT
-    ? `<div class="hero-more">2026 참가 ${sortedAll.length}명 · 참가 현황 탭에서 전체 보기</div>` : '';
-  el.innerHTML = header + rows + more;
+  el.innerHTML = header + rows;
 }
 
 // ── Summary ──
 function renderSummary(players) {
-  document.getElementById('stat-total').innerHTML = players.length + '<span class="stat-unit">명</span>';
+  document.getElementById('stat-total').textContent = players.length + '명';
   if (!players.length) return;
-  document.getElementById('stat-rounds').innerHTML = (players[0]?.scores?.length || 0) + '<span class="stat-unit">회</span>';
+  document.getElementById('stat-rounds').textContent = (players[0]?.scores?.length || 0) + '회';
   const bestAvgPlayer = players.find(p => p.avg != null);
   document.getElementById('stat-best-avg').textContent = bestAvgPlayer ? bestAvgPlayer.avg.toFixed(1) : '—';
   document.getElementById('stat-best-name').textContent = bestAvgPlayer ? bestAvgPlayer.name : '—';
@@ -1703,7 +1431,7 @@ function renderTop10(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.rounds ?? '—'}R</td>
@@ -1720,7 +1448,7 @@ function renderWeightedTop10(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.wAvg.toFixed(1)}</td>
       <td class="rounds-val">${p.recent ?? '—'}</td>
@@ -1733,7 +1461,7 @@ function renderBestList(players) {
   const el = document.getElementById('best-list');
   const sorted = [...players].filter(p => p.best !== null).sort((a,b) => a.best - b.best).slice(0, 5);
   el.innerHTML = sorted.map((p, i) => `
-    <div class="best-item${i === 0 ? ' first' : ''}">
+    <div class="best-item">
       <div class="best-rank">${i + 1}</div>
       <div class="best-name">${p.name} ${tierBadge(p.tier, p.name)}</div>
       <div class="best-score">${p.best}</div>
@@ -1745,35 +1473,31 @@ function renderTierChart(players) {
   const counts = {};
   players.forEach(p => { counts[p.tier] = (counts[p.tier] || 0) + 1; });
   const labels = Object.keys(counts).sort();
-  // 티어 배지(.tier-0~.tier-5)와 동일한 팔레트 — 사이트 전체에서 티어 색이
-  // 항상 같은 의미를 갖도록 통일(골드→에메랄드→시안→블루→바이올렛→슬레이트).
   const colors = {
-    '0': '#FDE6AB',
-    '1': '#E2D1A3',
-    '2': '#CABC99',
-    '3': '#B1A88E',
-    '4': '#9A9482',
-    '5': '#848076'
+    '0': '#00C878',
+    '1': 'rgba(0,200,120,0.70)',
+    '2': 'rgba(0,200,120,0.45)',
+    '3': 'rgba(0,200,120,0.28)',
+    '4': 'rgba(0,200,120,0.16)',
+    '5': 'rgba(0,200,120,0.08)'
   };
 
   if (charts.tier) charts.tier.destroy();
-  charts.tier = new Chart(freshCanvas('tier-chart'), {
+  charts.tier = new Chart(document.getElementById('tier-chart').getContext('2d'), {
     type: 'doughnut',
     data: {
       labels: labels.map(t => `T${t}`),
       datasets: [{
         data: labels.map(t => counts[t]),
-        backgroundColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
-        borderColor: labels.map(t => colors[t] || 'rgba(43,174,134,0.08)'),
+        backgroundColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
+        borderColor: labels.map(t => colors[t] || 'rgba(0,200,120,0.08)'),
         borderWidth: 1
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        // 범례를 아래로 — 오른쪽 배치는 카드가 좁아지면(≈1100px 이하) 도넛을
-        // 짓눌러 점처럼 만들어버림. 아래 배치는 폭에 영향받지 않음.
-        legend: { position: 'bottom', labels: { color: 'rgba(236,241,238,0.30)', font: { family: 'Space Grotesk', size: 11, weight: '500' }, padding: 10, boxWidth: 9 } }
+        legend: { position: 'right', labels: { color: '#3A6650', font: { family: 'Space Grotesk', size: 12, weight: '500' }, padding: 10, boxWidth: 10 } }
       }
     }
   });
@@ -1782,27 +1506,19 @@ function renderTierChart(players) {
 // ── MP 요약 ──
 function renderMPOverview(players) {
   const el = document.getElementById('mp-overview');
-  // 승리 기록이 있는 선수만 TOP5 후보로 — 0승(패만 있거나 무만 있는)인
-  // 선수가 표본이 적다는 이유만으로 순위표에 끼는 것을 방지.
-  const withWin = players.filter(p => (p.win || 0) > 0);
-  if (!withWin.length) {
-    el.innerHTML = `<div class="no-change-msg">승리 기록 있는 선수 없음</div>`;
-    return;
-  }
-  el.innerHTML = withWin.slice(0, 5).map((p, i) => {
+  el.innerHTML = players.slice(0, 5).map((p, i) => {
     const isTop = i === 0;
-    const barColor  = isTop ? 'var(--accent)' : 'rgba(255,255,255,0.14)';
-    const rateColor = isTop ? 'var(--accent)' : 'var(--text-muted)';
-    const nameColor = isTop ? 'var(--accent)' : 'var(--text)';
-    return `<div class="mp-item${isTop ? ' leader' : ''}">
+    const barColor  = isTop ? '#00C878' : 'rgba(0,200,120,0.22)';
+    const rateColor = (p.rate === 100) ? '#00C878' : isTop ? '#00C878' : '#B0D4C4';
+    return `<div class="mp-item">
       <div class="mp-item-header">
-        <span class="mp-item-name" style="color:${nameColor}">${p.name}</span>
+        <span class="mp-item-name">${p.name}</span>
         <span class="mp-item-rate" style="color:${rateColor}">${p.rate !== null ? p.rate + '%' : '—'}</span>
       </div>
       <div class="win-rate-bar">
         <div class="win-rate-fill" style="width:${p.rate||0}%;background:${barColor}"></div>
       </div>
-      <div class="mp-item-sub" style="color:${isTop ? 'var(--accent)' : 'var(--text-muted)'};font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
+      <div class="mp-item-sub" style="color:#3A6650;font-size:13px">${p.count}경기 · ${p.win}승 · ${p.loss}패</div>
     </div>`;
   }).join('');
 }
@@ -1816,7 +1532,7 @@ function renderFullRanking(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.best ?? '—'}</td>
@@ -1834,7 +1550,7 @@ function renderWeightedFull(players) {
     const scoreCls = i === 0 ? 'score-val accent' : 'score-val';
     return `<tr${rowCls}>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td class="player-name">${p.name}</td>
       <td>${tierBadge(p.tier, p.name)}</td>
       <td class="${scoreCls}">${p.wAvg != null ? p.wAvg.toFixed(1) : '—'}</td>
       <td class="rounds-val">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
@@ -1847,7 +1563,7 @@ function renderWeightedFull(players) {
 function tierTableHTML(tp) {
   const rows = tp.map((p, i) => `<tr>
     <td class="rank-num${i === 0 ? ' first' : ''}">${i + 1}</td>
-    <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+    <td class="player-name">${p.name}</td>
     <td class="${i === 0 ? 'score-val accent' : 'score-val'}">${p.avg != null ? p.avg.toFixed(1) : '—'}</td>
     <td class="rounds-val">${p.best ?? '—'}</td>
     <td class="rounds-val">${p.rounds ?? '—'}R</td>
@@ -1894,13 +1610,13 @@ function renderMPTable(players) {
   const tbody = document.querySelector('#mp-table tbody');
   tbody.innerHTML = players.map((p, i) => {
     const numCls   = i === 0 ? 'first' : i < 3 ? 'top3' : '';
-    const rateColor = i === 0 ? 'var(--accent)' : 'var(--text-muted)';
-    return `<tr${i === 0 ? ' class="rank-first"' : ''}>
+    const rateColor = i === 0 ? '#00C878' : '#B0D4C4';
+    return `<tr>
       <td class="rank-num ${numCls}">${i + 1}</td>
-      <td class="player-name">${p.name}${retiredBadge(p.name)}</td>
+      <td class="player-name">${p.name}</td>
       <td class="rounds-val">${p.count}</td>
-      <td class="rounds-val">${p.win}</td>
-      <td class="rounds-val">${p.loss}</td>
+      <td class="rounds-val" style="color:#00C878">${p.win}</td>
+      <td class="rounds-val" style="color:#C87878">${p.loss}</td>
       <td style="text-align:right;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${rateColor};font-variant-numeric:tabular-nums">${p.rate !== null ? p.rate + '%' : '—'}</td>
     </tr>`;
   }).join('');
@@ -1933,21 +1649,21 @@ function renderMPChart(players) {
 
   const eventCount = eventKeys.length;
   document.getElementById('mp-chart-summary').innerHTML = `
-    <div style="color:var(--text-muted);font-size:13px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
+    <div style="color:#6A9A84;font-size:13px;margin-bottom:6px">총 ${eventCount}회 이벤트 (모임 vs 상대)</div>
     <div>
-      <span style="color:var(--accent)"><b>${clubWin}</b> 승</span>
-      <span style="color:var(--divider);margin:0 8px">|</span>
+      <span style="color:#00C878"><b>${clubWin}</b> 승</span>
+      <span style="color:#555;margin:0 8px">|</span>
       <span style="color:#C87878"><b>${clubLoss}</b> 패</span>
-      ${clubDraw ? `<span style="color:var(--divider);margin:0 8px">|</span><span style="color:var(--text-muted)"><b>${clubDraw}</b> 무</span>` : ''}
+      ${clubDraw ? `<span style="color:#555;margin:0 8px">|</span><span style="color:#6A9A84"><b>${clubDraw}</b> 무</span>` : ''}
     </div>
   `;
 
   const labels = ['승', '패', ...(clubDraw ? ['무'] : [])];
   const data   = [clubWin, clubLoss, ...(clubDraw ? [clubDraw] : [])];
-  const bgColors = ['rgba(43,174,134,0.7)', 'rgba(200,120,120,0.7)', 'rgba(255,255,255,0.10)'];
-  const bdColors = ['#2BAE86', '#C87878', 'rgba(255,255,255,0.30)'];
+  const bgColors = ['rgba(0,200,120,0.7)', 'rgba(200,120,120,0.7)', 'rgba(100,120,100,0.4)'];
+  const bdColors = ['#00C878', '#C87878', '#3A6650'];
 
-  const ctx = freshCanvas('mp-chart');
+  const ctx = document.getElementById('mp-chart').getContext('2d');
   charts.mp = new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -1965,7 +1681,7 @@ function renderMPChart(players) {
         legend: {
           display: true,
           position: 'bottom',
-          labels: { color: 'rgba(236,241,238,0.60)', font: { family: 'DM Mono', size: 12 }, padding: 16 }
+          labels: { color: '#B0D4C4', font: { family: 'DM Mono', size: 12 }, padding: 16 }
         },
         tooltip: {
           callbacks: {
@@ -2002,10 +1718,9 @@ function renderAttendance(dicts) {
     }).join('');
     rows.push({ name, cells, count });
   }
-  // 참가 횟수 최다인 선수(공동 포함)만 강조 — 나머지는 값과 무관하게 중립
   const maxCount = Math.max(...rows.map(r => r.count));
   for (const r of rows) {
-    const cc = r.count === maxCount ? 'var(--accent)' : 'var(--text-muted)';
+    const cc = r.count === maxCount ? '#00C878' : 'rgba(0,200,120,0.40)';
     html += `<tr><td class="name-cell">${r.name}</td>${r.cells}
       <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:500;font-size:13px;color:${cc};font-variant-numeric:tabular-nums">${r.count}</td></tr>`;
   }

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>티오스코어 — 새 디자인 미리보기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0F0C; --surface:rgba(255,255,255,0.020); --surface-2:#0B110E;
+  --accent:#00C878; --accent-dim:rgba(0,200,120,0.10); --accent-border:rgba(0,200,120,0.22);
+  --text:#ECF1EE; --text-sub:rgba(236,241,238,0.60); --text-muted:rgba(236,241,238,0.30);
+  --text-faint:rgba(236,241,238,0.16); --border:rgba(255,255,255,0.07); --divider:rgba(255,255,255,0.05); --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;}
+.header{background:rgba(10,15,12,0.82);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.header-brand{display:flex;align-items:center;gap:12px;}
+.header-accent-bar{width:3px;height:20px;background:#00C878;border-radius:2px;}
+.header-brand h1{font-family:'Syne',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1.1;}
+.header-sub{font-size:11px;font-weight:500;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.18em;display:block;}
+.header-right{display:flex;align-items:center;gap:14px;}
+.updated-text{font-family:'DM Mono',monospace;font-size:13px;color:var(--text-muted);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.refresh-btn{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 14px;border-radius:var(--radius);font-family:'Space Grotesk';font-size:13px;font-weight:500;}
+.container{padding:40px 32px 60px;max-width:1320px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.18em;color:var(--text-faint);margin-bottom:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+.card.accent-border{border-color:var(--border);border-top:1px solid var(--accent-border);background:linear-gradient(180deg,rgba(0,200,120,0.035),rgba(255,255,255,0.010));}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:40px;}
+.tc-group-label{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;display:flex;align-items:center;gap:8px;border-radius:4px;padding:4px 8px;}
+.tc-group-label.up{color:#D4A843;background:rgba(212,168,67,0.07);border:1px solid rgba(212,168,67,0.15);}
+.tier-change-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:0 6px 6px 0;margin-bottom:4px;border-top:1px solid var(--divider);}
+.tier-change-item:first-of-type{border-top:none;}
+.tier-change-item.up{background:rgba(251,191,36,0.06);border-left:2px solid rgba(251,191,36,0.30);}
+.tier-change-item.down{background:rgba(255,255,255,0.03);border-left:2px solid rgba(100,116,139,0.22);}
+.tc-indicator{font-family:'DM Mono';font-size:13px;width:16px;text-align:center;}
+.tc-indicator.up{color:#D4A843;} .tc-indicator.down{color:#64748B;}
+.tc-name{font-weight:700;font-size:15px;flex:1;}
+.tier-change-item.up .tc-name{color:#E8D08A;} .tier-change-item.down .tc-name{color:#94A3B8;}
+.tc-tiers{font-family:'DM Mono';font-size:13px;} .tc-tiers b{font-weight:500;}
+.ya-header{display:flex;gap:8px;padding:0 2px 6px;border-bottom:1px solid var(--divider);margin-bottom:4px;}
+.ya-header span{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+.ya-item{display:flex;align-items:center;gap:8px;padding:6px 2px;border-top:1px solid var(--divider);}
+.ya-item:first-of-type{border-top:none;}
+.ya-rank{font-family:'DM Mono';font-size:13px;color:var(--text-muted);width:20px;text-align:right;}
+.ya-rank.first{color:var(--accent);}
+.ya-name{font-weight:700;font-size:13px;flex:1;}
+.ya-score{font-family:'DM Mono';font-size:13px;color:var(--text-sub);width:40px;text-align:right;}
+.ya-item.first .ya-score{color:var(--accent);}
+.ya-rounds{font-family:'DM Mono';font-size:13px;color:var(--text-muted);width:28px;text-align:right;}
+.mp-part-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--divider);}
+.mp-part-item:first-child{border-top:none;}
+.mp-part-name{font-weight:700;font-size:13px;width:64px;}
+.mp-part-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.mp-part-bar{height:100%;border-radius:2px;background:var(--text-muted);}
+.mp-part-bar.leader{background:var(--accent);}
+.mp-part-name.leader{color:var(--accent);}
+.mp-part-count{font-family:'DM Mono';font-size:13px;color:var(--text-muted);width:28px;text-align:right;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;}
+.stat-card{border-top:1px solid var(--border);padding:18px 4px 4px;}
+.stat-card.highlight{border-top-color:var(--accent-border);}
+.stat-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.16em;color:var(--text-faint);margin-bottom:14px;}
+.stat-value{font-family:'DM Mono';font-size:54px;font-weight:500;color:var(--text);letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums;}
+.stat-value.accent{color:var(--accent);}
+.stat-sub{font-size:12px;color:var(--text-muted);margin-top:8px;}
+.three-col{display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px;margin-bottom:24px;}
+.rank-table{width:100%;border-collapse:collapse;}
+.rank-table th{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.14em;color:var(--text-faint);text-align:left;padding:6px 10px 10px;border-bottom:1px solid var(--border);}
+.rank-table th.right{text-align:right;}
+.rank-table td{padding:11px 10px;border-bottom:1px solid var(--divider);color:var(--text-sub);}
+.rank-table tr:last-child td{border-bottom:none;}
+.rank-table tbody tr.rank-first td{background:var(--accent-dim);}
+.rank-num{font-family:'DM Mono';font-size:13px;color:var(--text-muted);width:26px;}
+.rank-num.first{color:var(--accent);font-size:16px;font-weight:700;}
+.player-name{font-weight:700;font-size:15px;}
+.rank-first .player-name{color:var(--accent);}
+.score-val{font-family:'DM Mono';font-size:15px;text-align:right;color:var(--text-sub);font-variant-numeric:tabular-nums;}
+.rounds-val{font-family:'DM Mono';font-size:13px;text-align:right;color:var(--text-muted);}
+.tier-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-family:'DM Mono';font-size:13px;font-weight:500;border:1px solid;}
+.tier-0{color:#00C878;border-color:rgba(0,200,120,0.40);background:rgba(0,200,120,0.20);font-weight:700;}
+.tier-1{color:#00C878;border-color:rgba(0,200,120,0.25);background:rgba(0,200,120,0.12);}
+.tier-2{color:#D4A843;border-color:rgba(212,168,67,0.22);background:rgba(212,168,67,0.10);}
+.tier-3{color:#6A8A7A;border-color:rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);}
+.tier-4{color:#4A6A5A;border-color:rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:32px;}
+.tab{font-size:13px;font-weight:500;padding:12px 18px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+.note{max-width:1320px;margin:0 auto;padding:0 32px 40px;color:var(--text-muted);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-brand">
+    <div class="header-accent-bar"></div>
+    <div><h1>사군자 티오방</h1><span class="header-sub">Score Dashboard</span></div>
+  </div>
+  <div class="header-right">
+    <span class="updated-text">2026.07.19 업데이트</span>
+    <div class="live-dot"></div>
+    <button class="refresh-btn">↻ 새로고침</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero-grid">
+    <div>
+      <div class="section-label">최근 대회 티어 변동</div>
+      <div class="card accent-border">
+        <div class="tc-group-label up"><span>▲ 상승</span></div>
+        <div class="tier-change-item up"><span class="tc-indicator up">▲</span><span class="tc-name">김현섭</span><span class="tc-tiers">T5 → <b>T4</b></span></div>
+        <div class="tier-change-item up"><span class="tc-indicator up">▲</span><span class="tc-name">이호준</span><span class="tc-tiers">T5 → <b>T4</b></span></div>
+        <div class="tier-change-item down"><span class="tc-indicator down">▼</span><span class="tc-name">나한영</span><span class="tc-tiers">T1 → <b>T2</b></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">2026 시즌 평균 스코어</div>
+      <div class="card accent-border">
+        <div class="ya-header"><span style="width:20px">#</span><span style="flex:1">선수</span><span style="width:40px;text-align:right">평균</span><span style="width:28px;text-align:right">R</span></div>
+        <div class="ya-item first"><span class="ya-rank first">1</span><span class="ya-name">이정승</span><span class="ya-score">81.0</span><span class="ya-rounds">5</span></div>
+        <div class="ya-item"><span class="ya-rank">2</span><span class="ya-name">최창환</span><span class="ya-score">82.0</span><span class="ya-rounds">4</span></div>
+        <div class="ya-item"><span class="ya-rank">3</span><span class="ya-name">이은광</span><span class="ya-score">83.0</span><span class="ya-rounds">5</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">전체 대회 참여현황</div>
+      <div class="card accent-border">
+        <div class="mp-part-item"><span class="mp-part-name leader">김성환</span><div class="mp-part-bar-wrap"><div class="mp-part-bar leader" style="width:100%"></div></div><span class="mp-part-count">5</span></div>
+        <div class="mp-part-item"><span class="mp-part-name">임익준</span><div class="mp-part-bar-wrap"><div class="mp-part-bar" style="width:80%"></div></div><span class="mp-part-count">4</span></div>
+        <div class="mp-part-item"><span class="mp-part-name">홍경택</span><div class="mp-part-bar-wrap"><div class="mp-part-bar" style="width:80%"></div></div><span class="mp-part-count">4</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">전체 현황</div><div class="tab">랭킹</div><div class="tab">티어</div><div class="tab">매치플레이</div><div class="tab">참가 현황</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">전체 멤버</div><div class="stat-value">41</div><div class="stat-sub">등록 인원</div></div>
+    <div class="stat-card"><div class="stat-label">시즌 라운드</div><div class="stat-value">5</div><div class="stat-sub">누적 대회 수</div></div>
+    <div class="stat-card highlight"><div class="stat-label">최저 누적평균</div><div class="stat-value accent">81.0</div><div class="stat-sub">이정승</div></div>
+    <div class="stat-card highlight"><div class="stat-label">개인 베스트</div><div class="stat-value accent">72</div><div class="stat-sub">김태경</div></div>
+  </div>
+
+  <div class="three-col">
+    <div>
+      <div class="section-label">누적평균 TOP 10</div>
+      <div class="card">
+        <table class="rank-table">
+          <thead><tr><th>#</th><th>선수</th><th>티어</th><th class="right">평균</th><th class="right">R</th></tr></thead>
+          <tbody>
+            <tr class="rank-first"><td class="rank-num first">1</td><td class="player-name">이정승</td><td><span class="tier-badge tier-1">T1</span></td><td class="score-val">81.0</td><td class="rounds-val">5</td></tr>
+            <tr><td class="rank-num">2</td><td class="player-name">최창환</td><td><span class="tier-badge tier-1">T1</span></td><td class="score-val">82.0</td><td class="rounds-val">4</td></tr>
+            <tr><td class="rank-num">3</td><td class="player-name">이은광</td><td><span class="tier-badge tier-1">T1</span></td><td class="score-val">83.0</td><td class="rounds-val">5</td></tr>
+            <tr><td class="rank-num">4</td><td class="player-name">김대우</td><td><span class="tier-badge tier-2">T2</span></td><td class="score-val">86.3</td><td class="rounds-val">3</td></tr>
+            <tr><td class="rank-num">5</td><td class="player-name">조현민</td><td><span class="tier-badge tier-3">T3</span></td><td class="score-val">94.8</td><td class="rounds-val">4</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">티어 분포</div>
+      <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:180px;color:var(--text-muted);font-size:12px">도넛 차트 영역</div>
+    </div>
+    <div>
+      <div class="section-label">개인 베스트 TOP 5</div>
+      <div class="card accent-border">
+        <div class="ya-item first"><span class="ya-rank first">1</span><span class="ya-name">김태경</span><span class="ya-score" style="color:var(--accent)">72</span></div>
+        <div class="ya-item"><span class="ya-rank">2</span><span class="ya-name">이현우</span><span class="ya-score">73</span></div>
+        <div class="ya-item"><span class="ya-rank">3</span><span class="ya-name">임승언</span><span class="ya-score">74</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="note">※ 정적 미리보기 — 실제 데이터/차트는 서버 연결 시 표시됩니다. 새 디자인 원칙(중립 헤어라인·흰색 투명도 램프·그린 액센트 1개·에디토리얼 여백)이 그대로 적용된 dashboard.html의 CSS를 사용했습니다.</div>
+</body>
+</html>

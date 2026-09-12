@@ -10,3 +10,8 @@ __pycache__/
 # Claude local settings
 .claude/
 finance/out/
+
+# 다른 프로젝트 사본(사군자 실명 장부 포함) — 커밋 금지
+참고_Sagunja Finance/
+# 엑셀 수정 전 자동 백업(임시)
+finance/data/backups/
