@@ -125,7 +125,8 @@ TIER_ROUND_DATE = "M/DD/2026"
 ```
 기준스코어 = 누적평균 × 0.5 + 26년평균 × 0.5
 ```
-update_scores.py 실행 후 시트 수식이 자동 재계산. 실행 직후 아래 코드로 읽기:
+update_scores.py 실행 후 시트 수식이 자동 재계산. 실행 직후 `python tier_calc.py`가 gspread로 기준스코어를 읽어 재배분을 계산한다(PC·클라우드 공통).
+아래 CSV 내보내기 코드는 PC 전용 — 클라우드 세션은 `docs.google.com`이 네트워크 정책으로 차단되어 실패한다(시트 API `sheets.googleapis.com`은 허용).
 ```python
 import urllib.request, csv, io
 SHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"

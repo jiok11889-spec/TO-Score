@@ -159,6 +159,11 @@ git pull
 **회비 정산**: 카카오뱅크 거래내역 xlsx를 첨부 → `python finance/src/apply_bank.py <첨부경로> --pw <비밀번호>` → 검증 후 `--apply` → 커밋·push.
 비밀번호는 명령줄에 들어가므로 세션 기록에 남는다. 통장 파일 자체는 커밋하지 않는다(finance/in, out은 ignore).
 
+**클라우드 세션 제약 (2026-09-12 확인)**
+- `docs.google.com`은 차단 → `server.py` 로컬 실행·CSV 내보내기 읽기는 불가. `sheets.googleapis.com`·`oauth2.googleapis.com`은 허용 → gspread 기반 스크립트(update_scores/tier_calc/audit_scores)는 정상.
+- 컨테이너 기본 `cryptography`가 `_cffi_backend` 없이 깨져 있어 google-auth import가 실패 → requirements.txt의 `cffi`가 해결. 반드시 `pip install -r requirements.txt` 먼저.
+- 환경변수(secret)는 세션 컨테이너 시작 시 주입되므로, 설정 후엔 **새 세션**을 열어야 반영된다. 확인: `python -c "import os;print('set' if os.environ.get('GOOGLE_SA_JSON') else 'missing')"`
+
 **막히면**: 키 오류면 1회 설정 미완료. 첨부가 안 되면 PC에서 `캡쳐/`에 넣고 push한 뒤 모바일에서 pull.
 
 ## 파일 구조

@@ -1,6 +1,7 @@
 # 서버(server.py)는 표준 라이브러리만 사용. 아래는 작업 스크립트용 — 클라우드 세션은 먼저 `pip install -r requirements.txt`
 gspread>=6.0
 google-auth>=2.0
+cffi>=1.15   # 클라우드 컨테이너의 시스템 cryptography가 _cffi_backend 없이 깨져 있어 필요
 pandas>=2.0.0
 openpyxl>=3.1.0
 Pillow>=10.0.0
