@@ -26,7 +26,7 @@ JSON_KEY_FILE = "kinetic-horizon-492311-s5-55bd3f137a39.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
           "https://www.googleapis.com/auth/drive"]
 SHEET = "스코어 집계 (입력)"
-COL_NAME, COL_BASE, COL_TIER = 1, 23, 24   # 0-based
+COL_NAME, COL_BASE, COL_TIER = 1, 23, 24   # 0-based (헤더 2행에서 이름으로 재확인)
 FIRST_ROW = 4                              # 1-based, 데이터 시작 행
 TIERS = [1, 2, 3, 4, 5]
 
@@ -38,7 +38,11 @@ def connect():
 
 def read_players(ws):
     """(행번호, 이름, 기준스코어, 현재티어) — 유지·비PRO·기준스코어 보유자만."""
+    global COL_NAME, COL_BASE, COL_TIER
     rows = ws.get_all_values()
+    header = rows[1]  # 대회 열이 삽입될 때마다 밀리므로 이름으로 찾는다
+    COL_NAME, COL_BASE, COL_TIER = (header.index("이름"), header.index("기준스코어"),
+                                    header.index("현재 티어"))
     out, skipped = [], []
     for i, r in enumerate(rows):
         if i < FIRST_ROW - 1 or len(r) <= COL_TIER or not r[COL_NAME].strip():

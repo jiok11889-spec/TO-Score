@@ -12,6 +12,7 @@
 대회를 추가한 뒤에는 이 검증을 한 번 돌려 0건인지 확인할 것.
 """
 import io
+import math
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
@@ -27,7 +28,16 @@ SHEET = "스코어 집계 (입력)"
 
 FIRST_DATA_ROW = 4          # 1-based
 COL_NAME = 1                # 0-based
-C_AVG, C_BEST, C_CNT, C_LAST, C_MCNT, C_MAVG = 19, 26, 27, 28, 29, 30
+C_AVG, C_BEST, C_CNT, C_LAST, C_MCNT, C_MAVG = 19, 26, 27, 28, 29, 30  # 기본값, resolve_cols()로 재확인
+
+
+def resolve_cols(hdr):
+    """대회 열이 삽입될 때마다 통계 열이 밀리므로 헤더 2행에서 이름으로 찾는다."""
+    global C_AVG, C_BEST, C_CNT, C_LAST, C_MCNT, C_MAVG
+    def find(key):
+        return next(i for i, h in enumerate(hdr) if key in str(h).replace(chr(10), ""))
+    C_AVG, C_BEST, C_CNT = find("누적평균"), find("개인베스트"), find("라운드횟수")
+    C_LAST, C_MCNT, C_MAVG = find("가장최근라운딩"), find("매치 플레이 횟수"), find("매치 플레이 평균")
 
 
 def num(s):
@@ -44,6 +54,7 @@ def connect():
 
 def score_columns(hdr):
     """대회 열(0-based)과 버퍼 열 문자를 돌려준다."""
+    resolve_cols(hdr)
     cols = [c for c in range(2, C_AVG) if str(hdr[c]).strip()]
     buffer_idx = C_AVG - 1          # 누적평균 바로 앞 = 빈 버퍼 열
     return cols, chr(ord("A") + buffer_idx)
@@ -59,7 +70,7 @@ def audit(vals, cols):
         if not sc:
             continue
         real = {"best": min(v for _, v in sc), "cnt": len(sc), "last": sc[-1][1],
-                "avg": round(sum(v for _, v in sc) / len(sc), 1)}
+                "avg": math.floor(sum(v for _, v in sc) / len(sc) * 10 + 0.5) / 10}  # 시트와 같은 반올림(half-up)
         shown = {"best": num(r[C_BEST]), "cnt": num(r[C_CNT]),
                  "last": num(r[C_LAST]), "avg": num(r[C_AVG])}
         for k in issues:
