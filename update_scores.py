@@ -230,7 +230,20 @@ def update_tier_history_sheet(spreadsheet):
     name_col = header.index("이름")
 
     if TIER_ROUND_COL in header:
+        # 가드: 이 회차 열이 다른 이벤트(예: 대회 없는 재배분)로 이미 채워져 있으면 중단.
+        # 2026-09-12 사례 — 9회 열이 8/4 재배분에 쓰인 걸 모르고 6차를 9회로 준비했었음.
+        col0 = header.index(TIER_ROUND_COL)
+        existing_date = all_values[hi + 1][col0].strip() if len(all_values[hi + 1]) > col0 else ""
+        has_values = any(len(r) > col0 and r[col0].strip() for r in all_values[hi + 2:])
+        if has_values and existing_date != TIER_ROUND_DATE:
+            print(f"  [중단] '{TIER_ROUND_COL}' 열에 이미 값이 있고 날짜({existing_date or '빈칸'})가 "
+                  f"TIER_ROUND_DATE({TIER_ROUND_DATE})와 다름. 회차 표(CLAUDE.md '대회 히스토리')를 확인하고 "
+                  f"TIER_ROUND_COL을 다음 빈 회차로 바꿀 것.")
+            return
         print(f"  '{TIER_ROUND_COL}' 컬럼 이미 존재")
+        if not existing_date:
+            batch_update_cells(sheet, [(hi + 2, col0 + 1, TIER_ROUND_DATE)])
+            print(f"  [{TIER_ROUND_COL}] 날짜 칸 비어 있어 {TIER_ROUND_DATE} 기록")
     else:
         insert_col = len(header) + 1
         batch_update_cells(sheet, [
