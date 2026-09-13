@@ -142,10 +142,12 @@ push 하면 Render 자동 배포. 대시보드는 서버가 Sheets 데이터를 
 클라우드 세션은 **git에 있는 파일만** 받는다. 구글 시트 키 파일은 gitignore라 없으므로, 아래 1회 설정 없이는
 시트에 쓰는 스크립트(update_scores.py / tier_calc.py / audit_scores.py)가 `[ERR] 구글 시트 키를 찾을 수 없습니다`로 멈춘다.
 
-**1회 설정 (사용자가 직접, PC에서)**
-1. claude.ai/code → 환경(Environment) 설정 → 환경변수(secret) 추가
-2. 이름 `GOOGLE_SA_JSON`, 값 = 저장소 루트 `kinetic-horizon-492311-s5-55bd3f137a39.json` 파일 내용 전체(JSON 한 덩어리)
-3. 저장. 스크립트는 `sheets_auth.py`가 이 변수를 먼저 읽는다 (파일 경로를 쓰려면 `GOOGLE_SA_JSON_FILE`).
+**1회 설정 (2026-09-13 완료 — 클라우드 환경 이름 `TO-Score`)**
+1. claude.ai/code → 메시지 입력창 위의 구름 아이콘(환경 이름) 클릭 → 환경 추가 또는 기존 환경 톱니바퀴
+2. 환경 변수 칸은 `.env` 형식(한 줄에 `KEY=value` 하나)이라 키 JSON(13줄)을 **한 줄로 압축**해 넣어야 한다. PC에서:
+   `python -c "import json;print('GOOGLE_SA_JSON='+json.dumps(json.load(open(r'<키파일 경로>')),separators=(',',':')))"` 의 출력을 붙여넣기 (PowerShell `| clip`은 BOM이 붙으니 `Set-Clipboard` 사용)
+3. 네트워크 액세스는 기본 **신뢰됨(Trusted)** 유지 — 허용 목록에 `*.googleapis.com`이 있어 시트 API가 된다.
+4. 저장. 스크립트는 `sheets_auth.py`가 이 변수를 먼저 읽는다 (파일 경로를 쓰려면 `GOOGLE_SA_JSON_FILE`). 모바일에서 새 세션을 만들 때 환경을 `TO-Score`로 고른다.
 
 **세션 시작 시 (에이전트가 자동으로)**
 ```
