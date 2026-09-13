@@ -144,10 +144,15 @@ push 하면 Render 자동 배포. 대시보드는 서버가 Sheets 데이터를 
 
 **1회 설정 (2026-09-13 완료 — 클라우드 환경 이름 `TO-Score`)**
 1. claude.ai/code → 메시지 입력창 위의 구름 아이콘(환경 이름) 클릭 → 환경 추가 또는 기존 환경 톱니바퀴
-2. 환경 변수 칸은 `.env` 형식(한 줄에 `KEY=value` 하나)이라 키 JSON(13줄)을 **한 줄로 압축**해 넣어야 한다. PC에서:
-   `python -c "import json;print('GOOGLE_SA_JSON='+json.dumps(json.load(open(r'<키파일 경로>')),separators=(',',':')))"` 의 출력을 붙여넣기 (PowerShell `| clip`은 BOM이 붙으니 `Set-Clipboard` 사용)
+2. 환경 변수 칸은 `.env` 형식(한 줄에 `KEY=value` 하나). JSON 원문은 따옴표 때문에 값이 잘린다(2026-09-13 테스트: 73자만 주입됨).
+   그래서 **base64 한 줄**로 넣는다. PC PowerShell, 저장소 루트에서:
+   ```powershell
+   "GOOGLE_SA_JSON_B64=" + [Convert]::ToBase64String([IO.File]::ReadAllBytes("kinetic-horizon-492311-s5-55bd3f137a39.json")) | Set-Clipboard
+   ```
+   클립보드의 `GOOGLE_SA_JSON_B64=...`(영숫자와 `+/=`만, 약 3,000자) 한 줄을 환경 변수 칸에 붙여넣는다. 기존 `GOOGLE_SA_JSON=` 줄은 지운다.
 3. 네트워크 액세스는 기본 **신뢰됨(Trusted)** 유지 — 허용 목록에 `*.googleapis.com`이 있어 시트 API가 된다.
-4. 저장. 스크립트는 `sheets_auth.py`가 이 변수를 먼저 읽는다 (파일 경로를 쓰려면 `GOOGLE_SA_JSON_FILE`). 모바일에서 새 세션을 만들 때 환경을 `TO-Score`로 고른다.
+4. 저장. `sheets_auth.py`가 `GOOGLE_SA_JSON_B64` → `GOOGLE_SA_JSON` → `GOOGLE_SA_JSON_FILE` → 로컬 키 파일 순으로 읽는다. 모바일에서 새 세션을 만들 때 환경을 `TO-Score`로 고른다.
+5. 새 세션에서 확인: `python -c "import os;print(len(os.environ.get('GOOGLE_SA_JSON_B64','')))"` → 3,000 안팎이면 정상, 0이면 미주입(환경 잘못 고름 또는 저장 안 됨).
 
 **세션 시작 시 (에이전트가 자동으로)**
 ```
@@ -164,7 +169,7 @@ git pull
 **클라우드 세션 제약 (2026-09-12 확인)**
 - `docs.google.com`은 차단 → `server.py` 로컬 실행·CSV 내보내기 읽기는 불가. `sheets.googleapis.com`·`oauth2.googleapis.com`은 허용 → gspread 기반 스크립트(update_scores/tier_calc/audit_scores)는 정상.
 - 컨테이너 기본 `cryptography`가 `_cffi_backend` 없이 깨져 있어 google-auth import가 실패 → requirements.txt의 `cffi`가 해결. 반드시 `pip install -r requirements.txt` 먼저.
-- 환경변수(secret)는 세션 컨테이너 시작 시 주입되므로, 설정 후엔 **새 세션**을 열어야 반영된다. 확인: `python -c "import os;print('set' if os.environ.get('GOOGLE_SA_JSON') else 'missing')"`
+- 환경변수(secret)는 세션 컨테이너 시작 시 주입되므로, 설정 후엔 **새 세션**을 열어야 반영된다. 확인: `python -c "import os;print(len(os.environ.get('GOOGLE_SA_JSON_B64','')))"`
 
 **막히면**: 키 오류면 1회 설정 미완료. 첨부가 안 되면 PC에서 `캡쳐/`에 넣고 push한 뒤 모바일에서 pull.
 
