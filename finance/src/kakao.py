@@ -10,7 +10,7 @@
 
 당월 미납뿐 아니라 **누적 미납**(몇 달째 밀렸는지)을 표시한다.
 
-정산 대상은 **직전 달**이다(대시보드의 latest_ym은 현재 달까지 잡으므로 쓰지 않는다).
+정산 대상은 **이번 달**이다(대시보드의 latest_ym은 현재 달까지 잡으므로 쓰지 않는다).
 선납(미래 달까지 미리 낸 사람)은 미납으로 잡지 않고,
 "N월분 선입금"으로 따로 표시한다. 회비에 못 미친 선입금도 잔여액과 함께 표시한다.
 """
@@ -63,11 +63,10 @@ def read_sheet():
 
 
 def settle_month(months, members):
-    """정산 대상 = 직전 달. 선납으로 채워진 이후 달은 대상이 아니다."""
+    """정산 대상 = 이번 달(월초 공지에서 당월 미납을 알린다). 이후 달은 선납."""
     live = [m for m in months if any(x["months"][m] > 0 for x in members)]
     t = datetime.now()
-    prev = (t.year % 100, t.month - 1) if t.month > 1 else (t.year % 100 - 1, 12)
-    done = [m for m in live if ym_key(m) <= prev]
+    done = [m for m in live if ym_key(m) <= (t.year % 100, t.month)]
     return done[-1] if done else live[-1]
 
 
