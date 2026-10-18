@@ -10,30 +10,32 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 SPREADSHEET_ID = "16Ay7f7lhccjdfKhb-Fe1U6DVicAVq0dqS3kEzusgXg4"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# 26년 9월 11일 6차 대회 스코어 — 360도 (임시10, 참가 16명 전원 멤버, 게스트 없음)
-# 실타수(스코어 점수) 기준, 신페리오 net 아님. 출처: 캡쳐/260911/ (360 Country Club 출력물)
-# ※ 출력물 "박현우" = 시트 "박헌우" (사용자 확인 완료, 2026-09-12)
-# ※ 김성환 동명이인: 출력물엔 "김성환"만 표기 → 김성환(92) (사용자 확인 완료, 2026-09-12)
-# ※ 박정수(26년 7월 신규)는 이번이 첫 대회 → 기준스코어 생성, N=33으로 재배분(아래 TIER_MAP).
-SEP_2026_SCORES = {
-    "이형석":      73,
-    "박병우":      76,
-    "임승언":      77,
-    "윤석원":      80,
-    "이은광":      81,
-    "최창환":      83,
-    "나한영":      86,
-    "이도영":      92,
-    "옥지엽":      98,
-    "이준범":     101,
-    "권기표":     102,
-    "박헌우":     102,
-    "주홍석":     103,
-    "임익준":     104,
-    "김성환(92)": 108,
-    "박정수":     112,
+# 26년 10월 18일 7차 대회 스코어 — 포웰CC 안성 (참가 12명, 출처: 캡쳐/261018/ SMARTSCORE 출력물)
+# 실타수(스코어 점수) 기준, 신페리오 net 아님. 12명 합 1,079 → 평균 89.9 = 출력물 Team Average 일치.
+# ※ 김성환 동명이인: 출력물엔 "김성환"만 표기(89타). 규칙상 추측 금지 → 사용자 확인 전까지 "김성환(??)"로 두고
+#    main()이 실행을 막는다. 확인되면 키를 "김성환(82)" 또는 "김성환(92)"로 바꿀 것.
+# ※ 강승원(95)은 탈회 27명 정리(manage_members.py) 때 빠진 전 멤버, 회비 명단에도 없음 → 게스트로 보고 제외.
+#    복귀 멤버면 시트 행 추가 후 이 딕셔너리에 넣고 재실행.
+# ※ 박승훈(85)은 26년 9월부터 회비 납부한 신규 멤버, 이번이 첫 대회 → 규칙 E대로 기준스코어 생긴 뒤 TIER_MAP 배정.
+#    시트에 행이 없으면 [!!] 미입력으로 나온다 → 행 추가 후 재실행.
+# ※ 김수민(88)은 10월 복귀(config.RETIRED_PLAYERS에서 제외됨). 시트 행·과거 스코어 보존돼 있음.
+OCT_2026_SCORES = {
+    "박진석":      79,
+    "황인호":      82,
+    "김대우":      82,
+    "박승훈":      85,
+    "김수민":      88,
+    "김성환(??)":  89,
+    "백근호":      92,
+    "권기표":      94,
+    "이건희":      94,
+    "이도영":      97,
+    "이호준":     102,
 }
 
+# [7차 대회 10/18 반영 후 할 일] 아래 TIER_MAP은 아직 6차(9/11) 기준. 1차 실행으로 스코어가 들어가면
+# `python tier_calc.py --emit` 결과(박승훈 첫 기록·김수민 복귀 반영)로 이 블록을 교체할 것.
+#
 # 6차 대회(9/11) 반영 후 기준스코어(누적평균×0.5 + 26년평균×0.5) 기반 티어 재배분
 # 박정수 첫 기록으로 N=32→33, 규칙 D: R=N-35=-2 → T5-1, T4-1
 #   → T1=7 / T2=7 / T3=7 / T4=6 / T5=6 (합 33), 경계 타이 없음
@@ -69,10 +71,10 @@ TIER_MAP = {
 }
 
 NEW_MEMBERS = []
-EVENT_COL_NAME = "26' 6차 대회"
-EVENT_DATE = "9/11/2026"
-TIER_ROUND_COL = "10회"  # 9회 = 8/4 탈퇴자 정리 재배분(대회 없음)
-TIER_ROUND_DATE = "9/11/2026"
+EVENT_COL_NAME = "26' 7차 대회"
+EVENT_DATE = "10/18/2026"
+TIER_ROUND_COL = "11회"  # 10회 = 6차(9/11), 9회 = 8/4 재배분(대회 없음)
+TIER_ROUND_DATE = "10/18/2026"
 
 
 def connect():
@@ -139,8 +141,8 @@ def update_score_sheet(spreadsheet):
         if not name:
             continue
 
-        if name in SEP_2026_SCORES:
-            score_updates.append((row_idx, score_col_1based, SEP_2026_SCORES[name]))
+        if name in OCT_2026_SCORES:
+            score_updates.append((row_idx, score_col_1based, OCT_2026_SCORES[name]))
             score_done.append(name)
 
         if tier_col_1based and name in TIER_MAP:
@@ -150,7 +152,7 @@ def update_score_sheet(spreadsheet):
 
     batch_update_cells(sheet, score_updates)
     print(f"  [OK] 스코어 입력: {len(score_done)}명")
-    score_missing = [n for n in SEP_2026_SCORES if n not in score_done]
+    score_missing = [n for n in OCT_2026_SCORES if n not in score_done]
     if score_missing:
         print(f"  [!!] 스코어 미입력 (시트에 없음): {score_missing}")
 
@@ -289,6 +291,10 @@ def update_tier_history_sheet(spreadsheet):
 
 
 def main():
+    unconfirmed = [n for n in OCT_2026_SCORES if "??" in n]
+    if unconfirmed:
+        print(f"[중단] 동명이인 미확인: {unconfirmed} — 키를 실제 시트 이름으로 바꾼 뒤 실행하세요.")
+        return
     print("Google Sheets 연결 중...")
     try:
         spreadsheet = connect()
