@@ -17,3 +17,4 @@ finance/out/
 # 엑셀 수정 전 자동 백업(임시)
 finance/data/backups/
 finance/in/
+in/
