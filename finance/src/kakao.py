@@ -95,7 +95,7 @@ def build_message(balance, account):
         if not paid_idx:
             continue
         gaps = [ym for ym in upto[paid_idx[0]:] if m["months"][ym] < fee]
-        if len(gaps) > 1:
+        if any(g != latest for g in gaps):  # 지난달 1개월만 밀려도 공지
             chronic.append((m["name"], gaps, sum(fee - m["months"][ym] for ym in gaps)))
     chronic.sort(key=lambda x: -len(x[1]))
 
