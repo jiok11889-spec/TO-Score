@@ -46,11 +46,14 @@ def _read_payment_sheet():
             continue
         status = str(row[1]) if len(row) > 1 and row[1] else ''
         month_payments = {}
+        joined = None  # 가입월 칸에 '가입'이라고 적어두면 그 달까지는 회비 대상이 아니다
         for col_idx, ym in month_cols:
             val = row[col_idx] if col_idx < len(row) else None
             if isinstance(val, (int, float)) and val > 0:
                 month_payments[ym] = val
-        members.append({'name': name.strip(), 'status': status, 'months': month_payments})
+            elif isinstance(val, str) and '가입' in val:
+                joined = ym
+        members.append({'name': name.strip(), 'status': status, 'months': month_payments, 'joined': joined})
     return month_cols, members
 
 def load_member_status():
@@ -74,7 +77,8 @@ def load_all_payment_status():
     for _, ym in month_cols:
         if not any(ym in m['months'] for m in active):
             continue
-        all_status[ym] = {m['name']: m['months'].get(ym, 0) for m in active}
+        all_status[ym] = {m['name']: m['months'].get(ym, 0) for m in active
+                          if not m['joined'] or ym_sort_key(ym) > ym_sort_key(m['joined'])}
     months = list(all_status.keys())
     # 선납이 있으면 미래 월에도 값이 들어간다. 기본 표시는 실제 달을 넘지 않게 한다.
     now = datetime.now()
@@ -146,7 +150,7 @@ def build_data():
     member_names=[mt['name'] for mt in member_totals]
     def month_cards(st):
         """그 달 가장 흔한 입금액을 정상 회비로 보고 완납/부분납부/미납을 가른다."""
-        names=[m for m in all_members if m in member_names]
+        names=[m for m in all_members if m in member_names and m in st]  # 가입 전 달은 st에 없다
         paid_amts=[st.get(m,0) for m in names if st.get(m,0)>0]
         fee=Counter(paid_amts).most_common(1)[0][0] if paid_amts else 0
         cards=[]
