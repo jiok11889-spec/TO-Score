@@ -23,7 +23,7 @@ import openpyxl
 FIN = Path(__file__).resolve().parent.parent
 XLSX = FIN / "data" / "TO Score.xlsx"
 RESOLVE_OUT = FIN.parent / "in" / "resolve.txt"
-EXPENSE_KINDS = ("모임비", "경조사비", "강연비", "경품비", "지각비")
+EXPENSE_KINDS = ("모임비", "경조사비", "강연비", "경품비", "지각비", "서버비")
 
 
 class Stop(SystemExit):
