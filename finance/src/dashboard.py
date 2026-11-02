@@ -46,12 +46,14 @@ def _read_payment_sheet():
             continue
         status = str(row[1]) if len(row) > 1 and row[1] else ''
         month_payments = {}
-        joined = None  # 가입월 칸에 '가입'이라고 적어두면 그 달까지는 회비 대상이 아니다
+        # 면제되는 마지막 달 칸에 '가입' 또는 '복귀'라고 적어두면
+        # 그 달까지의 빈 달은 미납으로 보지 않는다 (가입월·탈퇴 기간)
+        joined = None
         for col_idx, ym in month_cols:
             val = row[col_idx] if col_idx < len(row) else None
             if isinstance(val, (int, float)) and val > 0:
                 month_payments[ym] = val
-            elif isinstance(val, str) and '가입' in val:
+            elif isinstance(val, str) and ('가입' in val or '복귀' in val):
                 joined = ym
         members.append({'name': name.strip(), 'status': status, 'months': month_payments, 'joined': joined})
     return month_cols, members
@@ -69,6 +71,12 @@ def load_income_by_month():
             result[ym] = int(total)
     return result
 
+def exempt(m, ym):
+    """가입·복귀 전의 빈 달은 회비 대상이 아니다 (낸 달은 그대로 보인다)."""
+    if not m.get('joined') or m['months'].get(ym):
+        return False
+    return ym_sort_key(ym) <= ym_sort_key(m['joined'])
+
 def load_all_payment_status():
     month_cols, members = _read_payment_sheet()
     active = [m for m in members if m['status'] != '탈퇴']
@@ -78,7 +86,7 @@ def load_all_payment_status():
         if not any(ym in m['months'] for m in active):
             continue
         all_status[ym] = {m['name']: m['months'].get(ym, 0) for m in active
-                          if not m['joined'] or ym_sort_key(ym) > ym_sort_key(m['joined'])}
+                          if not exempt(m, ym)}
     months = list(all_status.keys())
     # 선납이 있으면 미래 월에도 값이 들어간다. 기본 표시는 실제 달을 넘지 않게 한다.
     now = datetime.now()

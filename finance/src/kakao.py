@@ -54,11 +54,17 @@ def read_sheet():
             continue
         if str(ws.cell(row=r, column=2).value or "").strip() == "탈퇴":
             continue
-        pays = {}
+        pays, mark = {}, None
         for c, ym in months:
             v = ws.cell(row=r, column=c).value
             pays[ym] = v if isinstance(v, (int, float)) else 0
-        members.append({"name": str(name).strip(), "months": pays})
+            if isinstance(v, str) and ("가입" in v or "복귀" in v):
+                mark = ym
+        # 면제되는 마지막 달 칸에 '가입'/'복귀'를 적어두면 그 달까지의 빈 달은 미납이 아니다
+        skip = set()
+        if mark:
+            skip = {ym for _, ym in months if not pays[ym] and ym_key(ym) <= ym_key(mark)}
+        members.append({"name": str(name).strip(), "months": pays, "skip": skip})
     return [m for _, m in months], members
 
 
@@ -79,8 +85,9 @@ def build_message(balance, account):
     amts = [m["months"][latest] for m in members if m["months"][latest] > 0]
     fee = Counter(amts).most_common(1)[0][0] if amts else 0
 
+    cur = [m for m in members if latest not in m["skip"]]  # 이번 달 회비 대상
     full, partial, none = [], [], []
-    for m in members:
+    for m in cur:
         v = m["months"][latest]
         (full if v >= fee else partial if v > 0 else none).append(
             m["name"] if v >= fee or v == 0 else (m["name"], v))
@@ -94,7 +101,7 @@ def build_message(balance, account):
         paid_idx = [i for i, ym in enumerate(upto) if m["months"][ym] > 0]
         if not paid_idx:
             continue
-        gaps = [ym for ym in upto[paid_idx[0]:] if m["months"][ym] < fee]
+        gaps = [ym for ym in upto[paid_idx[0]:] if m["months"][ym] < fee and ym not in m["skip"]]
         if any(g != latest for g in gaps):  # 지난달 1개월만 밀려도 공지
             chronic.append((m["name"], gaps, sum(fee - m["months"][ym] for ym in gaps)))
     chronic.sort(key=lambda x: -len(x[1]))
@@ -113,7 +120,7 @@ def build_message(balance, account):
     mm = latest.split()[-1]
     L = [f"티오방 {mm} 회비입출내역입니다 ⛳", "",
          f"▪ 현재 잔액 : {balance:,}원",
-         f"▪ {mm} 입금 : {total:,}원 ({len(full) + len(partial)}명 / {len(members)}명)", ""]
+         f"▪ {mm} 입금 : {total:,}원 ({len(full) + len(partial)}명 / {len(cur)}명)", ""]
     if none:
         L.append(f"▪ {mm} 미납")
         for i in range(0, len(none), 4):
